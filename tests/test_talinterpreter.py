@@ -410,15 +410,11 @@ class TestSourceAnnotations(unittest.TestCase):
         test_cases = [
             '@some text',
             '\n',
-            '<!DOCTYPE ...>@some text',
-            ' <!DOCTYPE ...>@some text',
-            '\n<!DOCTYPE ...>@some text',
-            '<!DOCTYPE ...',
-            '<?xml ...>@some text',
-            ' <?xml ...>@some text',
-            '\n<?xml ...>@some text',
+            '<?xml ...?>@some text',
+            ' <?xml ...?>@some text',
+            '\n<?xml ...?>@some text',
             '<?xml ...',
-            '<?xml ...?>\n<!DOCTYPE ...>@some text',
+            '<?xml ...?>@\n<!DOCTYPE ...>some text',
         ]
         for output in test_cases:
             input = output.replace('@', '')

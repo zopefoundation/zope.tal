@@ -102,9 +102,8 @@ class TALInterpreter:
 
         1. setPosition bytecode follows setSourceFile, and we need position
            information to output the line number.
-        2. Mozilla does not cope with HTML comments that occur before
-           <!DOCTYPE> (XXX file a bug into bugzilla.mozilla.org as comments
-           are legal there according to HTML4 spec).
+        2. Comments are not allowed in XML documents before the <?xml?>
+           declaration.
 
     For performance reasons (XXX premature optimization?) instead of checking
     the value of _pending_source_annotation on every write to the output
@@ -257,17 +256,13 @@ class TALInterpreter:
             self._stream_write = self.stream.write
 
     def _annotated_stream_write(self, s):
-        idx = s.find('<!DOCTYPE')
-        if idx == -1:
-            idx = s.find('<?xml')
+        idx = s.find('<?xml')
         if idx >= 0 or s.isspace():
-            # Do *not* preprend comments in front of the <!DOCTYPE> or
-            # <?xml?> declaration!  Although that is completely legal according
-            # to w3c.org, Mozilla chokes on such pages.
-            end_of_doctype = s.find('>', idx)
+            # Do not preprend comments in front of the <?xml?> declaration.
+            end_of_doctype = s.find('?>', idx)
             if end_of_doctype > idx:
-                self.stream.write(s[:end_of_doctype+1])
-                s = s[end_of_doctype+1:]
+                self.stream.write(s[:end_of_doctype+2])
+                s = s[end_of_doctype+2:]
                 # continue
             else:
                 self.stream.write(s)
