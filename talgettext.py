@@ -76,8 +76,7 @@ class UpdatePOEngine(POEngine):
         if not fuzzy and str:
             # check for multi-line values and munge them appropriately
             if ('\n' in str):
-                str = '\n' + str
-                lines = str.split('\n')
+                lines = str.rstrip().split('\n')
                 str = string.join (lines, '"\n"')
             self.catalog[id] = str
 
@@ -125,15 +124,14 @@ class UpdatePOEngine(POEngine):
                 section = STR
                 l = l[6:]
             # Skip empty lines
-            l = l.strip()
-            if not l:
+            if not l.strip():
                 continue
             # XXX: Does this always follow Python escape semantics?
             l = eval(l)
             if section == ID:
                 msgid += l
             elif section == STR:
-                msgstr += l
+                msgstr += '%s\n' % l
             else:
                 print >> sys.stderr, 'Syntax error on %s:%d' % (infile, lno), \
                       'before:'
@@ -184,24 +182,32 @@ def main():
         def write(self, s):
             pass
 
+    # check if we've already instantiated an engine;
+    # if not, use the stupidest one available
     if not engine:
         engine = POEngine()
-        
-    for file in args:
+
+    # process each file specified
+    for filename in args:
         p = HTMLTALParser()
-        p.parseFile(file)
+        p.parseFile(filename)
         program, macros = p.getCode()
         TALInterpreter(program, macros, engine, stream=Devnull())()
 
-    # Now print all the entries in the engine
+    # Now output the keys in the engine
+    # write them to a file if --output is specified; otherwise use standard out
+    if (outfile is None):
+        outfile = sys.stdout
+    else:
+        outfile = file(outfile, "w")
+        
     msgids = engine.catalog.keys()
     msgids.sort()
     for msgid in msgids:
         msgstr = engine.catalog[msgid]
-        print 'msgid "%s"' % msgid
-        print 'msgstr "%s"' % msgstr
-        print
-
+        outfile.write('msgid "%s"\n' % msgid)
+        outfile.write('msgstr "%s"\n' % msgstr)
+        outfile.write('\n')
 
 if __name__ == '__main__':
     main()
