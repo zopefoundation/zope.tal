@@ -20,7 +20,6 @@ import re
 import sys
 import logging
 
-from cgi import escape
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
@@ -472,7 +471,9 @@ class TALInterpreter:
         if text is self.Default:
             self.interpret(stuff[1])
             return
-        s = escape(text)
+        # '&' must be done first!
+        s = text.replace(
+            "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         self._stream_write(s)
         i = s.rfind('\n')
         if i < 0:
