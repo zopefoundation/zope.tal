@@ -20,6 +20,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import os
 os.environ['NO_SECURITY'] = 'true'
 
+import getopt
 import sys
 import time
 
@@ -92,19 +93,21 @@ def profile_tal(fn, count, profiler):
 tal_fn = 'benchmark/tal%.2d.html'
 dtml_fn = 'benchmark/dtml%.2d.html'
 
-def compare(n, count, profiler=None):
+def compare(n, count, profiler=None, verbose=1):
     t1 = int(time_zpt(tal_fn % n, count) * 1000 + 0.5)
     t2 = int(time_tal(tal_fn % n, count) * 1000 + 0.5)
     t3 = 'n/a' # int(time_dtml(dtml_fn % n, count) * 1000 + 0.5)
-    print '%.2d: %10s %10s %10s' % (n, t1, t2, t3)
+    if verbose:
+        print '%.2d: %10s %10s %10s' % (n, t1, t2, t3)
     if profiler:
         profile_tal(tal_fn % n, count, profiler)
 
-def main(count, profiler=None):
+def main(count, profiler=None, verbose=1):
     n = 1
-    print '##: %10s %10s %10s' % ('ZPT', 'TAL', 'DTML')
+    if verbose:
+        print '##: %10s %10s %10s' % ('ZPT', 'TAL', 'DTML')
     while os.path.isfile(tal_fn % n) and os.path.isfile(dtml_fn % n):
-        compare(n, count, profiler)
+        compare(n, count, profiler, verbose)
         n = n + 1
 
 data = {'x':'X', 'r2': range(2), 'r8': range(8), 'r64': range(64)}
@@ -114,16 +117,21 @@ for i in range(10):
 if __name__ == "__main__":
     filename = "markbench.prof"
     profiler = None
-    if len(sys.argv) > 1 and sys.argv[1] == "-p":
-        import profile
-        profiler = profile.Profile()
-        del sys.argv[1]
+    verbose = 1
 
-    if len(sys.argv) > 1:
-        for arg in sys.argv[1:]:
-            compare(int(arg), 25, profiler)
+    opts, args = getopt.getopt(sys.argv[1:], "pq")
+    for opt, arg in opts:
+        if opt == "-p":
+            import profile
+            profiler = profile.Profile()
+        elif opt == "-q":
+            verbose = 0
+
+    if len(args) > 1:
+        for arg in args:
+            compare(int(arg), 25, profiler, verbose)
     else:
-        main(25, profiler)
+        main(25, profiler, verbose)
 
     if profiler is not None:
         profiler.dump_stats(filename)
