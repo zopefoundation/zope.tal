@@ -13,7 +13,7 @@
 ##############################################################################
 """Dummy TAL expression engine so that I can test out the TAL implementation.
 
-$Id: dummyengine.py,v 1.15 2004/03/08 23:33:58 srichter Exp $
+$Id: dummyengine.py,v 1.16 2004/03/23 19:18:17 srichter Exp $
 """
 import re
 
@@ -79,6 +79,12 @@ class DummyEngine:
 
     def setGlobal(self, name, value):
         self.globals[name] = value
+
+    def getValue(self, name, default=None):
+        value = self.globals.get(name, default)
+        if value is default:
+            value = self.locals.get(name, default)
+        return value
 
     def evaluate(self, expression):
         assert (expression.startswith("$") and expression.endswith("$"),
