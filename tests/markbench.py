@@ -90,8 +90,17 @@ def profile_tal(fn, count, profiler):
     for i in r:
         profiler.runcall(tal)
 
-tal_fn = 'benchmark/tal%.2d.html'
-dtml_fn = 'benchmark/dtml%.2d.html'
+# Figure out where the benchmark files are:
+try:
+    fname = __file__
+except NameError:
+    fname = sys.argv[0]
+taldir = os.path.dirname(os.path.dirname(os.path.abspath(fname)))
+benchdir = os.path.join(taldir, 'benchmark')
+
+# Construct templates for the filenames:
+tal_fn = os.path.join(benchdir, 'tal%.2d.html')
+dtml_fn = os.path.join(benchdir, 'dtml%.2d.html')
 
 def compare(n, count, profiler=None, verbose=1):
     if verbose:
@@ -110,6 +119,13 @@ def main(count, profiler=None, verbose=1):
         compare(n, count, profiler, verbose)
         n = n + 1
 
+def get_signal_name(sig):
+    import signal
+    for name in dir(signal):
+        if getattr(signal, name) == sig:
+            return name
+    return None
+
 data = {'x':'X', 'r2': range(2), 'r8': range(8), 'r64': range(64)}
 for i in range(10):
     data['x%s' % i] = 'X%s' % i
@@ -117,17 +133,39 @@ for i in range(10):
 if __name__ == "__main__":
     filename = "markbench.prof"
     profiler = None
-    verbose = 1
+    runtests = False
+    verbose = True
 
-    opts, args = getopt.getopt(sys.argv[1:], "pq")
+    opts, args = getopt.getopt(sys.argv[1:], "pqt")
     for opt, arg in opts:
         if opt == "-p":
             import profile
             profiler = profile.Profile()
         elif opt == "-q":
-            verbose = 0
+            verbose = False
+        elif opt == "-t":
+            runtests = True
 
-    if len(args) > 1:
+    if runtests:
+        srcdir = os.path.dirname(os.path.dirname(taldir))
+        topdir = os.path.dirname(srcdir)
+        pwd = os.getcwd()
+        os.chdir(topdir)
+        rc = os.spawnl(os.P_WAIT, sys.executable,
+                       sys.executable, "test.py", "zope.tal.tests")
+        if rc > 0:
+            # XXX Failing tests don't cause test.py to report an
+            # error; not sure why.  ;-(
+            sys.exit(rc)
+        elif rc < 0:
+            sig = -rc
+            print >>sys.stderr, (
+                "Process exited, signal %d (%s)."
+                % (sig, get_signal_name(sig) or "<unknown signal>"))
+            sys.exit(1)
+        os.chdir(pwd)
+
+    if len(args) >= 1:
         for arg in args:
             compare(int(arg), 25, profiler, verbose)
     else:
