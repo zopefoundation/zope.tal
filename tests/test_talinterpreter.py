@@ -81,6 +81,12 @@ class I18NErrorsTestCase(TestCaseBase):
         self._check('<p i18n:id=""></p>',
                     "missing i18n:id value not caught")
 
+    def test_id_with_attributes(self):
+        self._check('''<input name="Delete"
+                       tal:attributes="name string:delete_button"
+                       i18n:attributes="name message-id">''',
+            "expected attribute being both part of tal:attributes" +
+            " and having a msgid in i18n:attributes to be denied")
 
 class OutputPresentationTestCase(TestCaseBase):
 
