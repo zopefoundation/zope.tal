@@ -94,10 +94,13 @@ class POEngine(DummyEngine):
         DummyEngine.__init__(self, macros)
 
     def evaluate(*args):
-        return '' # who cares
+        # If the result of evaluate ever gets into a message ID, we want
+        # to notice the fact in the .pot file.
+        return 'XXX'
 
     def evaluatePathOrVar(*args):
-        return '' # who cares
+        # Actually this method is never called.
+        return 'XXX'
 
     def evaluateSequence(self, expr):
         return (0,) # dummy
