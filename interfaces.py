@@ -162,8 +162,7 @@ class ITALExpressionEngine(Interface):
         """
 
     def translate(msgid, domain=None, mapping=None, default=None):
-        """See ITranslationService.translate()"""
-        # XXX ITranslationService does not exist!
+        """See zope.i18n.interfaces.ITranslationDomain.translate"""
 
     def evaluateCode(lang, code):
         """Evaluates code of the given language.
