@@ -336,7 +336,9 @@ class TALInterpreter:
                     value = evalue
         if ok:
             if msgid:
-                value = self.i18n_attribute(value)
+                translated = self.i18n_attribute(value)
+                if translated is not None:
+                    value = translated
             if value is None:
                 value = name
             value = "%s=%s" % (name, quote(value))
