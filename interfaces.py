@@ -161,7 +161,7 @@ class ITALIterator(Interface):
 
         """
 
-        
+
 class ITALExpressionErrorInfo(Interface):
 
     type = Attribute("type",
