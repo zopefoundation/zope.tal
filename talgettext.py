@@ -39,9 +39,9 @@ from zope.tal.talinterpreter import TALInterpreter, normalize
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
-from zope.i18n.messageid import MessageID
+from zope.i18nmessageid import MessageID
 
-__version__ = '$Revision: 1.17 $'
+__version__ = '$Revision: 1.18 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.

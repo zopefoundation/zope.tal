@@ -14,7 +14,7 @@
 ##############################################################################
 """Tests for TALInterpreter.
 
-$Id: test_talinterpreter.py,v 1.11 2004/03/23 19:18:15 srichter Exp $
+$Id: test_talinterpreter.py,v 1.12 2004/04/15 14:49:10 fdrake Exp $
 """
 import sys
 import unittest
@@ -26,7 +26,7 @@ from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.dummyengine import DummyEngine, DummyTranslationDomain
 from zope.tal.tests import utils
-from zope.i18n.messageid import MessageID
+from zope.i18nmessageid import MessageID
 
 class TestCaseBase(unittest.TestCase):
 

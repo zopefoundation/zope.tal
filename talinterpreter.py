@@ -13,14 +13,14 @@
 ##############################################################################
 """Interpreter for a pre-compiled TAL program.
 
-$Id: talinterpreter.py,v 1.31 2004/03/23 19:18:10 srichter Exp $
+$Id: talinterpreter.py,v 1.32 2004/04/15 14:49:10 fdrake Exp $
 """
 import sys
 
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
-from zope.i18n.messageid import MessageID
+from zope.i18nmessageid import MessageID
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode

@@ -13,7 +13,7 @@
 ##############################################################################
 """Dummy TAL expression engine so that I can test out the TAL implementation.
 
-$Id: dummyengine.py,v 1.16 2004/03/23 19:18:17 srichter Exp $
+$Id: dummyengine.py,v 1.17 2004/04/15 14:49:09 fdrake Exp $
 """
 import re
 
@@ -21,7 +21,7 @@ from zope.interface import implements
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18n.interfaces import ITranslationDomain
-from zope.i18n.messageid import MessageID
+from zope.i18nmessageid import MessageID
 
 Default = object()
 
