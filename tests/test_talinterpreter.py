@@ -247,6 +247,25 @@ class OutputPresentationTestCase(TestCaseBase):
         </html>''' "\n"
         self.compare(INPUT, EXPECTED)
 
+    def test_unicode_content(self):
+        INPUT = """<p tal:content="python:u'déjà-vu'">para</p>"""
+        EXPECTED = u"""<p>déjà-vu</p>""" "\n"
+        self.compare(INPUT, EXPECTED)
+
+    def test_unicode_structure(self):
+        INPUT = """<p tal:replace="structure python:u'déjà-vu'">para</p>"""
+        EXPECTED = u"""déjà-vu""" "\n"
+        self.compare(INPUT, EXPECTED)
+
+    def test_i18n_replace_number(self):
+        INPUT = """
+        <p i18n:translate="foo ${bar}">
+        <span tal:replace="python:123" i18n:name="bar">para</span>
+        </p>"""
+        EXPECTED = u"""
+        <p>FOO 123</p>""" "\n"
+        self.compare(INPUT, EXPECTED)
+
     def test_entities(self):
         INPUT = ('<img tal:define="foo nothing" '
                  'alt="&a; &#1; &#x0a; &a &#45 &; &#0a; <>" />')

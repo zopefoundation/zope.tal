@@ -13,7 +13,7 @@
 ##############################################################################
 """Dummy TAL expression engine so that I can test out the TAL implementation.
 
-$Id: dummyengine.py,v 1.12 2003/08/08 23:04:56 srichter Exp $
+$Id: dummyengine.py,v 1.13 2003/08/15 14:02:37 gotcha Exp $
 """
 import re
 
@@ -247,6 +247,6 @@ class DummyTranslationService:
             text = msgid.upper()
 
         def repl(m):
-            return mapping[m.group(m.lastindex).lower()]
+            return unicode(mapping[m.group(m.lastindex).lower()])
         cre = re.compile(r'\$(?:([_A-Za-z][-\w]*)|\{([_A-Za-z][-\w]*)\})')
         return cre.sub(repl, text)

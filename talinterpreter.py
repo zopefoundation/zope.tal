@@ -325,16 +325,16 @@ class TALInterpreter:
                 value = None
             else:
                 ok = 0
-        else:
-            if expr is not None:
-                evalue = self.engine.evaluateText(item[3])
-                if evalue is self.Default:
-                    if action == 'insert': # Cancelled insert
-                        ok = 0
-                else:
-                    if evalue is None:
-                        ok = 0
-                    value = evalue
+        elif expr is not None:
+            evalue = self.engine.evaluateText(item[3])
+            if evalue is self.Default:
+                if action == 'insert': # Cancelled insert
+                    ok = 0
+            else:
+                if evalue is None:
+                    ok = 0
+                value = evalue
+                
         if ok:
             if xlat:
                 translated = self.translate(msgid or value, value, {})
@@ -344,7 +344,6 @@ class TALInterpreter:
                 value = name
             value = "%s=%s" % (name, quote(value))
         return ok, name, value
-
     bytecode_handlers["<attrAction>"] = attrAction
 
     def no_tag(self, start, program):
