@@ -46,12 +46,13 @@ for s in BOOLEAN_HTML_ATTRS:
 BOOLEAN_HTML_ATTRS = d
 
 _nulljoin = ''.join
+_spacejoin = ' '.join
 
 def normalize(text):
     # Now we need to normalize the whitespace in implicit message ids and
     # implicit $name substitution values by stripping leading and trailing
     # whitespace, and folding all internal whitespace to a single space.
-    return _nulljoin(text.split())
+    return _spacejoin(text.split())
 
 
 class AltTALGenerator(TALGenerator):
