@@ -20,8 +20,8 @@ import sys
 
 from zope.tal.taldefs import NAME_RE, TALESError, ErrorInfo
 from zope.tal.interfaces import ITALESCompiler, ITALESEngine
-from zope.interfaces.i18n import ITranslationService
-from zope.interfaces.i18n import IDomain
+from zope.i18n.interfaces import ITranslationService
+from zope.i18n.interfaces import IDomain
 
 Default = object()
 
