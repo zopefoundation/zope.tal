@@ -223,6 +223,11 @@ class DummyDomain:
         # First, transform a string with ${name} placeholders into a list of
         # substrings.  Then upcase everything but the placeholders, then glue
         # things back together.
+
+        # simulate an unknown msgid by returning None
+        if msgid=="don't translate me":
+            return None
+        
         def repl(m):
             return mapping[m.group(m.lastindex).lower()]
         cre = re.compile(r'\$(?:([_A-Z]\w*)|\{([_A-Z]\w*)\})')
