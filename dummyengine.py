@@ -189,8 +189,9 @@ class DummyEngine:
     def getDefault(self):
         return Default
 
-    def translate(self, domain, msgid, mapping):
-        return self.translationService.translate(domain, msgid, mapping)
+    def translate(self, domain, msgid, mapping, default=None):
+        return self.translationService.translate(domain, msgid, mapping,
+                                                 default=default)
 
 
 class Iterator:
@@ -216,7 +217,7 @@ class DummyTranslationService:
     __implements__ = ITranslationService
 
     def translate(self, domain, msgid, mapping=None, context=None,
-                  target_language=None):
+                  target_language=None, default=None):
         # This is a fake translation service which simply uppercases non
         # ${name} placeholder text in the message id.
         #
@@ -225,10 +226,12 @@ class DummyTranslationService:
         # things back together.
 
         # simulate an unknown msgid by returning None
-        if msgid=="don't translate me":
-            return None
-        
+        if msgid == "don't translate me":
+            text = default
+        else:
+            text = msgid.upper()
+
         def repl(m):
             return mapping[m.group(m.lastindex).lower()]
-        cre = re.compile(r'\$(?:([_A-Z]\w*)|\{([_A-Z]\w*)\})')
-        return cre.sub(repl, msgid.upper())
+        cre = re.compile(r'\$(?:([_A-Za-z][-\w]*)|\{([_A-Za-z][-\w]*)\})')
+        return cre.sub(repl, text)

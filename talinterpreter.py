@@ -336,19 +336,13 @@ class TALInterpreter:
                     value = evalue
         if ok:
             if xlat:
-                translated = self.i18n_attribute(msgid or value)
+                translated = self.translate(msgid or value, value, {})
                 if translated is not None:
                     value = translated
             if value is None:
                 value = name
             value = "%s=%s" % (name, quote(value))
         return ok, name, value
-
-    def i18n_attribute(self, s):
-        # s is the value of an attribute before translation
-        # it may have been computed
-        return self.translate(s, {})
-
 
     bytecode_handlers["<attrAction>"] = attrAction
 
@@ -536,33 +530,34 @@ class TALInterpreter:
         # See if there is was an i18n:data for msgid
         if len(stuff) > 2:
             obj = self.engine.evaluate(stuff[2])
-        xlated_msgid = self.translate(msgid, i18ndict, obj)
+        xlated_msgid = self.translate(msgid, default, i18ndict, obj)
         # XXX I can't decide whether we want to cgi escape the translated
         # string or not.  OT1H not doing this could introduce a cross-site
         # scripting vector by allowing translators to sneak JavaScript into
         # translations.  OTOH, for implicit interpolation values, we don't
         # want to escape stuff like ${name} <= "<b>Timmy</b>".
         #s = escape(xlated_msgid)
-        s = xlated_msgid
+        #s = xlated_msgid
         # Watch out for unknown translation message id.  In this case, and
         # when both an explicit message id and default text are given, the
         # Plone people want the default text, so by Papal Edict this is what
         # we return.  For example:
         #
-        #     <span i18n:translate="explict id">default text</span>
+        #     <span i18n:translate="explicit id">default text</span>
         #
         # returns
         #
         #     <span>default text</span>
-        if s is None:
-            s = default or msgid
-            # log that an unknown id was found
-            logging.warn('TAL/i18n: Message id %s was not found in the '
-                         'translation table; using default text: %s' %
-                         (msgid, default))
+        assert xlated_msgid is not None
+##        if xlated_msgid is None:
+##            s = default or msgid
+##            # log that an unknown id was found
+##            logging.warn('TAL/i18n: Message id %s was not found in the '
+##                         'translation table; using default text: %s' %
+##                         (msgid, default))
         # If there are i18n variables to interpolate into this string, better
         # do it now.
-        self._stream_write(s)
+        self._stream_write(xlated_msgid)
     bytecode_handlers['insertTranslation'] = do_insertTranslation
 
     def do_insertStructure(self, stuff):
@@ -616,20 +611,14 @@ class TALInterpreter:
             self.interpret(block)
     bytecode_handlers["loop"] = do_loop
 
-    def translate(self, msgid, i18ndict=None, obj=None):
-        # XXX is this right?
-        if i18ndict is None:
-            i18ndict = {}
+    def translate(self, msgid, default, i18ndict, obj=None):
         if obj:
             i18ndict.update(obj)
         if not self.i18nInterpolate:
             return msgid
-        # XXX Mmmh, it seems that sometimes the msgid is None; is that really
-        # possible?
-        if msgid is None:
-            return None
         # XXX We need to pass in one of context or target_language
-        return self.engine.translate(self.i18nContext.domain, msgid, i18ndict)
+        return self.engine.translate(self.i18nContext.domain,
+                                     msgid, i18ndict, default=default)
 
     def do_rawtextColumn(self, (s, col)):
         self._stream_write(s)
