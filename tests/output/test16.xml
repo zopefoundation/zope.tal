@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <body>
 
-<img href="foo" Alt="bar" alT="baz" Href="about:foo"/>
+<Img href="foo" Alt="bar" alT="baz" Href="about:foo"/>
 
 </body>
