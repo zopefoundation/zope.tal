@@ -15,11 +15,10 @@
 
 This creates a parser with namespace processing enabled.
 """
-
 import logging
 
 
-class XMLParser:
+class XMLParser(object):
 
     ordered_attributes = 0
 

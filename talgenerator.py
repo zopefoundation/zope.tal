@@ -31,7 +31,7 @@ I18N_EXPRESSION = 3
 _name_rx = re.compile(NAME_RE)
 
 
-class TALGenerator:
+class TALGenerator(object):
 
     inMacroUse = 0
     inMacroDef = 0

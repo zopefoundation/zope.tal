@@ -123,7 +123,7 @@ def IS_CHARACTER_JUNK(ch, ws=" \t"):
 
 del re
 
-class SequenceMatcher:
+class SequenceMatcher(object):
     def __init__(self, isjunk=None, a='', b=''):
         # Members:
         # a

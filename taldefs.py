@@ -95,7 +95,7 @@ class I18NError(TALError):
     pass
 
 
-class ErrorInfo:
+class ErrorInfo(object):
     implements(ITALExpressionErrorInfo)
 
     def __init__(self, err, position=(None, None)):

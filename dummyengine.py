@@ -30,7 +30,7 @@ name_match = re.compile(r"(?s)(%s):(.*)\Z" % NAME_RE).match
 class CompilerError(Exception):
     pass
 
-class DummyEngine:
+class DummyEngine(object):
 
     position = None
     source_file = None
@@ -247,7 +247,7 @@ class DummyEngine:
 
         return result.getvalue()
 
-class Iterator:
+class Iterator(object):
 
     def __init__(self, name, seq, engine):
         self.name = name
@@ -266,7 +266,7 @@ class Iterator:
         return 1
 
 
-class DummyTranslationDomain:
+class DummyTranslationDomain(object):
     implements(ITranslationDomain)
 
     domain = ''

@@ -18,10 +18,9 @@ needed to perform translation of a marked string from a page template.
 
 $Id$
 """
-
 DEFAULT_DOMAIN = "default"
 
-class TranslationContext:
+class TranslationContext(object):
     """Information about the I18N settings of a TAL processor."""
 
     def __init__(self, parent=None, domain=None, target=None, source=None):

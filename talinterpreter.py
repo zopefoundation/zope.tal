@@ -89,7 +89,7 @@ class AltTALGenerator(TALGenerator):
         return TALGenerator.replaceAttrs(self, attrlist, repldict)
 
 
-class TALInterpreter:
+class TALInterpreter(object):
     """TAL interpreter.
 
     Some notes on source annotations.  They are HTML/XML comments added to the

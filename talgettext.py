@@ -250,7 +250,7 @@ def main():
         return
 
     # We don't care about the rendered output of the .pt file
-    class Devnull:
+    class Devnull(object):
         def write(self, s):
             pass
 
