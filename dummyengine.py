@@ -225,9 +225,15 @@ class DummyTranslationService:
         # substrings.  Then upcase everything but the placeholders, then glue
         # things back together.
 
+        # If the domain is a string method, then transform the string
+        # by calling that method.
+
+
         # simulate an unknown msgid by returning None
         if msgid == "don't translate me":
             text = default
+        elif domain and hasattr('', domain):
+            text = getattr(msgid, domain)()
         else:
             text = msgid.upper()
 
