@@ -155,7 +155,6 @@ class TALInterpreter:
 
     def popMacro(self):
         stuff = self.macroStack.pop()
-        #self.i18nContext = stuff[3]
         return stuff
 
     def macroContext(self, what):
