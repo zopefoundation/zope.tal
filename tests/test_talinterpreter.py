@@ -63,7 +63,7 @@ class MacroErrorsTestCase(TestCaseBase):
 
 
 class MacroFunkyErrorTest(TestCaseBase):
-    
+
     def test_div_in_p_using_macro(self):
         dummy, macros = self._compile('<p metal:define-macro="M">Booh</p>')
         engine = DummyEngine(macros)
@@ -143,7 +143,7 @@ class MacroExtendTestCase(TestCaseBase):
         actual = result.getvalue().strip()
         expected = self._read(('output', 'acme_template_source.html')).strip()
         self.assertEqual(actual, expected)
-        
+
 
 class I18NCornerTestCase(TestCaseBase):
 
