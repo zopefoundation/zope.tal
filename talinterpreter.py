@@ -569,7 +569,7 @@ class TALInterpreter:
         if structure is self.Default:
             self.interpret(block)
             return
-        text = str(structure)
+        text = unicode(structure)
         if not (repldict or self.strictinsert):
             # Take a shortcut, no error checking
             self.stream_write(text)
