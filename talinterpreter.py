@@ -154,17 +154,7 @@ class TALInterpreter:
         self.macroStack.append([macroName, slots, entering, self.i18nContext])
 
     def popMacro(self):
-        stuff = self.macroStack.pop()
-        return stuff
-
-    def macroContext(self, what):
-        macroStack = self.macroStack
-        i = len(macroStack)
-        while i > 0:
-            i = i-1
-            if macroStack[i][0] == what:
-                return i
-        return -1
+        return self.macroStack.pop()
 
     def __call__(self):
         assert self.level == 0
@@ -385,14 +375,6 @@ class TALInterpreter:
         else:
             self.do_optTag(stuff)
     bytecode_handlers["optTag"] = do_optTag
-
-    def dumpMacroStack(self, prefix, suffix, value):
-        sys.stderr.write("+---- %s%s = %s\n" % (prefix, suffix, value))
-        for i in range(len(self.macroStack)):
-            what, macroName, slots = self.macroStack[i][:3]
-            sys.stderr.write("| %2d. %-12s %-12s %s\n" %
-                             (i, what, macroName, slots and slots.keys()))
-        sys.stderr.write("+--------------------------------------\n")
 
     def do_rawtextBeginScope(self, (s, col, position, closeprev, dict)):
         self._stream_write(s)
