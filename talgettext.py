@@ -86,14 +86,12 @@ class POEngine(DummyEngine):
     def evaluateBoolean(self, expr):
         return 1 # dummy
 
-    def translate(self, domain, msgid, default, mapping, position):
+    def translate(self, domain, msgid, mapping, position, default=None):
         # assume domain and mapping are ignored; if they are not,
         # unit test must be updated.
         if msgid not in self.catalog:
             self.catalog[msgid] = []
-            
         self.catalog[msgid].append((self.file, position))
-
         return 'x'
 
 class UpdatePOEngine(POEngine):
@@ -187,10 +185,11 @@ class UpdatePOEngine(POEngine):
     def evaluatePathOrVar(self, expr):
         return 'who cares'
 
-    def translate(self, domain, msgid, mapping, position):
+    def translate(self, domain, msgid, mapping, position,
+                  default=None):
         if msgid not in self.base:
-            POEngine.translate(self, domain, msgid, mapping, position)
-
+            POEngine.translate(self, domain, msgid, mapping, position,
+                               default=default)
         return 'x'
     
 def main():
