@@ -23,6 +23,7 @@ import logging
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
+from zope.i18n.messageid import MessageID
 from zope.tal.taldefs import quote, TAL_VERSION, TALError, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode
@@ -471,6 +472,11 @@ class TALInterpreter:
         if text is self.Default:
             self.interpret(stuff[1])
             return
+        if isinstance(text, MessageID):
+            # Translate this now.  XXX passing None for the domain is bogus
+            # but necessary based on the signature of .translate().  We should
+            # switch msgid and domain, since domains tag along in MessageIDs.
+            text = self.engine.translate(None, text)
         # '&' must be done first!
         s = text.replace(
             "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
