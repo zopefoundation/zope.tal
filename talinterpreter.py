@@ -11,8 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Interpreter for a pre-compiled TAL program.
+"""Interpreter for a pre-compiled TAL program.
+
+$Id: talinterpreter.py,v 1.30 2004/02/24 13:58:18 srichter Exp $
 """
 import sys
 

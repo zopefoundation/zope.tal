@@ -11,10 +11,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Parse XML and compile to TALInterpreter intermediate code.
-"""
+"""Parse XML and compile to TALInterpreter intermediate code.
 
+$Id: talparser.py,v 1.4 2004/02/24 13:58:18 srichter Exp $
+"""
 from zope.tal.taldefs import XML_NS, ZOPE_I18N_NS, ZOPE_METAL_NS, ZOPE_TAL_NS
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.xmlparser import XMLParser
