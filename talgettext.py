@@ -48,18 +48,52 @@ def usage(code, msg=''):
     sys.exit(code)
 
 
+
+class POTALInterpreter(TALInterpreter):
+    def translate(self, msgid, i18ndict=None, obj=None):
+        # XXX is this right?
+        if i18ndict is None:
+            i18ndict = {}
+        if obj:
+            i18ndict.update(obj)
+        # XXX Mmmh, it seems that sometimes the msgid is None; is that really
+        # possible?
+        if msgid is None:
+            return None
+        # XXX We need to pass in one of context or target_language
+        return self.engine.translate(self.i18nContext.domain, msgid, i18ndict,
+                                     position=self.position)
+
+
 class POEngine(DummyEngine):
     __implements__ = ITALESEngine
 
-    catalog = {}
 
-    def evaluatePathOrVar(self, expr):
-        return 'who cares'
+    def __init__(self, macros=None):
+        self.catalog = {}
+        DummyEngine.__init__(self, macros)
 
-    def translate(self, domain, msgid, mapping):
+    def evalaluate(*args):
+        return '' # who cares
+
+    def evaluatePathOrVar(*args):
+        return '' # who cares
+
+    def evaluateSequence(self, expr):
+        return (0,) # dummy
+
+    def evaluateBoolean(self, expr):
+        return 1 # dummy
+
+    def translate(self, domain, msgid, mapping, position):
         # assume domain and mapping are ignored; if they are not,
         # unit test must be updated.
-        self.catalog[msgid] = ''
+        if msgid not in self.catalog:
+            self.catalog[msgid] = []
+            
+        self.catalog[msgid].append((self.file, position))
+
+        return 'x'
 
 class UpdatePOEngine(POEngine):
     """A slightly-less braindead POEngine which supports loading an existing
@@ -70,6 +104,8 @@ class UpdatePOEngine(POEngine):
 
         self._filename = filename
         self._loadFile()
+        self.base = self.catalog
+        self.catalog = {}
 
     def __add(self, id, str, fuzzy):
         "Add a non-fuzzy translation to the dictionary."
@@ -150,9 +186,11 @@ class UpdatePOEngine(POEngine):
     def evaluatePathOrVar(self, expr):
         return 'who cares'
 
-    def translate (self, domain, msgid, mapping):
-        if (msgid not in self.catalog.keys()):
-            self.catalog[msgid] = ''
+    def translate(self, domain, msgid, mapping, position):
+        if msgid not in self.base:
+            POEngine.translate(self, domain, msgid, mapping, position)
+
+        return 'x'
     
 def main():
     try:
@@ -165,12 +203,16 @@ def main():
 
     outfile = None
     engine = None
+    update_mode = False
     for opt, arg in opts:
         if opt in ('-h', '--help'):
             usage(0)
         elif opt in ('-o', '--output'):
             outfile = arg
         elif opt in ('-u', '--update'):
+            update_mode = True
+            if outfile is None:
+                outfile = arg
             engine = UpdatePOEngine(filename=arg)
 
     if not args:
@@ -189,24 +231,33 @@ def main():
 
     # process each file specified
     for filename in args:
-        p = HTMLTALParser()
-        p.parseFile(filename)
-        program, macros = p.getCode()
-        TALInterpreter(program, macros, engine, stream=Devnull())()
+        try:
+            engine.file = filename
+            p = HTMLTALParser()
+            p.parseFile(filename)
+            program, macros = p.getCode()
+            POTALInterpreter(program, macros, engine, stream=Devnull(),
+                             metal=0)()
+        except: # Hee hee, I love bare excepts!
+            print 'There was an error processing', filename
+            print sys.exc_info()[1]
 
     # Now output the keys in the engine
     # write them to a file if --output is specified; otherwise use standard out
     if (outfile is None):
         outfile = sys.stdout
     else:
-        outfile = file(outfile, "w")
+        outfile = file(outfile, update_mode and "a" or "w")
         
     msgids = engine.catalog.keys()
     msgids.sort()
     for msgid in msgids:
-        msgstr = engine.catalog[msgid]
+        positions = engine.catalog[msgid]
+        for filename, position in positions:
+            outfile.write('#: %s:%s\n' % (filename, position[0]))
+            
         outfile.write('msgid "%s"\n' % msgid)
-        outfile.write('msgstr "%s"\n' % msgstr)
+        outfile.write('msgstr ""\n')
         outfile.write('\n')
 
 if __name__ == '__main__':

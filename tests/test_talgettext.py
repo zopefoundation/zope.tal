@@ -29,8 +29,9 @@ class test_POEngine(unittest.TestCase):
         test_keys = ['foo', 'bar', 'blarf', 'washington']
         
         engine = POEngine()
+        engine.file = 'foo.pt'
         for key in test_keys:
-            engine.translate(None, key, None)
+            engine.translate(None, key, None, 1)
 
         for key in test_keys:
             self.failIf( (key not in engine.catalog),

@@ -622,9 +622,6 @@ class TALInterpreter:
             i18ndict = {}
         if obj:
             i18ndict.update(obj)
-        # XXX need to fill this in with TranslationService calls.  For now,
-        # we'll just do simple interpolation based on a $-strings to %-strings
-        # algorithm in Mailman.
         if not self.i18nInterpolate:
             return msgid
         # XXX Mmmh, it seems that sometimes the msgid is None; is that really
