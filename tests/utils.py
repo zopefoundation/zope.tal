@@ -11,8 +11,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Helper functions for the test suite."""
+"""Helper functions for the test suite.
 
+$Id$
+"""
 import os
 import sys
 

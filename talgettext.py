@@ -26,6 +26,8 @@ Options:
     -u / --update <file>
         Update the existing translation <file> with any new translation strings
         found.
+
+$Id$
 """
 import sys
 import time

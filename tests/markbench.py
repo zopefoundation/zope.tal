@@ -12,7 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-'''Run benchmarks of TAL vs. DTML'''
+"""Run benchmarks of TAL vs. DTML
+
+$Id$
+"""
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)

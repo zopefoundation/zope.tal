@@ -12,8 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for the talgettext utility."""
+"""Tests for the talgettext utility.
 
+$Id$
+"""
 import sys
 import unittest
 

@@ -12,8 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for TALInterpreter."""
+"""Tests for TALInterpreter.
 
+$Id$
+"""
 import unittest
 
 from StringIO import StringIO
