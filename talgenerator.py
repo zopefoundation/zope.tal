@@ -387,6 +387,14 @@ class TALGenerator(object):
         self.inMacroUse = 0
         self.emit("useMacro", expr, cexpr, self.popSlots(), program)
 
+    def emitExtendMacro(self, defineName, useExpr):
+        cexpr = self.compileExpression(useExpr)
+        program = self.popProgram()
+        self.inMacroUse = 0
+        self.emit("extendMacro", useExpr, cexpr, self.popSlots(), program,
+                  defineName)
+        self.emitDefineMacro(defineName)
+
     def emitDefineSlot(self, slotName):
         program = self.popProgram()
         slotName = slotName.strip()
@@ -538,10 +546,12 @@ class TALGenerator(object):
             raise I18NError("i18n:data must be accompanied by i18n:translate",
                             position)
 
-        if len(metaldict) > 1 and (defineMacro or useMacro):
-            raise METALError("define-macro and use-macro cannot be used "
-                             "together or with define-slot or fill-slot",
-                             position)
+        if defineMacro or useMacro:
+            if fillSlot or defineSlot:
+                raise METALError(
+                    "define-slot and fill-slot cannot be used with "
+                    "define-macro or use-macro", position)
+
         if replace:
             if content:
                 raise TALError(
@@ -827,10 +837,13 @@ class TALGenerator(object):
             self.emitDefineSlot(defineSlot)
         if fillSlot:
             self.emitFillSlot(fillSlot)
-        if useMacro:
-            self.emitUseMacro(useMacro)
-        if defineMacro:
-            self.emitDefineMacro(defineMacro)
+        if useMacro or defineMacro:
+            if useMacro and defineMacro:
+                self.emitExtendMacro(defineMacro, useMacro)
+            elif useMacro:
+                self.emitUseMacro(useMacro)
+            elif defineMacro:
+                self.emitDefineMacro(defineMacro)
         if useMacro or defineSlot:
             # generate a source annotation after define-slot or use-macro
             # because the source file might have changed

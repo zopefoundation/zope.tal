@@ -181,7 +181,10 @@ class TALInterpreter(object):
         self.html = 0
         self.endsep = "/>"
         self.endlen = len(self.endsep)
+        # macroStack contains:
+        # [(macroName, slots, definingName, extending, entering, i18ncontext)]
         self.macroStack = []
+        self.inUseDirective = False
         self.position = None, None  # (lineno, offset)
         self.col = 0
         self.level = 0
@@ -220,11 +223,12 @@ class TALInterpreter(object):
         assert self.level == level
         assert self.scopeLevel == scopeLevel
 
-    def pushMacro(self, macroName, slots, entering=1):
+    def pushMacro(self, macroName, slots, definingName, extending, entering=1):
         if len(self.macroStack) >= self.stackLimit:
             raise METALError("macro nesting limit (%d) exceeded "
                              "by %s" % (self.stackLimit, `macroName`))
-        self.macroStack.append([macroName, slots, entering, self.i18nContext])
+        self.macroStack.append([macroName, slots, definingName, extending,
+                                entering, self.i18nContext])
 
     def popMacro(self):
         return self.macroStack.pop()
@@ -361,28 +365,29 @@ class TALInterpreter(object):
         try:
             for item in attrList:
                 if _len(item) == 2:
-                    name, s = item
+                    rendered = item[1:]
                 else:
                     # item[2] is the 'action' field:
                     if item[2] in ('metal', 'tal', 'xmlns', 'i18n'):
                         if not self.showtal:
                             continue
-                        ok, name, s = self.attrAction(item)
+                        rendered = self.attrAction(item)
                     else:
-                        ok, name, s = attrAction(self, item)
-                    if not ok:
+                        rendered = attrAction(self, item)
+                    if not rendered:
                         continue
-                slen = _len(s)
-                if (wrap and
-                    col >= align and
-                    col + 1 + slen > wrap):
-                    append("\n")
-                    append(" "*align)
-                    col = align + slen
-                else:
-                    append(" ")
-                    col = col + 1 + slen
-                append(s)
+                for s in rendered:
+                    slen = _len(s)
+                    if (wrap and
+                        col >= align and
+                        col + 1 + slen > wrap):
+                        append("\n")
+                        append(" "*align)
+                        col = align + slen
+                    else:
+                        append(" ")
+                        col = col + 1 + slen
+                    append(s)
             append(end)
             col = col + endlen
         finally:
@@ -393,33 +398,47 @@ class TALInterpreter(object):
     def attrAction(self, item):
         name, value, action = item[:3]
         if action == 'insert':
-            return 0, name, value
+            return ()
         macs = self.macroStack
         if action == 'metal' and self.metal and macs:
-            if len(macs) > 1 or not macs[-1][2]:
-                # Drop all METAL attributes at a use-depth above one.
-                return 0, name, value
+            # Drop all METAL attributes at a use-depth beyond the first
+            # use-macro and its extensions
+            if len(macs) > 1:
+                for macro in macs[1:]:
+                    if macro is None:
+                        return ()
+                    extending = macro[3]
+                    if not extending:
+                        return ()
+            if not macs[-1][4]:
+                return ()
             # Clear 'entering' flag
-            macs[-1][2] = 0
+            macs[-1][4] = 0
             # Convert or drop depth-one METAL attributes.
             i = name.rfind(":") + 1
             prefix, suffix = name[:i], name[i:]
             if suffix == "define-macro":
                 # Convert define-macro as we enter depth one.
-                name = prefix + "use-macro"
-                value = macs[-1][0] # Macro name
+                useName = macs[0][0]
+                defName = macs[0][2]
+                res = []
+                if defName:
+                    res.append('%sdefine-macro=%s' % (prefix, quote(defName)))
+                if useName:
+                    res.append('%suse-macro=%s' % (prefix, quote(useName)))
+                return res
             elif suffix == "define-slot":
                 name = prefix + "fill-slot"
             elif suffix == "fill-slot":
                 pass
             else:
-                return 0, name, value
+                return ()
 
         if value is None:
             value = name
         else:
             value = "%s=%s" % (name, quote(value))
-        return 1, name, value
+        return [value]
 
     def attrAction_tal(self, item):
         name, value, action = item[:3]
@@ -451,8 +470,9 @@ class TALInterpreter(object):
                     value = translated
             if value is None:
                 value = name
-            value = "%s=%s" % (name, quote(value))
-        return ok, name, value
+            return ["%s=%s" % (name, quote(value))]
+        else:
+            return ()
     bytecode_handlers["<attrAction>"] = attrAction
 
     def no_tag(self, start, program):
@@ -751,8 +771,10 @@ class TALInterpreter(object):
 
     def do_defineMacro(self, (macroName, macro)):
         macs = self.macroStack
+        wasInUse = self.inUseDirective
+        self.inUseDirective = False
         if len(macs) == 1:
-            entering = macs[-1][2]
+            entering = macs[-1][4]
             if not entering:
                 macs.append(None)
                 self.interpret(macro)
@@ -760,9 +782,11 @@ class TALInterpreter(object):
                 macs.pop()
                 return
         self.interpret(macro)
+        self.inUseDirective = wasInUse
     bytecode_handlers["defineMacro"] = do_defineMacro
 
-    def do_useMacro(self, (macroName, macroExpr, compiledSlots, block)):
+    def do_useMacro(self, (macroName, macroExpr, compiledSlots, block),
+                    definingName=None, extending=False):
         if not self.metal:
             self.interpret(block)
             return
@@ -778,14 +802,18 @@ class TALInterpreter(object):
             if mode != (self.html and "html" or "xml"):
                 raise METALError("macro %s has incompatible mode %s" %
                                  (`macroName`, `mode`), self.position)
-        self.pushMacro(macroName, compiledSlots)
+        self.pushMacro(macroName, compiledSlots, definingName, extending)
 
         # We want 'macroname' name to be always available as a variable
         outer = self.engine.getValue('macroname')
         self.engine.setLocal('macroname', macroName.split('/')[-1])
 
         prev_source = self.sourceFile
+        wasInUse = self.inUseDirective
+        self.inUseDirective = True
         self.interpret(macro)
+        self.inUseDirective = wasInUse
+
         if self.sourceFile != prev_source:
             self.engine.setSourceFile(prev_source)
             self.sourceFile = prev_source
@@ -793,6 +821,19 @@ class TALInterpreter(object):
         # Push the outer macroname again.
         self.engine.setLocal('macroname', outer)
     bytecode_handlers["useMacro"] = do_useMacro
+
+    def do_extendMacro(self, (macroName, macroExpr, compiledSlots, block,
+                              definingName)):
+        # extendMacro results from a combination of define-macro and
+        # use-macro.  definingName has the value of the
+        # metal:define-macro attribute.
+        extending = False
+        if self.metal and self.inUseDirective:
+            # extend the calling directive.
+            extending = True
+        self.do_useMacro((macroName, macroExpr, compiledSlots, block),
+                         definingName, extending)
+    bytecode_handlers["extendMacro"] = do_extendMacro
 
     def do_fillSlot(self, (slotName, block)):
         # This is only executed if the enclosing 'use-macro' evaluates
@@ -806,17 +847,41 @@ class TALInterpreter(object):
             return
         macs = self.macroStack
         if macs and macs[-1] is not None:
-            macroName, slots = self.popMacro()[:2]
-            slot = slots.get(slotName)
+            len_macs = len(macs)
+            # Measure the extension depth of this use-macro
+            depth = 1
+            while depth < len_macs:
+                if macs[-depth][3]:
+                    depth += 1
+                else:
+                    break
+            # Search for a slot filler from the most specific to the
+            # most general macro.  The most general is at the top of
+            # the stack.
+            slot = None
+            i = len_macs - depth
+            while i < len_macs:
+                slots = macs[i][1]
+                slot = slots.get(slotName)
+                if slot is not None:
+                    break
+                i += 1
             if slot is not None:
+                # Found a slot filler.  Temporarily chop the macro
+                # stack starting at the macro that filled the slot and
+                # render the slot filler.
+                chopped = macs[i:]
+                del macs[i:]
                 prev_source = self.sourceFile
                 self.interpret(slot)
                 if self.sourceFile != prev_source:
                     self.engine.setSourceFile(prev_source)
                     self.sourceFile = prev_source
-                self.pushMacro(macroName, slots, entering=0)
+                # Restore the stack entries.
+                for mac in chopped:
+                    mac[4] = 0  # Not entering
+                macs.extend(chopped)
                 return
-            self.pushMacro(macroName, slots)
             # Falling out of the 'if' allows the macro to be interpreted.
         self.interpret(block)
     bytecode_handlers["defineSlot"] = do_defineSlot
