@@ -369,12 +369,77 @@ class OutputPresentationTestCase(TestCaseBase):
         self.assertEqual(sio.getvalue(), EXPECTED)
 
 
+class TestSourceAnnotations(unittest.TestCase):
+
+    # there are additional test files in input/ and output/ subdirs
+    # (test_sa*)
+
+    def setUp(self):
+        program = []
+        macros = {}
+        engine = DummyEngine()
+        self.interpreter = TALInterpreter(program, macros, engine)
+        self.sio = self.interpreter.stream = StringIO()
+        self.interpreter._pending_source_annotation = True
+
+    def testFormatSourceAnnotation(self):
+        interpreter = self.interpreter
+        interpreter.sourceFile = '/path/to/source.pt'
+        interpreter.position = (123, 42)
+        self.assertEquals(interpreter.formatSourceAnnotation(),
+            "<!--\n" +
+            "=" * 78 + "\n" +
+            "/path/to/source.pt (line 123)\n" +
+            "=" * 78 + "\n" +
+            "-->")
+
+    def testFormatSourceAnnotation_no_position(self):
+        interpreter = self.interpreter
+        interpreter.sourceFile = '/path/to/source.pt'
+        interpreter.position = (None, None)
+        self.assertEquals(interpreter.formatSourceAnnotation(),
+            "<!--\n" +
+            "=" * 78 + "\n" +
+            "/path/to/source.pt\n" +
+            "=" * 78 + "\n" +
+            "-->")
+
+    def test_annotated_stream_write(self):
+        interpreter = self.interpreter
+        interpreter.formatSourceAnnotation = lambda: '@'
+        test_cases = [
+            '@some text',
+            '\n',
+            '<!DOCTYPE ...>@some text',
+            ' <!DOCTYPE ...>@some text',
+            '\n<!DOCTYPE ...>@some text',
+            '<!DOCTYPE ...',
+            '<?xml ...>@some text',
+            ' <?xml ...>@some text',
+            '\n<?xml ...>@some text',
+            '<?xml ...',
+            '<?xml ...?>\n<!DOCTYPE ...>@some text',
+        ]
+        for output in test_cases:
+            input = output.replace('@', '')
+            self.sio.seek(0)
+            self.sio.truncate()
+            interpreter._pending_source_annotation = True
+            interpreter._annotated_stream_write(input)
+            self.assertEquals(self.sio.getvalue(), output)
+            if '@' in output:
+                self.assert_(not interpreter._pending_source_annotation)
+            else:
+                self.assert_(interpreter._pending_source_annotation)
+
+
 def test_suite():
     suite = unittest.makeSuite(I18NErrorsTestCase)
     suite.addTest(unittest.makeSuite(MacroErrorsTestCase))
     suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
     suite.addTest(unittest.makeSuite(ScriptTestCase))
     suite.addTest(unittest.makeSuite(I18NCornerTestCase))
+    suite.addTest(unittest.makeSuite(TestSourceAnnotations))
 
     # XXX: Deactivated test, since we have not found a solution for this and
     # it is a deep and undocumented HTML parser issue.

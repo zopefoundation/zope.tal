@@ -561,7 +561,10 @@ class TALGenerator:
         if self.inMacroUse:
             if fillSlot:
                 self.pushProgram()
+                # generate a source annotation at the beginning of fill-slot
                 if self.source_file is not None:
+                    if position != (None, None):
+                        self.emit("setPosition", position)
                     self.emit("setSourceFile", self.source_file)
                 todo["fillSlot"] = fillSlot
                 self.inMacroUse = 0
@@ -574,7 +577,10 @@ class TALGenerator:
                 self.pushProgram()
                 self.emit("version", TAL_VERSION)
                 self.emit("mode", self.xml and "xml" or "html")
+                # generate a source annotation at the beginning of the macro
                 if self.source_file is not None:
+                    if position != (None, None):
+                        self.emit("setPosition", position)
                     self.emit("setSourceFile", self.source_file)
                 todo["defineMacro"] = defineMacro
                 self.inMacroDef = self.inMacroDef + 1
@@ -710,9 +716,9 @@ class TALGenerator:
             todo["position"] = position
         self.todoPush(todo)
         if isend:
-            self.emitEndElement(name, isend)
+            self.emitEndElement(name, isend, position=position)
 
-    def emitEndElement(self, name, isend=0, implied=0):
+    def emitEndElement(self, name, isend=0, implied=0, position=(None, None)):
         todo = self.todoPop()
         if not todo:
             # Shortcut
@@ -720,7 +726,7 @@ class TALGenerator:
                 self.emitEndTag(name)
             return
 
-        self.position = position = todo.get("position", (None, None))
+        self.position = todo.get("position", (None, None))
         defineMacro = todo.get("defineMacro")
         useMacro = todo.get("useMacro")
         defineSlot = todo.get("defineSlot")
@@ -747,7 +753,7 @@ class TALGenerator:
                 exc = TALError
                 what = "TAL"
             raise exc("%s attributes on <%s> require explicit </%s>" %
-                      (what, name, name), position)
+                      (what, name, name), self.position)
 
         if script:
             self.emitEvaluateCode(script)
@@ -823,6 +829,13 @@ class TALGenerator:
             self.emitUseMacro(useMacro)
         if defineMacro:
             self.emitDefineMacro(defineMacro)
+        if useMacro or defineSlot:
+            # generate a source annotation after define-slot or use-macro
+            # because the source file might have changed
+            if self.source_file is not None:
+                if position != (None, None):
+                    self.emit("setPosition", position)
+                self.emit("setSourceFile", self.source_file)
 
 
 def _parseI18nAttributes(i18nattrs, position, xml):
