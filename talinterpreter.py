@@ -536,21 +536,7 @@ class TALInterpreter:
         # scripting vector by allowing translators to sneak JavaScript into
         # translations.  OTOH, for implicit interpolation values, we don't
         # want to escape stuff like ${name} <= "<b>Timmy</b>".
-        #s = escape(xlated_msgid)
-        #s = xlated_msgid
-        # Watch out for unknown translation message id.  In this case, and
-        # when both an explicit message id and default text are given, the
-        # Plone people want the default text, so by Papal Edict this is what
-        # we return.  For example:
-        #
-        #     <span i18n:translate="explicit id">default text</span>
-        #
-        # returns
-        #
-        #     <span>default text</span>
         assert xlated_msgid is not None
-        # If there are i18n variables to interpolate into this string,
-        # better do it now.
         self._stream_write(xlated_msgid)
     bytecode_handlers['insertTranslation'] = do_insertTranslation
 
