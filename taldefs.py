@@ -48,8 +48,9 @@ KNOWN_TAL_ATTRIBUTES = [
     "attributes",
     "on-error",
     "omit-tag",
-    "tal tag",
-    "script"
+    "script",
+    "tal tag",      # a pseudo attribute that holds the namespace of elements
+                    # like <tal:x>, <metal:y>, <i18n:z>
     ]
 
 KNOWN_I18N_ATTRIBUTES = [
