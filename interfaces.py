@@ -41,6 +41,11 @@ class ITALExpressionCompiler(Interface):
         different ITALExpressionEngine implementations.
         """
 
+    def getContext(namespace):
+        """Create an expression execution context
+
+        The given namespace provides the initial top-level names.
+        """
 
 class ITALExpressionEngine(Interface):
     """Render-time interface provided by a TAL expression implementation.
