@@ -29,7 +29,6 @@ Options:
         found.
 """
 
-import os
 import sys
 import time
 import getopt
@@ -41,7 +40,7 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALESEngine
 from zope.tal.taldefs import TALESError
 
-__version__ = '$Revision: 1.11 $'
+__version__ = '$Revision: 1.12 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.

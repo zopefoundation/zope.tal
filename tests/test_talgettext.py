@@ -17,7 +17,7 @@
 import sys
 import unittest
 
-from zope.tal.talgettext import POEngine, UpdatePOEngine
+from zope.tal.talgettext import POEngine
 from zope.tal.tests import utils
 
 class test_POEngine(unittest.TestCase):

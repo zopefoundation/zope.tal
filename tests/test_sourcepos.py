@@ -14,7 +14,6 @@
 ##############################################################################
 """Tests for TALInterpreter."""
 
-import sys
 import unittest
 
 from StringIO import StringIO

@@ -17,12 +17,13 @@
 import sys
 import unittest
 
-import zope.tal.tests.utils
-import zope.tal.tests.test_htmltalparser
-import zope.tal.tests.test_talinterpreter
-import zope.tal.tests.test_files
-import zope.tal.tests.test_sourcepos
+from zope.tal.tests import utils
+from zope.tal.tests import test_htmltalparser
+from zope.tal.tests import test_talinterpreter
+from zope.tal.tests import test_files
+from zope.tal.tests import test_sourcepos
 
+# XXX this code isn't picked up by the Zope 3 test framework..
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(test_htmltalparser.test_suite())

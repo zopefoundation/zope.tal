@@ -20,7 +20,6 @@ import getopt
 import sys
 import time
 
-from cPickle import dumps, loads
 from cStringIO import StringIO
 
 from zope.tal.driver import FILE, compilefile, interpretit

@@ -15,16 +15,13 @@
 Interpreter for a pre-compiled TAL program.
 """
 
-import getopt
-import re
 import sys
-import logging
 
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
 from zope.i18n.messageid import MessageID
-from zope.tal.taldefs import quote, TAL_VERSION, TALError, METALError
+from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.talgenerator import TALGenerator

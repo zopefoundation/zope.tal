@@ -16,7 +16,6 @@ Dummy TALES engine so that I can test out the TAL implementation.
 """
 
 import re
-import sys
 
 from zope.tal.taldefs import NAME_RE, TALESError, ErrorInfo
 from zope.tal.interfaces import ITALESCompiler, ITALESEngine
