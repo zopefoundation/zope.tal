@@ -37,10 +37,14 @@ BOOLEAN_HTML_ATTRS = [
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
 ]
-d = {}
-for s in BOOLEAN_HTML_ATTRS:
-    d[s] = 1
-BOOLEAN_HTML_ATTRS = d
+
+def _init():
+    d = {}
+    for s in BOOLEAN_HTML_ATTRS:
+        d[s] = 1
+    return d
+
+BOOLEAN_HTML_ATTRS = _init()
 
 _nulljoin = ''.join
 _spacejoin = ' '.join
