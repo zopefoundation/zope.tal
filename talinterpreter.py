@@ -265,7 +265,13 @@ class TALInterpreter:
                 if _len(item) == 2:
                     name, s = item
                 else:
-                    ok, name, s = attrAction(self, item)
+                    # item[2] is the 'action' field:
+                    if item[2] in ('metal', 'tal', 'xmlns', 'i18n'):
+                        if not self.showtal:
+                            continue
+                        ok, name, s = self.attrAction(item)
+                    else:
+                        ok, name, s = attrAction(self, item)
                     if not ok:
                         continue
                 slen = _len(s)
@@ -288,8 +294,7 @@ class TALInterpreter:
 
     def attrAction(self, item):
         name, value, action = item[:3]
-        if action == 'insert' or (action in ('metal', 'tal', 'xmlns', 'i18n')
-                                  and not self.showtal):
+        if action == 'insert':
             return 0, name, value
         macs = self.macroStack
         if action == 'metal' and self.metal and macs:
@@ -320,14 +325,6 @@ class TALInterpreter:
 
     def attrAction_tal(self, item):
         name, value, action = item[:3]
-        if action in ('metal', 'tal', 'xmlns', 'i18n'):
-            if not self.showtal:
-                # This shortcuts a common case that's also handled by
-                # the short path in .attrAction(); this avoids a
-                # method call that gets called too often.
-                return 0, name, value
-            else:
-                return self.attrAction(item)
         ok = 1
         expr, xlat, msgid = item[3:]
         if self.html and name.lower() in BOOLEAN_HTML_ATTRS:
