@@ -12,8 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Run all tests."""
+"""Run all tests.
 
+$Id: $
+"""
 import sys
 import unittest
 
