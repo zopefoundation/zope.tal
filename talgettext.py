@@ -33,6 +33,7 @@ import getopt
 import os
 import sys
 import string
+import traceback
 
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
@@ -50,7 +51,7 @@ def usage(code, msg=''):
 
 
 class POTALInterpreter(TALInterpreter):
-    def translate(self, msgid, i18ndict=None, obj=None):
+    def translate(self, msgid, default, i18ndict=None, obj=None):
         # XXX is this right?
         if i18ndict is None:
             i18ndict = {}
@@ -62,7 +63,7 @@ class POTALInterpreter(TALInterpreter):
             return None
         # XXX We need to pass in one of context or target_language
         return self.engine.translate(self.i18nContext.domain, msgid, i18ndict,
-                                     position=self.position)
+                                     position=self.position, default=default)
 
 
 class POEngine(DummyEngine):
@@ -85,7 +86,7 @@ class POEngine(DummyEngine):
     def evaluateBoolean(self, expr):
         return 1 # dummy
 
-    def translate(self, domain, msgid, mapping, position):
+    def translate(self, domain, msgid, default, mapping, position):
         # assume domain and mapping are ignored; if they are not,
         # unit test must be updated.
         if msgid not in self.catalog:
@@ -240,7 +241,7 @@ def main():
                              metal=0)()
         except: # Hee hee, I love bare excepts!
             print 'There was an error processing', filename
-            print sys.exc_info()[1]
+            traceback.print_exc()
 
     # Now output the keys in the engine
     # write them to a file if --output is specified; otherwise use standard out
