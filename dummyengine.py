@@ -59,11 +59,6 @@ class DummyEngine(object):
     def compile(self, expr):
         return "$%s$" % expr
 
-    def uncompile(self, expression):
-        assert (expression.startswith("$") and expression.endswith("$"),
-            expression)
-        return expression[1:-1]
-
     def beginScope(self):
         self.stack.append(self.locals)
 
