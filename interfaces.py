@@ -99,7 +99,7 @@ class ITALExpressionEngine(Interface):
 
         The result of evaluating 'compiled_expression' must be a
         string containing a parsable HTML or XML fragment.  Any TAL
-        markup cnotained in the result string will be interpreted.
+        markup contained in the result string will be interpreted.
         """
 
     def evaluateText(compiled_expression):
@@ -108,6 +108,12 @@ class ITALExpressionEngine(Interface):
         The returned text should be suitable for direct inclusion in
         the output: any HTML or XML escaping or quoting is the
         responsibility of the expression itself.
+
+        If the expression evaluates to None, then that is returned. It
+        represents 'nothing' in TALES.
+        If the expression evaluates to what getDefault() of this interface
+        returns, by comparison using 'is', then that is returned. It
+        represents 'default' in TALES.
         """
 
     def evaluateValue(compiled_expression):
