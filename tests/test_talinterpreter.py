@@ -14,7 +14,7 @@
 ##############################################################################
 """Tests for TALInterpreter.
 
-$Id: test_talinterpreter.py,v 1.12 2004/04/15 14:49:10 fdrake Exp $
+$Id$
 """
 import sys
 import unittest

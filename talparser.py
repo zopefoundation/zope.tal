@@ -13,7 +13,7 @@
 ##############################################################################
 """Parse XML and compile to TALInterpreter intermediate code.
 
-$Id: talparser.py,v 1.6 2004/04/07 15:13:00 gintautasm Exp $
+$Id$
 """
 from zope.tal.taldefs import XML_NS, ZOPE_I18N_NS, ZOPE_METAL_NS, ZOPE_TAL_NS
 from zope.tal.talgenerator import TALGenerator

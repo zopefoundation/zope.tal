@@ -13,7 +13,7 @@
 ##############################################################################
 """Interpreter for a pre-compiled TAL program.
 
-$Id: talinterpreter.py,v 1.32 2004/04/15 14:49:10 fdrake Exp $
+$Id$
 """
 import sys
 

@@ -13,7 +13,7 @@
 ##############################################################################
 """Parse HTML and compile to TALInterpreter intermediate code.
 
-$Id: htmltalparser.py,v 1.5 2003/08/21 14:19:29 srichter Exp $
+$Id$
 """
 
 from HTMLParser import HTMLParser, HTMLParseError

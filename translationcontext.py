@@ -16,7 +16,7 @@
 The translation context provides a container for the information
 needed to perform translation of a marked string from a page template.
 
-$Id: translationcontext.py,v 1.2 2002/12/25 14:15:29 jim Exp $
+$Id$
 """
 
 DEFAULT_DOMAIN = "default"

@@ -14,7 +14,7 @@
 ##############################################################################
 """Tests for the HTMLTALParser code generator.
 
-$Id: test_htmltalparser.py,v 1.8 2003/08/21 14:19:29 srichter Exp $
+$Id$
 """
 import pprint
 import sys

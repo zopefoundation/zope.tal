@@ -14,7 +14,7 @@
 ##############################################################################
 """Helper program to time compilation and interpretation
 
-$Id: timer.py,v 1.4 2004/02/24 13:58:18 srichter Exp $
+$Id$
 """
 import getopt
 import sys
