@@ -13,7 +13,7 @@
 ##############################################################################
 """Code generator for TALInterpreter intermediate code.
 
-$Id: talgenerator.py,v 1.10 2003/08/08 23:04:56 srichter Exp $
+$Id: talgenerator.py,v 1.11 2003/08/14 17:23:18 fdrake Exp $
 """
 
 import cgi
@@ -278,7 +278,7 @@ class TALGenerator:
             else:
                 self.emit("setGlobal", name, cexpr)
 
-    def emitOnError(self, name, onError):
+    def emitOnError(self, name, onError, TALtag, isend):
         block = self.popProgram()
         key, expr = parseSubstitution(onError)
         cexpr = self.compileExpression(expr)
@@ -287,7 +287,10 @@ class TALGenerator:
         else:
             assert key == "structure"
             self.emit("insertStructure", cexpr, {}, [])
-        self.emitEndTag(name)
+        if TALtag:
+            self.emitOptTag(name, (None, 1), isend)
+        else:
+            self.emitEndTag(name)
         handler = self.popProgram()
         self.emit("onError", block, handler)
 
@@ -316,7 +319,7 @@ class TALGenerator:
             assert key == "structure"
             self.emit("insertStructure", cexpr, attrDict, program)
 
-    def emitI18nVariable(self, varname, action, expression):
+    def emitI18nVariable(self, stuff):
         # Used for i18n:name attributes.  arg is extra information describing
         # how the contents of the variable should get filled in, and it will
         # either be a 1-tuple or a 2-tuple.  If arg[0] is None, then the
@@ -329,6 +332,7 @@ class TALGenerator:
         # calculate the contents of the variable, e.g.
         # "I live in <span i18n:name="country"
         #                  tal:replace="here/countryOfOrigin" />"
+        varname, action, expression = stuff
         m = _name_rx.match(varname)
         if m is None or m.group() != varname:
             raise TALError("illegal i18n:name: %r" % varname, self.position)
@@ -608,7 +612,11 @@ class TALGenerator:
             todo["scope"] = 1
         if onError:
             self.pushProgram() # handler
+            if TALtag:
+                self.pushProgram() # start
             self.emitStartTag(name, list(attrlist)) # Must copy attrlist!
+            if TALtag:
+                self.pushProgram() # start
             self.pushProgram() # block
             todo["onError"] = onError
         if define:
@@ -623,20 +631,25 @@ class TALGenerator:
             if repeatWhitespace:
                 self.emitText(repeatWhitespace)
         if content:
-            todo["content"] = content
-        if replace:
+            if varname:
+                todo['i18nvar'] = (varname, I18N_CONTENT, None)
+                todo["content"] = content
+                self.pushProgram()
+            else:
+                todo["content"] = content
+        elif replace:
             # tal:replace w/ i18n:name has slightly different semantics.  What
             # we're actually replacing then is the contents of the ${name}
             # placeholder.
             if varname:
-                todo['i18nvar'] = (varname, replace)
+                todo['i18nvar'] = (varname, I18N_EXPRESSION, replace)
             else:
                 todo["replace"] = replace
             self.pushProgram()
         # i18n:name w/o tal:replace uses the content as the interpolation
         # dictionary values
         elif varname:
-            todo['i18nvar'] = (varname, None)
+            todo['i18nvar'] = (varname, I18N_REPLACE, None)
             self.pushProgram()
         if msgid is not None:
             self.i18nLevel += 1
@@ -679,9 +692,11 @@ class TALGenerator:
         self.emitStartTag(name, self.replaceAttrs(attrlist, repldict), isend)
         if optTag:
             self.pushProgram()
-        if content:
+        if content and not varname:
             self.pushProgram()
         if msgid is not None:
+            self.pushProgram()
+        if content and varname:
             self.pushProgram()
         if todo and position != (None, None):
             todo["position"] = position
@@ -727,10 +742,7 @@ class TALGenerator:
 
         # If there's no tal:content or tal:replace in the tag with the
         # i18n:name, tal:replace is the default.
-        i18nNameAction = I18N_REPLACE
         if content:
-            if varname:
-                i18nNameAction = I18N_CONTENT
             self.emitSubstitution(content, {})
         # If we're looking at an implicit msgid, emit the insertTranslation
         # opcode now, so that the end tag doesn't become part of the implicit
@@ -738,8 +750,12 @@ class TALGenerator:
         # the opcode after the i18nVariable opcode so we can better handle
         # tags with both of them in them (and in the latter case, the contents
         # would be thrown away for msgid purposes).
+        #
+        # Still, we should emit insertTranslation opcode before i18nVariable
+        # in case tal:content, i18n:translate and i18n:name in the same tag
         if msgid is not None:
-            if not varname:
+            if (not varname) or (
+                varname and (varname[1] == I18N_CONTENT)):
                 self.emitTranslation(msgid, i18ndata)
             self.i18nLevel -= 1
         if optTag:
@@ -758,26 +774,30 @@ class TALGenerator:
         if replace:
             self.emitSubstitution(replace, repldict)
         elif varname:
-            if varname[1] is not None:
-                i18nNameAction = I18N_EXPRESSION
             # o varname[0] is the variable name
-            # o i18nNameAction is either
+            # o varname[1] is either
             #   - I18N_REPLACE for implicit tal:replace
             #   - I18N_CONTENT for tal:content
             #   - I18N_EXPRESSION for explicit tal:replace
-            # o varname[1] will be None for the first two actions and the
+            # o varname[2] will be None for the first two actions and the
             #   replacement tal expression for the third action.
-            self.emitI18nVariable(varname[0], i18nNameAction, varname[1])
+            assert (varname[1]
+                    in [I18N_REPLACE, I18N_CONTENT, I18N_EXPRESSION])
+            self.emitI18nVariable(varname)
         # Do not test for "msgid is not None", i.e. we only want to test for
         # explicit msgids here.  See comment above.
-        if msgid is not None and varname:
-            self.emitTranslation(msgid, i18ndata)
+        if msgid is not None: 
+            # in case tal:content, i18n:translate and i18n:name in the
+            # same tag insertTranslation opcode has already been
+            # emitted
+            if varname and (varname[1] <> I18N_CONTENT):
+                self.emitTranslation(msgid, i18ndata)
         if repeat:
             self.emitRepeat(repeat)
         if condition:
             self.emitCondition(condition)
         if onError:
-            self.emitOnError(name, onError)
+            self.emitOnError(name, onError, optTag and optTag[1], isend)
         if scope:
             self.emit("endScope")
         if i18ncontext:

@@ -602,6 +602,37 @@ translated string</span>
   ('rawtextColumn', ('</span>\n', 0))
   ])
 
+    def test_i18n_name_with_content(self):
+        self._run_check('<div i18n:translate="">This is text for '
+            '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
+            '</div>', [
+('setPosition', (1, 0)),
+('beginScope', {'i18n:translate': ''}),
+('startTag', ('div', [('i18n:translate', '', 'i18n')])),
+('insertTranslation',
+ ('',
+  [('rawtextOffset', ('This is text for ', 17)),
+   ('setPosition', (1, 40)),
+   ('beginScope',
+    {'tal:content': 'bar', 'i18n:name': 'bar_name', 'i18n:translate': ''}),
+   ('i18nVariable',
+       ('bar_name',
+        [('startTag',
+           ('span',
+            [('i18n:translate', '', 'i18n'),
+             ('tal:content', 'bar', 'tal'),
+             ('i18n:name', 'bar_name', 'i18n')])),
+         ('insertTranslation',
+           ('',
+             [('insertText', ('$bar$', []))])),
+         ('rawtextOffset', ('</span>', 7))],
+      None)),
+   ('endScope', ()),
+   ('rawtextOffset', ('.', 1))])),
+('endScope', ()),
+('rawtextOffset', ('</div>', 6)) 
+  ])
+
     def test_i18n_name_implicit_value(self):
         # input/test22.html
         self._run_check('''\

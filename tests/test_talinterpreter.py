@@ -131,6 +131,75 @@ class I18NCornerTestCase(TestCaseBase):
             I18NError, self._compile,
             '<span i18n:translate="" i18n:name="color_name">green</span>')
 
+    def test_translate_static_text_as_dynamic(self):
+        program, macros = self._compile(
+            '<div i18n:translate="">This is text for '
+            '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
+            '</div>')
+        self._check(program,
+                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
+
+    def test_translate_static_text_as_dynamic_from_bytecode(self):
+        program =  [('version', '1.4'),
+ ('mode', 'html'),
+('setPosition', (1, 0)),
+('beginScope', {'i18n:translate': ''}),
+('startTag', ('div', [('i18n:translate', '', 'i18n')])),
+('insertTranslation',
+ ('',
+  [('rawtextOffset', ('This is text for ', 17)),
+   ('setPosition', (1, 40)),
+   ('beginScope',
+    {'tal:content': 'bar', 'i18n:name': 'bar_name', 'i18n:translate': ''}),
+   ('i18nVariable',
+       ('bar_name',
+        [('startTag',
+           ('span',
+            [('i18n:translate', '', 'i18n'),
+             ('tal:content', 'bar', 'tal'),
+             ('i18n:name', 'bar_name', 'i18n')])),
+         ('insertTranslation',
+           ('',
+             [('insertText', ('$bar$', []))])),
+         ('rawtextOffset', ('</span>', 7))],
+      None)),
+   ('endScope', ()),
+   ('rawtextOffset', ('.', 1))])),
+('endScope', ()),
+('rawtextOffset', ('</div>', 6)) 
+]
+        self._check(program,
+                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
+
+    def test_for_correct_msgids(self):
+
+        class CollectingTranslationService(DummyTranslationService):
+            data = []
+
+            def translate(self, msgid, domain=None, mapping=None,
+                          context=None, target_language=None, default=None):
+                self.data.append(msgid)
+                return DummyTranslationService.translate(
+                    self,
+                    msgid, domain, mapping, context, target_language, default)
+
+        xlatsvc = CollectingTranslationService()
+        self.engine.translationService = xlatsvc
+        result = StringIO()
+        program, macros = self._compile(
+            '<div i18n:translate="">This is text for '
+            '<span i18n:translate="" tal:content="bar" '
+            'i18n:name="bar_name"/>.</div>')
+        self.interpreter = TALInterpreter(program, {}, self.engine,
+                                          stream=result)
+        self.interpreter()
+        self.assert_('BaRvAlUe' in xlatsvc.data)
+        self.assert_('This is text for ${bar_name}.' in
+                     xlatsvc.data)
+        self.assertEqual(
+            '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
+            result.getvalue())
+
 
 class I18NErrorsTestCase(TestCaseBase):
 
