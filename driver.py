@@ -132,8 +132,6 @@ def main():
             strictinsert = 0
         if opt == '-m':
             macros = 1
-        if opt == '-n':
-            versionTest = 0
         if opt in ('-x', '--xml'):
             if mode == 'html':
                 usage(1, '--html and --xml are mutually exclusive')

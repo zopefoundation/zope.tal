@@ -72,7 +72,7 @@ class TALGenerator:
     def optimize(self, program):
         output = []
         collect = []
-        rawseen = cursor = 0
+        cursor = 0
         if self.xml:
             endsep = "/>"
         else:
@@ -117,7 +117,6 @@ class TALGenerator:
                     output.append(("rawtextOffset", (text, len(text))))
             if opcode != None:
                 output.append(self.optimizeArgsList(item))
-            rawseen = cursor+1
             collect = []
         return self.optimizeCommonTriple(output)
 
@@ -697,7 +696,6 @@ class TALGenerator:
         replace = todo.get("replace")
         condition = todo.get("condition")
         onError = todo.get("onError")
-        define = todo.get("define")
         repldict = todo.get("repldict", {})
         scope = todo.get("scope")
         optTag = todo.get("optional tag")
