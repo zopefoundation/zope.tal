@@ -213,7 +213,7 @@ class Iterator:
 
 
 class DummyTranslationService:
-    __implements__ = ITranslationService
+    implements(ITranslationService)
 
     def translate(self, msgid, domain=None, mapping=None, context=None,
                   target_language=None, default=None):

@@ -34,13 +34,14 @@ import time
 import getopt
 import traceback
 
+from zope.interface import implements
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
 
-__version__ = '$Revision: 1.13 $'
+__version__ = '$Revision: 1.14 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -87,7 +88,7 @@ class POTALInterpreter(TALInterpreter):
 
 
 class POEngine(DummyEngine):
-    __implements__ = ITALExpressionEngine
+    implements(ITALExpressionEngine)
 
     def __init__(self, macros=None):
         self.catalog = {}
@@ -106,7 +107,8 @@ class POEngine(DummyEngine):
         return True # dummy
 
     def translate(self, msgid, domain=None, mapping=None, default=None,
-                  # XXX position is not part of the ITALExpressionEngine interface
+                  # XXX position is not part of the ITALExpressionEngine
+                  #     interface
                   position=None):
         # assume domain and mapping are ignored; if they are not,
         # unit test must be updated.

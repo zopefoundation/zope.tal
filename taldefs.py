@@ -16,6 +16,7 @@ Common definitions used by TAL and METAL compilation an transformation.
 """
 
 from zope.tal.interfaces import ITALExpressionErrorInfo
+from zope.interface import implements
 
 TAL_VERSION = "1.4"
 
@@ -92,8 +93,7 @@ class I18NError(TALError):
 
 
 class ErrorInfo:
-
-    __implements__ = ITALExpressionErrorInfo
+    implements(ITALExpressionErrorInfo)
 
     def __init__(self, err, position=(None, None)):
         if isinstance(err, Exception):
@@ -104,7 +104,6 @@ class ErrorInfo:
             self.value = None
         self.lineno = position[0]
         self.offset = position[1]
-
 
 
 import re
