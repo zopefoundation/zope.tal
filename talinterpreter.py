@@ -586,6 +586,21 @@ class TALInterpreter:
         program, macros = gen.getCode()
         self.interpret(program)
 
+    def do_evaluateCode(self, stuff):
+        lang, program = stuff
+        # Use a temporary stream to capture the interpretation of the
+        # subnodes, which should /not/ go to the output stream.
+        tmpstream = StringIO()
+        self.pushStream(tmpstream)
+        try:
+            self.interpret(program)
+        finally:
+            self.popStream()
+        code = tmpstream.getvalue()
+        output = self.engine.evaluateCode(lang, code)
+        self._stream_write(output)        
+    bytecode_handlers["evaluateCode"] = do_evaluateCode
+
     def do_loop(self, (name, expr, block)):
         self.interpret(block)
 

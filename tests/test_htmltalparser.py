@@ -12,14 +12,15 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for the HTMLTALParser code generator."""
+"""Tests for the HTMLTALParser code generator.
 
+$Id: test_htmltalparser.py,v 1.8 2003/08/21 14:19:29 srichter Exp $
+"""
 import pprint
 import sys
 import unittest
 
-from zope.tal import htmltalparser
-from zope.tal import taldefs
+from zope.tal import htmltalparser, taldefs
 from zope.tal.tests import utils
 
 
@@ -381,6 +382,58 @@ class TALGeneratorTestCases(TestCaseBase):
                rawtext('</p>')])),
              ('endScope', ()),
              ])
+
+    def test_script_1(self):
+        self._run_check('<p tal:script="text/server-python">code</p>', [
+             ('setPosition', (1, 0)),
+             ('beginScope', {'tal:script': 'text/server-python'}),
+             ('startTag', ('p',
+                           [('tal:script', 'text/server-python', 'tal')])),
+             ('evaluateCode', ('text/server-python',
+                           [('rawtextOffset', ('code', 4))])),
+             ('endScope', ()),
+             rawtext('</p>'),
+             ])
+
+    def test_script_2(self):
+        self._run_check('<tal:block script="text/server-python">'
+                        'code'
+                        '</tal:block>', [
+            ('setPosition', (1, 0)),
+            ('beginScope', {'script': 'text/server-python'}),
+            ('optTag',
+             ('tal:block',
+              None,
+              'tal',
+              0,
+              [('startTag', ('tal:block',
+                             [('script', 'text/server-python', 'tal')]))],
+              [('evaluateCode',
+                ('text/server-python',
+                 [('rawtextOffset', ('code', 4))]))])),
+            ('endScope', ())
+            ])
+
+    def test_script_3(self):
+        self._run_check('<script type="text/server-python">code</script>', [
+            ('setPosition', (1, 0)),
+            ('beginScope', {}),
+            ('optTag',
+             ('script',
+              '',
+              None,
+              0,
+              [('rawtextOffset', ('<script>', 8))],
+              [('evaluateCode',
+                ('text/server-python', [('rawtextOffset', ('code', 4))]))])),
+            ('endScope', ())
+            ])
+
+    def test_script_4(self):
+        self._run_check('<script type="text/javascript">code</script>', [
+            ('rawtextOffset',
+             ('<script type="text/javascript">code</script>', 44))
+            ])
 
     def test_attributes_1(self):
         self._run_check("<a href='foo' name='bar' tal:attributes="

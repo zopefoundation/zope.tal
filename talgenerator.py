@@ -13,7 +13,7 @@
 ##############################################################################
 """Code generator for TALInterpreter intermediate code.
 
-$Id: talgenerator.py,v 1.11 2003/08/14 17:23:18 fdrake Exp $
+$Id: talgenerator.py,v 1.12 2003/08/21 14:19:29 srichter Exp $
 """
 
 import cgi
@@ -319,6 +319,10 @@ class TALGenerator:
             assert key == "structure"
             self.emit("insertStructure", cexpr, attrDict, program)
 
+    def emitEvaluateCode(self, lang):
+        program = self.popProgram()
+        self.emit('evaluateCode', lang, program)
+
     def emitI18nVariable(self, stuff):
         # Used for i18n:name attributes.  arg is extra information describing
         # how the contents of the variable should get filled in, and it will
@@ -512,6 +516,7 @@ class TALGenerator:
         repeat = taldict.get("repeat")
         content = taldict.get("content")
         replace = taldict.get("replace")
+        script = taldict.get("script")
         attrsubst = taldict.get("attributes")
         onError = taldict.get("on-error")
         omitTag = taldict.get("omit-tag")
@@ -689,6 +694,8 @@ class TALGenerator:
         if replace:
             todo["repldict"] = repldict
             repldict = {}
+        if script:
+            todo["script"] = script    
         self.emitStartTag(name, self.replaceAttrs(attrlist, repldict), isend)
         if optTag:
             self.pushProgram()
@@ -698,6 +705,8 @@ class TALGenerator:
             self.pushProgram()
         if content and varname:
             self.pushProgram()
+        if script:
+            self.pushProgram()            
         if todo and position != (None, None):
             todo["position"] = position
         self.todoPush(todo)
@@ -720,6 +729,7 @@ class TALGenerator:
         repeat = todo.get("repeat")
         content = todo.get("content")
         replace = todo.get("replace")
+        script = todo.get("script")
         condition = todo.get("condition")
         onError = todo.get("onError")
         repldict = todo.get("repldict", {})
@@ -740,6 +750,8 @@ class TALGenerator:
             raise exc("%s attributes on <%s> require explicit </%s>" %
                       (what, name, name), position)
 
+        if script:
+            self.emitEvaluateCode(script)
         # If there's no tal:content or tal:replace in the tag with the
         # i18n:name, tal:replace is the default.
         if content:

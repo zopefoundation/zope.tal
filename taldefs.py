@@ -48,6 +48,7 @@ KNOWN_TAL_ATTRIBUTES = [
     "on-error",
     "omit-tag",
     "tal tag",
+    "script"
     ]
 
 KNOWN_I18N_ATTRIBUTES = [

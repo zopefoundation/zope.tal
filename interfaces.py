@@ -149,9 +149,16 @@ class ITALExpressionEngine(Interface):
         """
 
     def translate(msgid, domain=None, mapping=None, default=None):
+        """See ITranslationService.translate()"""
+
+    def evaluateCode(lang, code):
+        """Evaluates code of the given language.
+
+        Returns whatever the code outputs. This can be defined on a
+        per-language basis. In Python this usually everything the print
+        statement will return.
         """
-        See ITranslationService.translate()
-        """
+        
 
 class ITALIterator(Interface):
     """A TAL iterator
@@ -164,7 +171,6 @@ class ITALIterator(Interface):
 
         Return a true value if it was possible to advance and return
         a false value otherwise.
-
         """
 
 

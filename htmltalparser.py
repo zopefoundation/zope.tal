@@ -11,8 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Parse HTML and compile to TALInterpreter intermediate code.
+"""Parse HTML and compile to TALInterpreter intermediate code.
+
+$Id: htmltalparser.py,v 1.5 2003/08/21 14:19:29 srichter Exp $
 """
 
 from HTMLParser import HTMLParser, HTMLParseError
@@ -146,6 +147,12 @@ class HTMLTALParser(HTMLParser):
             raise TALError(
                 "empty HTML tags cannot use tal:content: %s" % `tag`,
                 self.getpos())
+        # Support for inline Python code.
+        if tag == 'script':
+            type_attr = filter(lambda a: a[0] == 'type', attrlist)
+            if type_attr and type_attr[0][1].startswith('text/server-'):
+                attrlist.remove(type_attr[0])
+                taldict = {'script': type_attr[0][1], 'omit-tag': ''}
         self.tagstack.append(tag)
         self.gen.emitStartElement(tag, attrlist, taldict, metaldict, i18ndict,
                                   self.getpos())

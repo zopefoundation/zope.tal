@@ -12,7 +12,6 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-
 """Program to extract internationalization markup from Page Templates.
 
 Once you have marked up a Page Template file with i18n: namespace tags, use
@@ -42,7 +41,7 @@ from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
 from zope.i18n.messageid import MessageID
 
-__version__ = '$Revision: 1.16 $'
+__version__ = '$Revision: 1.17 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.

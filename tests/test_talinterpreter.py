@@ -12,8 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for TALInterpreter."""
+"""Tests for TALInterpreter.
 
+$Id: test_talinterpreter.py,v 1.8 2003/08/21 14:19:29 srichter Exp $
+"""
 import sys
 import unittest
 
@@ -201,6 +203,79 @@ class I18NCornerTestCase(TestCaseBase):
             result.getvalue())
 
 
+class ScriptTestCase(TestCaseBase):
+
+    def setUp(self):
+        self.engine = DummyEngine()
+
+    def _check(self, program, expected):
+        result = StringIO()
+        self.interpreter = TALInterpreter(program, {}, self.engine,
+                                          stream=result)
+        self.interpreter()
+        self.assertEqual(expected, result.getvalue())
+
+    def test_simple(self):
+        program, macros = self._compile(
+            '<p tal:script="text/server-python">print "hello"</p>')
+        self._check(program, '<p>hello\n</p>\n')
+
+    def test_script_and_tal_block(self):
+        program, macros = self._compile(
+            '<tal:block script="text/server-python">\n'
+            '  global x\n'
+            '  x = 1\n'
+            '</tal:block>\n'
+            '<span tal:replace="x" />')
+        self._check(program, '\n1\n')
+        self.assertEqual(self.engine.codeGlobals['x'], 1)
+
+    def test_script_and_tal_block_having_inside_print(self):
+        program, macros = self._compile(
+            '<tal:block script="text/server-python">\n'
+            '  print "hello"'
+            '</tal:block>')
+        self._check(program, 'hello\n\n')
+
+    def test_script_and_omittag(self):
+        program, macros = self._compile(
+            '<p tal:omit-tag="" tal:script="text/server-python">\n'
+            '  print "hello"'
+            '</p>')
+        self._check(program, 'hello\n\n')
+
+    def test_script_and_inside_tags(self):
+        program, macros = self._compile(
+            '<p tal:omit-tag="" tal:script="text/server-python">\n'
+            '  print "<b>hello</b>"'
+            '</p>')
+        self._check(program, '<b>hello</b>\n\n')
+
+    def test_script_and_inside_tags_with_tal(self):
+        program, macros = self._compile(
+            '<p tal:omit-tag="" tal:script="text/server-python"> <!--\n'
+            '  print """<b tal:replace="string:foo">hello</b>"""\n'
+            '--></p>')
+        self._check(program, '<b tal:replace="string:foo">hello</b>\n\n')
+
+    def test_html_script(self):
+        program, macros = self._compile(
+            '<script type="text/server-python">\n'
+            '  print "Hello world!"\n'
+            '</script>')
+        self._check(program, 'Hello world!\n')
+
+    def test_html_script_and_javascript(self):
+        program, macros = self._compile(
+            '<script type="text/javascript" src="somefile.js" />\n'
+            '<script type="text/server-python">\n'
+            '  print "Hello world!"\n'
+            '</script>')
+        self._check(program,
+                    '<script type="text/javascript" src="somefile.js" />\n'
+                    'Hello world!\n')
+
+
 class I18NErrorsTestCase(TestCaseBase):
 
     def _check(self, src, msg):
@@ -285,6 +360,7 @@ def test_suite():
     suite = unittest.makeSuite(I18NErrorsTestCase)
     suite.addTest(unittest.makeSuite(MacroErrorsTestCase))
     suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
+    suite.addTest(unittest.makeSuite(ScriptTestCase))
     suite.addTest(unittest.makeSuite(I18NCornerTestCase))
     return suite
 

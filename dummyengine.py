@@ -13,7 +13,7 @@
 ##############################################################################
 """Dummy TAL expression engine so that I can test out the TAL implementation.
 
-$Id: dummyengine.py,v 1.13 2003/08/15 14:02:37 gotcha Exp $
+$Id: dummyengine.py,v 1.14 2003/08/21 14:19:29 srichter Exp $
 """
 import re
 
@@ -45,6 +45,7 @@ class DummyEngine:
         self.locals = self.globals = dict
         self.stack = [dict]
         self.translationService = DummyTranslationService()
+        self.useEngineAttrDicts = False
 
     def getCompilerError(self):
         return CompilerError
@@ -197,6 +198,47 @@ class DummyEngine:
         return self.translationService.translate(
             msgid, domain, mapping, default=default)
 
+    def evaluateCode(self, lang, code):
+        # We probably implement too much, but I use the dummy engine to test
+        # some of the issues that we will have.
+
+        # For testing purposes only
+        locals = {}
+        globals = {}
+        if self.useEngineAttrDicts:
+            globals = self.globals.copy()
+            locals = self.locals.copy()
+            
+        assert lang == 'text/server-python'
+        import sys, StringIO
+
+        # Removing probable comments
+        if code.strip().startswith('<!--') and code.strip().endswith('-->'):
+            code = code.strip()[4:-3]
+
+        # Prepare code.
+        lines = code.split('\n')
+        lines = filter(lambda l: l.strip() != '', lines)
+        code = '\n'.join(lines)
+        # This saves us from all indentation issues :)
+        if code.startswith(' ') or code.startswith('\t'):
+            code = 'if 1 == 1:\n' + code + '\n'
+        tmp = sys.stdout
+        sys.stdout = StringIO.StringIO()
+        try:
+            exec code in globals, locals
+        finally:
+            result = sys.stdout
+            sys.stdout = tmp
+
+        # For testing purposes only
+        self.codeLocals = locals
+        self.codeGlobals = globals
+
+        self.locals.update(locals)
+        self.globals.update(globals)
+
+        return result.getvalue()
 
 class Iterator:
 
