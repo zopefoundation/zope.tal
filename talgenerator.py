@@ -840,7 +840,11 @@ class TALGenerator:
 
 def _parseI18nAttributes(i18nattrs, position, xml):
     d = {}
-    for spec in i18nattrs.split(";"):
+    # Filter out empty items, eg:
+    # i18n:attributes="value msgid; name msgid2;"
+    # would result in 3 items where the last one is empty
+    attrs = filter(None, i18nattrs.split(";"))
+    for spec in attrs:
         parts = spec.split()
         if len(parts) > 2:
             raise TALError("illegal i18n:attributes specification: %r" % spec,
