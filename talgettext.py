@@ -36,12 +36,13 @@ import traceback
 
 from zope.interface import implements
 from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talinterpreter import TALInterpreter
+from zope.tal.talinterpreter import TALInterpreter, normalize
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
+from zope.i18n.messageid import MessageID
 
-__version__ = '$Revision: 1.15 $'
+__version__ = '$Revision: 1.16 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -111,6 +112,12 @@ class POEngine(DummyEngine):
                   #     interface
                   position=None):
 
+        # Make the message is a MessageID object, if the default differs
+        # from the value, so that the POT generator can put the default
+        # text into a comment.
+        if default is not None and normalize(default) != msgid:
+            msgid = MessageID(msgid, default=default)
+        
         if domain not in self.catalog:
             self.catalog[domain] = {}
         domain = self.catalog[domain]
