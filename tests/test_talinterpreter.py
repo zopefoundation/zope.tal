@@ -14,7 +14,7 @@
 ##############################################################################
 """Tests for TALInterpreter.
 
-$Id: test_talinterpreter.py,v 1.10 2004/03/23 16:29:20 srichter Exp $
+$Id: test_talinterpreter.py,v 1.11 2004/03/23 19:18:15 srichter Exp $
 """
 import sys
 import unittest
@@ -61,17 +61,17 @@ class MacroErrorsTestCase(TestCaseBase):
         self.macro[0] = ("version", "duh")
 
 
-class MacroNamesTest(TestCaseBase):
+class MacroFunkyErrorTest(TestCaseBase):
     
-    def test_mocaroname(self):
+    def test_div_in_p_using_macro(self):
         dummy, macros = self._compile('<p metal:define-macro="M">Booh</p>')
         engine = DummyEngine(macros)
         program, dummy = self._compile(
-            '<p metal:use-macro="M"><div tal:content="macroname">foo</div></p>')
+            '<p metal:use-macro="M"><div>foo</div></p>')
         interpreter = TALInterpreter(program, {}, engine)
 
         output = interpreter()
-        self.assertEqual(output, '<p><div>M</div></p>')
+        self.assertEqual(output, '<p><div>foo</div></p>')
 
 
 class I18NCornerTestCase(TestCaseBase):
@@ -372,10 +372,15 @@ class OutputPresentationTestCase(TestCaseBase):
 def test_suite():
     suite = unittest.makeSuite(I18NErrorsTestCase)
     suite.addTest(unittest.makeSuite(MacroErrorsTestCase))
-    #suite.addTest(unittest.makeSuite(MacroNamesTest))
     suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
     suite.addTest(unittest.makeSuite(ScriptTestCase))
     suite.addTest(unittest.makeSuite(I18NCornerTestCase))
+
+    # XXX: Deactivated test, since we have not found a solution for this and
+    # it is a deep and undocumented HTML parser issue.
+    # Fred is looking into this.
+    #suite.addTest(unittest.makeSuite(MacroFunkyErrorTest))
+
     return suite
 
 if __name__ == "__main__":
