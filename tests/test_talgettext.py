@@ -24,19 +24,19 @@ class test_POEngine(unittest.TestCase):
     """Test the PO engine functionality, which simply adds items to a catalog
     as .translate is called
     """
-    
+
     def test_translate(self):
         test_keys = ['foo', 'bar', 'blarf', 'washington']
-        
+
         engine = POEngine()
         engine.file = 'foo.pt'
         for key in test_keys:
-            engine.translate(None, key, None, 1)
+            engine.translate(key)
 
         for key in test_keys:
-            self.failIf( (key not in engine.catalog),
-                         "POEngine catalog does not properly store message ids"
-                         )
+            self.failIf(key not in engine.catalog,
+                        "POEngine catalog does not properly store message ids"
+                        )
 
 def test_suite():
     suite = unittest.makeSuite(test_POEngine)

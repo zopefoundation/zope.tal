@@ -473,10 +473,8 @@ class TALInterpreter:
             self.interpret(stuff[1])
             return
         if isinstance(text, MessageID):
-            # Translate this now.  XXX passing None for the domain is bogus
-            # but necessary based on the signature of .translate().  We should
-            # switch msgid and domain, since domains tag along in MessageIDs.
-            text = self.engine.translate(None, text)
+            # Translate this now.
+            text = self.engine.translate(text)
         # '&' must be done first!
         s = text.replace(
             "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -617,8 +615,8 @@ class TALInterpreter:
         if not self.i18nInterpolate:
             return msgid
         # XXX We need to pass in one of context or target_language
-        return self.engine.translate(self.i18nContext.domain,
-                                     msgid, i18ndict, default=default)
+        return self.engine.translate(msgid, self.i18nContext.domain,
+                                     i18ndict, default=default)
 
     def do_rawtextColumn(self, (s, col)):
         self._stream_write(s)

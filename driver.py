@@ -52,7 +52,7 @@ from zope.tal.dummyengine import DummyTranslationService
 FILE = "tests/input/test01.xml"
 
 class TestTranslations(DummyTranslationService):
-    def translate(self, domain, msgid, mapping=None, context=None,
+    def translate(self, msgid, domain=None, mapping=None, context=None,
                   target_language=None, default=None):
         if msgid == 'timefmt':
             return '%(minutes)s minutes after %(hours)s %(ampm)s' % mapping
@@ -65,10 +65,10 @@ class TestTranslations(DummyTranslationService):
             return 'mailto:bperson@dom.ain'
         elif msgid == 'origin':
             return '%(name)s was born in %(country)s' % mapping
-        return DummyTranslationService.translate(self, domain, msgid,
-                                                 mapping, context,
-                                                 target_language,
-                                                 default=default)
+        return DummyTranslationService.translate(
+            self, msgid, domain, mapping, context,
+            target_language, default=default)
+
 
 class TestEngine(DummyEngine):
     def __init__(self, macros=None):

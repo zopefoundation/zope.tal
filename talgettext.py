@@ -41,7 +41,7 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALESEngine
 from zope.tal.taldefs import TALESError
 
-__version__ = '$Revision: 1.10 $'
+__version__ = '$Revision: 1.11 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -83,7 +83,7 @@ class POTALInterpreter(TALInterpreter):
         if msgid is None:
             return None
         # XXX We need to pass in one of context or target_language
-        return self.engine.translate(self.i18nContext.domain, msgid, i18ndict,
+        return self.engine.translate(msgid, self.i18nContext.domain, i18ndict,
                                      position=self.position, default=default)
 
 
@@ -106,7 +106,9 @@ class POEngine(DummyEngine):
     def evaluateBoolean(self, expr):
         return True # dummy
 
-    def translate(self, domain, msgid, mapping, position, default=None):
+    def translate(self, msgid, domain=None, mapping=None, default=None,
+                  # XXX position is not part of the ITALESEngine interface
+                  position=None):
         # assume domain and mapping are ignored; if they are not,
         # unit test must be updated.
         if msgid not in self.catalog:
@@ -206,11 +208,10 @@ class UpdatePOEngine(POEngine):
     def evaluatePathOrVar(self, expr):
         return 'who cares'
 
-    def translate(self, domain, msgid, mapping, position,
-                  default=None):
+    def translate(self, msgid, domain=None, mapping=None, default=None,
+                  position=None):
         if msgid not in self.base:
-            POEngine.translate(self, domain, msgid, mapping, position,
-                               default=default)
+            POEngine.translate(self, msgid, domain, mapping, default, position)
         return 'x'
 
 

@@ -189,9 +189,9 @@ class DummyEngine:
     def getDefault(self):
         return Default
 
-    def translate(self, domain, msgid, mapping, default=None):
-        return self.translationService.translate(domain, msgid, mapping,
-                                                 default=default)
+    def translate(self, msgid, domain=None, mapping=None, default=None):
+        return self.translationService.translate(
+            msgid, domain, mapping, default=default)
 
 
 class Iterator:
@@ -216,7 +216,7 @@ class Iterator:
 class DummyTranslationService:
     __implements__ = ITranslationService
 
-    def translate(self, domain, msgid, mapping=None, context=None,
+    def translate(self, msgid, domain=None, mapping=None, context=None,
                   target_language=None, default=None):
         # This is a fake translation service which simply uppercases non
         # ${name} placeholder text in the message id.
