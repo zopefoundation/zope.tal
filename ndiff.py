@@ -324,7 +324,7 @@ class SequenceMatcher:
         self.matching_blocks = []
         la, lb = len(self.a), len(self.b)
         self.__helper(0, la, 0, lb, self.matching_blocks)
-        self.matching_blocks.append( (la, lb, 0) )
+        self.matching_blocks.append((la, lb, 0))
         if TRACE:
             print '*** matching blocks', self.matching_blocks
         return self.matching_blocks
@@ -407,12 +407,12 @@ class SequenceMatcher:
             elif j < bj:
                 tag = 'insert'
             if tag:
-                answer.append( (tag, i, ai, j, bj) )
+                answer.append((tag, i, ai, j, bj))
             i, j = ai+size, bj+size
             # the list of matching blocks is terminated by a
             # sentinel with size 0
             if size:
-                answer.append( ('equal', ai, i, bj, j) )
+                answer.append(('equal', ai, i, bj, j))
         return answer
 
 # meant for dumping lines

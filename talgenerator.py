@@ -177,9 +177,9 @@ class TALGenerator:
         output = program[:2]
         prev2, prev1 = output
         for item in program[2:]:
-            if (  item[0] == "beginScope"
-                  and prev1[0] == "setPosition"
-                  and prev2[0] == "rawtextColumn"):
+            if ( item[0] == "beginScope"
+                 and prev1[0] == "setPosition"
+                 and prev2[0] == "rawtextColumn"):
                 position = output.pop()[1]
                 text, column = output.pop()[1]
                 prev1 = None, None
