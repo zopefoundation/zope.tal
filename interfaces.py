@@ -126,7 +126,7 @@ class ITALESEngine(Interface):
         """
         """
 
-    def translate(domain, msgid, mapping):
+    def translate(domain, msgid, mapping, default=None):
         """
         See ITranslationService.translate()
         """
