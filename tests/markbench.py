@@ -154,7 +154,7 @@ if __name__ == "__main__":
         rc = os.spawnl(os.P_WAIT, sys.executable,
                        sys.executable, "test.py", "zope.tal.tests")
         if rc > 0:
-            # XXX Failing tests don't cause test.py to report an
+            # TODO: Failing tests don't cause test.py to report an
             # error; not sure why.  ;-(
             sys.exit(rc)
         elif rc < 0:

@@ -556,7 +556,7 @@ class TALGenerator:
             # Hack to include preceding whitespace in the loop program
             repeatWhitespace = self.unEmitNewlineWhitespace()
         if position != (None, None):
-            # XXX at some point we should insist on a non-trivial position
+            # TODO: at some point we should insist on a non-trivial position
             self.emit("setPosition", position)
         if self.inMacroUse:
             if fillSlot:

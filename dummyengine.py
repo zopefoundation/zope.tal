@@ -144,11 +144,11 @@ class DummyEngine:
         return text
 
     def evaluateStructure(self, expr):
-        # XXX Should return None or a DOM tree
+        # TODO Should return None or a DOM tree
         return self.evaluate(expr)
 
     def evaluateSequence(self, expr):
-        # XXX Should return a sequence
+        # TODO: Should return a sequence
         return self.evaluate(expr)
 
     def evaluateMacro(self, macroName):

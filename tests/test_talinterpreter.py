@@ -437,7 +437,7 @@ def test_suite():
     suite.addTest(unittest.makeSuite(I18NCornerTestCase))
     suite.addTest(unittest.makeSuite(TestSourceAnnotations))
 
-    # XXX: Deactivated test, since we have not found a solution for this and
+    # TODO: Deactivated test, since we have not found a solution for this and
     # it is a deep and undocumented HTML parser issue.
     # Fred is looking into this.
     #suite.addTest(unittest.makeSuite(MacroFunkyErrorTest))

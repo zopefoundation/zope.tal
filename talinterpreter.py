@@ -31,7 +31,7 @@ BOOLEAN_HTML_ATTRS = [
     # List of Boolean attributes in HTML that should be rendered in
     # minimized form (e.g. <img ismap> rather than <img ismap="">)
     # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
-    # XXX The problem with this is that this is not valid XML and
+    # TODO: The problem with this is that this is not valid XML and
     # can't be parsed back!
     "compact", "nowrap", "ismap", "declare", "noshade", "checked",
     "disabled", "readonly", "multiple", "selected", "noresize",
@@ -105,7 +105,7 @@ class TALInterpreter:
         2. Comments are not allowed in XML documents before the <?xml?>
            declaration.
 
-    For performance reasons (XXX premature optimization?) instead of checking
+    For performance reasons (TODO: premature optimization?) instead of checking
     the value of _pending_source_annotation on every write to the output
     stream, the _stream_write attribute is changed to point to
     _annotated_stream_write method whenever _pending_source_annotation is
@@ -142,7 +142,7 @@ class TALInterpreter:
             -1 (which is the default setting) enables showtal when TAL
             processing is disabled, and disables showtal when TAL processing is
             enabled.  Note that you must use 0, 1, or -1; true boolean values
-            are not supported (XXX why?).
+            are not supported (TODO: why?).
 
             strictinsert -- enable TAL processing and stricter HTML/XML
             checking on text produced by structure inserts (on by default).
@@ -643,8 +643,8 @@ class TALInterpreter:
         if len(stuff) > 2:
             obj = self.engine.evaluate(stuff[2])
         xlated_msgid = self.translate(msgid, default, i18ndict, obj)
-        # XXX I can't decide whether we want to cgi escape the translated
-        # string or not.  OT1H not doing this could introduce a cross-site
+        # TODO: I can't decide whether we want to cgi escape the translated
+        # string or not.  OTOH not doing this could introduce a cross-site
         # scripting vector by allowing translators to sneak JavaScript into
         # translations.  OTOH, for implicit interpolation values, we don't
         # want to escape stuff like ${name} <= "<b>Timmy</b>".
@@ -723,7 +723,7 @@ class TALInterpreter:
             i18ndict.update(obj)
         if not self.i18nInterpolate:
             return msgid
-        # XXX We need to pass in one of context or target_language
+        # TODO: We need to pass in one of context or target_language
         return self.engine.translate(msgid, self.i18nContext.domain,
                                      i18ndict, default=default)
 
