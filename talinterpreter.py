@@ -14,7 +14,6 @@
 """
 Interpreter for a pre-compiled TAL program.
 """
-
 import sys
 
 # Do not use cStringIO here!  It's not unicode aware. :(
@@ -156,7 +155,7 @@ class TALInterpreter:
 
     def popMacro(self):
         stuff = self.macroStack.pop()
-        self.i18nContext = stuff[3]
+        #self.i18nContext = stuff[3]
         return stuff
 
     def macroContext(self, what):
