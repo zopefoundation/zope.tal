@@ -27,7 +27,6 @@ Options:
         Update the existing translation <file> with any new translation strings
         found.
 """
-
 import sys
 import time
 import getopt
@@ -40,8 +39,6 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
 from zope.i18nmessageid import MessageID
-
-__version__ = '$Revision: 1.18 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
