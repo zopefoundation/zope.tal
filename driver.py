@@ -190,6 +190,7 @@ def compilefile(file, mode=None):
     prefix = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
     if filename.startswith(prefix):
         filename = filename[len(prefix):]
+    filename = filename.replace(os.sep, '/') # test files expect slashes
     if mode == "html":
         from zope.tal.htmltalparser import HTMLTALParser
         p = HTMLTALParser(gen=TALGenerator(source_file=filename, xml=0))
