@@ -47,17 +47,21 @@ class DummyEngine(object):
         self.translationDomain = DummyTranslationDomain()
         self.useEngineAttrDicts = False
 
+    # zope.tal.interfaces.ITALExpressionCompiler
+
     def getCompilerError(self):
         return CompilerError
+
+    def compile(self, expr):
+        return "$%s$" % expr
+
+    # zope.tal.interfaces.ITALExpressionEngine
 
     def setSourceFile(self, source_file):
         self.source_file = source_file
 
     def setPosition(self, position):
         self.position = position
-
-    def compile(self, expr):
-        return "$%s$" % expr
 
     def beginScope(self):
         self.stack.append(self.locals)
@@ -115,6 +119,7 @@ class DummyEngine(object):
             return '%s (%s,%s)' % (self.source_file, lineno, offset)
         raise TALExpressionError("unrecognized expression: " + `expression`)
 
+    # implementation; can be overridden
     def evaluatePathOrVar(self, expr):
         expr = expr.strip()
         if self.locals.has_key(expr):
@@ -142,6 +147,7 @@ class DummyEngine(object):
         # TODO Should return None or a DOM tree
         return self.evaluate(expr)
 
+    # implementation; can be overridden
     def evaluateSequence(self, expr):
         # TODO: Should return a sequence
         return self.evaluate(expr)
@@ -164,14 +170,7 @@ class DummyEngine(object):
                                          (localName, file))
         return macro
 
-    def findMacroDocument(self, macroName):
-        file, localName = self.findMacroFile(macroName)
-        if not file:
-            return file, localName
-        import driver
-        doc = driver.parsefile(file)
-        return doc, localName
-
+    # internal
     def findMacroFile(self, macroName):
         if not macroName:
             raise TALExpressionError("empty macro name")
