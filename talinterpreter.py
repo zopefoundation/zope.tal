@@ -527,7 +527,6 @@ class TALInterpreter:
         # We only care about the evaluated contents if we need an implicit
         # message id.  All other useful information will be in the i18ndict on
         # the top of the i18nStack.
-
         default = normalize(tmpstream.getvalue())
         if msgid == '':
             msgid = default
@@ -543,23 +542,22 @@ class TALInterpreter:
         # want to escape stuff like ${name} <= "<b>Timmy</b>".
         #s = escape(xlated_msgid)
         s = xlated_msgid
-
-        # watch out for unknown translation message id
-        # The Plone people would like the i18n translation to return
-        # the default text when the message ID is not found in the
-        # translation table and there is an explicit message ID.
-        # example:
-        # <span i18n:translate="explict id">default text</span>
-        # will return
-        # <span>default text</span>
-        # if "explicit id" is not in the translation table
-        
+        # Watch out for unknown translation message id.  In this case, and
+        # when both an explicit message id and default text are given, the
+        # Plone people want the default text, so by Papal Edict this is what
+        # we return.  For example:
+        #
+        #     <span i18n:translate="explict id">default text</span>
+        #
+        # returns
+        #
+        #     <span>default text</span>
         if s is None:
             s = default or msgid
-
             # log that an unknown id was found
-            logging.warn('TAL/i18n: Message id %s was not found in the translation table; using default text.' % msgid)
-            
+            logging.warn('TAL/i18n: Message id %s was not found in the '
+                         'translation table; using default text: %s' %
+                         (msgid, default))
         # If there are i18n variables to interpolate into this string, better
         # do it now.
         self._stream_write(s)
