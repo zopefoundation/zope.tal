@@ -94,10 +94,10 @@ tal_fn = 'benchmark/tal%.2d.html'
 dtml_fn = 'benchmark/dtml%.2d.html'
 
 def compare(n, count, profiler=None, verbose=1):
-    t1 = int(time_zpt(tal_fn % n, count) * 1000 + 0.5)
-    t2 = int(time_tal(tal_fn % n, count) * 1000 + 0.5)
-    t3 = 'n/a' # int(time_dtml(dtml_fn % n, count) * 1000 + 0.5)
     if verbose:
+        t1 = int(time_zpt(tal_fn % n, count) * 1000 + 0.5)
+        t2 = int(time_tal(tal_fn % n, count) * 1000 + 0.5)
+        t3 = 'n/a' # int(time_dtml(dtml_fn % n, count) * 1000 + 0.5)
         print '%.2d: %10s %10s %10s' % (n, t1, t2, t3)
     if profiler:
         profile_tal(tal_fn % n, count, profiler)
