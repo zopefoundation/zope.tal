@@ -29,10 +29,10 @@ Options:
         found.
 """
 
-import getopt
 import os
 import sys
-import string
+import time
+import getopt
 import traceback
 
 from zope.tal.htmltalparser import HTMLTALParser
@@ -41,13 +41,34 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALESEngine
 from zope.tal.taldefs import TALESError
 
+__version__ = '$Revision: 1.10 $'
+
+pot_header = '''\
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\\n"
+"POT-Creation-Date: %(time)s\\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
+"Language-Team: LANGUAGE <LL@li.org>\\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=CHARSET\\n"
+"Content-Transfer-Encoding: ENCODING\\n"
+"Generated-By: talgettext.py %(version)s\\n"
+'''
+
+NLSTR = '"\n"'
+
 def usage(code, msg=''):
     # Python 2.1 required
     print >> sys.stderr, __doc__
     if msg:
         print >> sys.stderr, msg
     sys.exit(code)
-
 
 
 class POTALInterpreter(TALInterpreter):
@@ -69,7 +90,6 @@ class POTALInterpreter(TALInterpreter):
 class POEngine(DummyEngine):
     __implements__ = ITALESEngine
 
-
     def __init__(self, macros=None):
         self.catalog = {}
         DummyEngine.__init__(self, macros)
@@ -84,7 +104,7 @@ class POEngine(DummyEngine):
         return (0,) # dummy
 
     def evaluateBoolean(self, expr):
-        return 1 # dummy
+        return True # dummy
 
     def translate(self, domain, msgid, mapping, position, default=None):
         # assume domain and mapping are ignored; if they are not,
@@ -94,10 +114,11 @@ class POEngine(DummyEngine):
         self.catalog[msgid].append((self.file, position))
         return 'x'
 
+
 class UpdatePOEngine(POEngine):
     """A slightly-less braindead POEngine which supports loading an existing
     .po file first."""
-    
+
     def __init__ (self, macros=None, filename=None):
         POEngine.__init__(self, macros)
 
@@ -106,20 +127,20 @@ class UpdatePOEngine(POEngine):
         self.base = self.catalog
         self.catalog = {}
 
-    def __add(self, id, str, fuzzy):
+    def __add(self, id, s, fuzzy):
         "Add a non-fuzzy translation to the dictionary."
         if not fuzzy and str:
             # check for multi-line values and munge them appropriately
-            if ('\n' in str):
-                lines = str.rstrip().split('\n')
-                str = string.join (lines, '"\n"')
-            self.catalog[id] = str
+            if '\n' in s:
+                lines = s.rstrip().split('\n')
+                s = NLSTR.join(lines)
+            self.catalog[id] = s
 
     def _loadFile(self):
         # shamelessly cribbed from Python's Tools/i18n/msgfmt.py
-        # Nathan R. Yergler (nathan@zope.org)
-        # 25 March 2003
-        
+        # 25-Mar-2003 Nathan R. Yergler (nathan@zope.org)
+        # 14-Apr-2003 Hacked by Barry Warsaw (barry@zope.com)
+
         ID = 1
         STR = 2
 
@@ -130,20 +151,20 @@ class UpdatePOEngine(POEngine):
             sys.exit(1)
 
         section = None
-        fuzzy = 0
+        fuzzy = False
 
         # Parse the catalog
         lno = 0
         for l in lines:
-            lno += 1
+            lno += True
             # If we get a comment line after a msgstr, this is a new entry
             if l[0] == '#' and section == STR:
                 self.__add(msgid, msgstr, fuzzy)
                 section = None
-                fuzzy = 0
+                fuzzy = False
             # Record a fuzzy mark
             if l[:2] == '#,' and l.find('fuzzy'):
-                fuzzy = 1
+                fuzzy = True
             # Skip comments
             if l[0] == '#':
                 continue
@@ -181,7 +202,7 @@ class UpdatePOEngine(POEngine):
             return POEngine.evaluate(self, expression)
         except TALESError:
             pass
-    
+
     def evaluatePathOrVar(self, expr):
         return 'who cares'
 
@@ -191,7 +212,8 @@ class UpdatePOEngine(POEngine):
             POEngine.translate(self, domain, msgid, mapping, position,
                                default=default)
         return 'x'
-    
+
+
 def main():
     try:
         opts, args = getopt.getopt(
@@ -237,7 +259,7 @@ def main():
             p.parseFile(filename)
             program, macros = p.getCode()
             POTALInterpreter(program, macros, engine, stream=Devnull(),
-                             metal=0)()
+                             metal=False)()
         except: # Hee hee, I love bare excepts!
             print 'There was an error processing', filename
             traceback.print_exc()
@@ -248,17 +270,27 @@ def main():
         outfile = sys.stdout
     else:
         outfile = file(outfile, update_mode and "a" or "w")
-        
+
+    messages = engine.catalog.copy()
+    try:
+        messages.update(engine.base)
+    except AttributeError:
+        pass
+    if '' not in messages:
+        print >> outfile, pot_header % {'time': time.ctime(),
+                                        'version': __version__}
+
     msgids = engine.catalog.keys()
     msgids.sort()
     for msgid in msgids:
         positions = engine.catalog[msgid]
         for filename, position in positions:
             outfile.write('#: %s:%s\n' % (filename, position[0]))
-            
+
         outfile.write('msgid "%s"\n' % msgid)
         outfile.write('msgstr ""\n')
         outfile.write('\n')
+
 
 if __name__ == '__main__':
     main()
