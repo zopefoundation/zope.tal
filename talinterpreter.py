@@ -40,12 +40,18 @@ BOOLEAN_HTML_ATTRS = [
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
 ]
+d = {}
+for s in BOOLEAN_HTML_ATTRS:
+    d[s] = 1
+BOOLEAN_HTML_ATTRS = d
+
+_nulljoin = ''.join
 
 def normalize(text):
     # Now we need to normalize the whitespace in implicit message ids and
     # implicit $name substitution values by stripping leading and trailing
     # whitespace, and folding all internal whitespace to a single space.
-    return ' '.join(text.split())
+    return _nulljoin(text.split())
 
 
 class AltTALGenerator(TALGenerator):
@@ -245,8 +251,8 @@ class TALInterpreter:
         # for start tags with no attributes; those are optimized down
         # to rawtext events.  Hence, there is no special "fast path"
         # for that case.
-        _stream_write = self._stream_write
-        _stream_write("<" + name)
+        L = ["<", name]
+        append = L.append
         col = self.col + _len(name) + 1
         wrap = self.wrap
         align = col + 1
@@ -265,15 +271,17 @@ class TALInterpreter:
                 if (wrap and
                     col >= align and
                     col + 1 + slen > wrap):
-                    _stream_write("\n" + " "*align)
+                    append("\n")
+                    append(" "*align)
                     col = align + slen
                 else:
-                    s = " " + s
+                    append(" ")
                     col = col + 1 + slen
-                _stream_write(s)
-            _stream_write(end)
+                append(s)
+            append(end)
             col = col + endlen
         finally:
+            self._stream_write(_nulljoin(L))
             self.col = col
     bytecode_handlers["startTag"] = do_startTag
 
@@ -398,8 +406,9 @@ class TALInterpreter:
     def do_rawtextBeginScope_tal(self, (s, col, position, closeprev, dict)):
         self._stream_write(s)
         self.col = col
-        self.do_setPosition(position)
         engine = self.engine
+        self.position = position
+        engine.setPosition(position)
         if closeprev:
             engine.endScope()
             engine.beginScope()
