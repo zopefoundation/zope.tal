@@ -12,8 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for XMLParser.py."""
+"""Tests for XMLParser.py.
 
+$Id$
+"""
 import sys
 import unittest
 

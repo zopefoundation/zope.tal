@@ -11,10 +11,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Common definitions used by TAL and METAL compilation and transformation.
-"""
+"""Common definitions used by TAL and METAL compilation and transformation.
 
+$Id$
+"""
 import re
 from zope.tal.interfaces import ITALExpressionErrorInfo
 from zope.interface import implements
