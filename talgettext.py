@@ -32,6 +32,7 @@ Options:
 import getopt
 import os
 import sys
+import string
 
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
@@ -73,6 +74,11 @@ class UpdatePOEngine(POEngine):
     def __add(self, id, str, fuzzy):
         "Add a non-fuzzy translation to the dictionary."
         if not fuzzy and str:
+            # check for multi-line values and munge them appropriately
+            if ('\n' in str):
+                str = '\n' + str
+                lines = str.split('\n')
+                str = string.join (lines, '"\n"')
             self.catalog[id] = str
 
     def _loadFile(self):
@@ -182,7 +188,6 @@ def main():
         engine = POEngine()
         
     for file in args:
-        print file
         p = HTMLTALParser()
         p.parseFile(file)
         program, macros = p.getCode()
