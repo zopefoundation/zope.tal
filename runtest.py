@@ -12,10 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Driver program to run METAL and TAL regression tests.
-"""
+"""Driver program to run METAL and TAL regression tests.
 
+$Id$
+"""
 import glob
 import os
 import sys

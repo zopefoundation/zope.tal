@@ -12,8 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Driver program to test METAL and TAL implementation.
+"""Driver program to test METAL and TAL implementation.
 
 Usage: driver.py [options] [file]
 Options:
