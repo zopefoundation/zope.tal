@@ -11,8 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Code generator for TALInterpreter intermediate code.
+"""Code generator for TALInterpreter intermediate code.
+
+$Id: talgenerator.py,v 1.9 2003/07/29 14:15:22 fdrake Exp $
 """
 
 import cgi
@@ -657,8 +658,9 @@ class TALGenerator:
             for key, value in repldict.items():
                 if i18nattrs.get(key, None):
                     raise I18NError(
-                "attribute [%s] cannot both be part of tal:attributes and have a msgid in i18n:attributes" % key,
-                    position)
+                        "attribute [%s] cannot both be part of tal:attributes"
+                        " and have a msgid in i18n:attributes" % key,
+                        position)
                 ce = self.compileExpression(value)
                 repldict[key] = ce, key in i18nattrs, i18nattrs.get(key)
             for key in i18nattrs:
