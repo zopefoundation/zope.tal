@@ -31,10 +31,10 @@ class test_POEngine(unittest.TestCase):
         engine = POEngine()
         engine.file = 'foo.pt'
         for key in test_keys:
-            engine.translate(key)
+            engine.translate(key, 'domain')
 
         for key in test_keys:
-            self.failIf(key not in engine.catalog,
+            self.failIf(key not in engine.catalog['domain'],
                         "POEngine catalog does not properly store message ids"
                         )
 

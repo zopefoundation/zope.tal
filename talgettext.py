@@ -41,7 +41,7 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
 
-__version__ = '$Revision: 1.14 $'
+__version__ = '$Revision: 1.15 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -110,11 +110,14 @@ class POEngine(DummyEngine):
                   # XXX position is not part of the ITALExpressionEngine
                   #     interface
                   position=None):
-        # assume domain and mapping are ignored; if they are not,
-        # unit test must be updated.
-        if msgid not in self.catalog:
-            self.catalog[msgid] = []
-        self.catalog[msgid].append((self.file, position))
+
+        if domain not in self.catalog:
+            self.catalog[domain] = {}
+        domain = self.catalog[domain]
+
+        if msgid not in domain:
+            domain[msgid] = []
+        domain[msgid].append((self.file, position))
         return 'x'
 
 
@@ -273,7 +276,11 @@ def main():
     else:
         outfile = file(outfile, update_mode and "a" or "w")
 
-    messages = engine.catalog.copy()
+    catalog = {}
+    for domain in engine.catalog.keys():
+        catalog.update(engine.catalog[domain])
+
+    messages = catalog.copy()
     try:
         messages.update(engine.base)
     except AttributeError:
@@ -282,7 +289,8 @@ def main():
         print >> outfile, pot_header % {'time': time.ctime(),
                                         'version': __version__}
 
-    msgids = engine.catalog.keys()
+    msgids = catalog.keys()
+    # XXX: You should not sort by msgid, but by filename and position. (SR)
     msgids.sort()
     for msgid in msgids:
         positions = engine.catalog[msgid]
