@@ -11,8 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Generic expat-based XML parser base class.
+"""Generic Expat-based XML parser base class.
+
+This creates a parser with namespace processing enabled.
 """
 
 import logging
