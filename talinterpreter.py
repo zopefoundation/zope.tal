@@ -321,7 +321,13 @@ class TALInterpreter:
     def attrAction_tal(self, item):
         name, value, action = item[:3]
         if action in ('metal', 'tal', 'xmlns', 'i18n'):
-            return self.attrAction(item)
+            if not self.showtal:
+                # This shortcuts a common case that's also handled by
+                # the short path in .attrAction(); this avoids a
+                # method call that gets called too often.
+                return 0, name, value
+            else:
+                return self.attrAction(item)
         ok = 1
         expr, xlat, msgid = item[3:]
         if self.html and name.lower() in BOOLEAN_HTML_ATTRS:
