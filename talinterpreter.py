@@ -523,9 +523,9 @@ class TALInterpreter:
         # We only care about the evaluated contents if we need an implicit
         # message id.  All other useful information will be in the i18ndict on
         # the top of the i18nStack.
-        default = normalize(tmpstream.getvalue())
+        default = tmpstream.getvalue()
         if msgid == '':
-            msgid = default
+            msgid = normalize(default)
         self.i18nStack.pop()
         # See if there is was an i18n:data for msgid
         if len(stuff) > 2:
