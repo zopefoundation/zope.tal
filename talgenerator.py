@@ -339,7 +339,7 @@ class TALGenerator:
         m = _name_rx.match(varname)
         if m is None or m.group() != varname:
             raise TALError("illegal i18n:name: %r" % varname, self.position)
-        cexpr = None
+        key = cexpr = None
         program = self.popProgram()
         if action == I18N_REPLACE:
             # This is a tag with an i18n:name and a tal:replace (implicit or
@@ -355,7 +355,8 @@ class TALGenerator:
             assert action == I18N_EXPRESSION
             key, expr = parseSubstitution(expression)
             cexpr = self.compileExpression(expr)
-        self.emit('i18nVariable', varname, program, cexpr)
+        self.emit('i18nVariable',
+                  varname, program, cexpr, int(key == "structure"))
 
     def emitTranslation(self, msgid, i18ndata):
         program = self.popProgram()
@@ -797,7 +798,8 @@ class TALGenerator:
             #   - I18N_CONTENT for tal:content
             #   - I18N_EXPRESSION for explicit tal:replace
             # o varname[2] will be None for the first two actions and the
-            #   replacement tal expression for the third action.
+            #   replacement tal expression for the third action.  This
+            #   can include a 'text' or 'structure' indicator.
             assert (varname[1]
                     in [I18N_REPLACE, I18N_CONTENT, I18N_EXPRESSION])
             self.emitI18nVariable(varname)
