@@ -74,7 +74,7 @@ class POEngine(DummyEngine):
         self.catalog = {}
         DummyEngine.__init__(self, macros)
 
-    def evalaluate(*args):
+    def evaluate(*args):
         return '' # who cares
 
     def evaluatePathOrVar(*args):
@@ -242,8 +242,8 @@ def main():
             print 'There was an error processing', filename
             traceback.print_exc()
 
-    # Now output the keys in the engine
-    # write them to a file if --output is specified; otherwise use standard out
+    # Now output the keys in the engine.  Write them to a file if --output or
+    # --update was specified; otherwise use standard out.
     if (outfile is None):
         outfile = sys.stdout
     else:
