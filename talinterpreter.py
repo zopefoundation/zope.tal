@@ -405,8 +405,6 @@ class TALInterpreter(object):
             # use-macro and its extensions
             if len(macs) > 1:
                 for macro in macs[1:]:
-                    if macro is None:
-                        return ()
                     extending = macro[3]
                     if not extending:
                         return ()
@@ -773,14 +771,6 @@ class TALInterpreter(object):
         macs = self.macroStack
         wasInUse = self.inUseDirective
         self.inUseDirective = False
-        if len(macs) == 1:
-            entering = macs[-1][4]
-            if not entering:
-                macs.append(None)
-                self.interpret(macro)
-                assert macs[-1] is None
-                macs.pop()
-                return
         self.interpret(macro)
         self.inUseDirective = wasInUse
     bytecode_handlers["defineMacro"] = do_defineMacro
@@ -846,7 +836,7 @@ class TALInterpreter(object):
             self.interpret(block)
             return
         macs = self.macroStack
-        if macs and macs[-1] is not None:
+        if macs:
             len_macs = len(macs)
             # Measure the extension depth of this use-macro
             depth = 1
