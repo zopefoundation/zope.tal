@@ -144,6 +144,10 @@ class HTMLTALParser(HTMLParser):
         self.scan_xmlns(attrs)
         tag, attrlist, taldict, metaldict, i18ndict \
              = self.process_ns(tag, attrs)
+        if tag in EMPTY_HTML_TAGS and "content" in taldict:
+            raise TALError(
+                "empty HTML tags cannot use tal:content: %s" % `tag`,
+                self.getpos())
         self.tagstack.append(tag)
         self.gen.emitStartElement(tag, attrlist, taldict, metaldict, i18ndict,
                                   self.getpos())
@@ -156,6 +160,10 @@ class HTMLTALParser(HTMLParser):
         tag, attrlist, taldict, metaldict, i18ndict \
              = self.process_ns(tag, attrs)
         if taldict.get("content"):
+            if tag in EMPTY_HTML_TAGS:
+                raise TALError(
+                    "empty HTML tags cannot use tal:content: %s" % `tag`,
+                    self.getpos())
             self.gen.emitStartElement(tag, attrlist, taldict, metaldict,
                                       i18ndict, self.getpos())
             self.gen.emitEndElement(tag, implied=-1)
