@@ -455,13 +455,13 @@ class TALGenerator:
         for item in attrlist:
             key = item[0]
             if repldict.has_key(key):
-                expr, xlat = repldict[key]
-                item = item[:2] + ("replace", expr, xlat)
+                expr, xlat, msgid = repldict[key]
+                item = item[:2] + ("replace", expr, xlat, msgid)
                 del repldict[key]
             newlist.append(item)
         # Add dynamic-only attributes
-        for key, (expr, xlat) in repldict.items():
-            newlist.append((key, None, "insert", expr, xlat))
+        for key, (expr, xlat, msgid) in repldict.items():
+            newlist.append((key, None, "insert", expr, xlat, msgid))
         return newlist
 
     def emitStartElement(self, name, attrlist, taldict, metaldict, i18ndict,
@@ -644,16 +644,17 @@ class TALGenerator:
             else:
                 repldict = {}
             if i18nattrs:
-                i18nattrs = i18nattrs.split()
+                i18nattrs = _parseI18nAttributes(i18nattrs, self.position)
             else:
-                i18nattrs = ()
+                i18nattrs = {}
             # Convert repldict's name-->expr mapping to a
             # name-->(compiled_expr, translate) mapping
             for key, value in repldict.items():
-                repldict[key] = self.compileExpression(value), key in i18nattrs
+                ce = self.compileExpression(value)
+                repldict[key] = ce, key in i18nattrs, i18nattrs.get(key)
             for key in i18nattrs:
                 if key not in repldict:
-                    repldict[key] = None, 1
+                    repldict[key] = None, 1, i18nattrs.get(key)
         else:
             repldict = {}
         if replace:
@@ -774,6 +775,22 @@ class TALGenerator:
             self.emitUseMacro(useMacro)
         if defineMacro:
             self.emitDefineMacro(defineMacro)
+
+def _parseI18nAttributes(i18nattrs, position):
+    d = {}
+    for spec in i18nattrs.split(";"):
+        parts = spec.split()
+        if len(parts) > 2:
+            raise TALError("illegal i18n:attributes specification: %r" % spec,
+                           position)
+        if len(parts) == 2:
+            attr, msgid = parts
+        else:
+            # len(parts) == 1
+            attr = parts[0]
+            msgid = None
+        d[attr] = msgid
+    return d
 
 def test():
     t = TALGenerator()

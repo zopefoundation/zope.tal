@@ -314,7 +314,7 @@ class TALInterpreter:
         if action in ('metal', 'tal', 'xmlns', 'i18n'):
             return self.attrAction(item)
         ok = 1
-        expr, msgid = item[3:]
+        expr, xlat, msgid = item[3:]
         if self.html and name.lower() in BOOLEAN_HTML_ATTRS:
             evalue = self.engine.evaluateBoolean(item[3])
             if evalue is self.Default:
@@ -335,8 +335,8 @@ class TALInterpreter:
                         ok = 0
                     value = evalue
         if ok:
-            if msgid:
-                translated = self.i18n_attribute(value)
+            if xlat:
+                translated = self.i18n_attribute(msgid or value)
                 if translated is not None:
                     value = translated
             if value is None:
