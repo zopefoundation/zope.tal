@@ -126,7 +126,9 @@ class ITALESEngine(Interface):
         """
         """
 
-    def translate(domain, msgid, mapping, default=None):
+    # XXX msgid should come first, with domain defaulting to None.  When msgid
+    # is a MessageID, domain tags along and needn't be specified.
+    def translate(domain, msgid, mapping=None, default=None):
         """
         See ITranslationService.translate()
         """
