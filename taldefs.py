@@ -12,7 +12,7 @@
 #
 ##############################################################################
 """
-Common definitions used by TAL and METAL compilation an transformation.
+Common definitions used by TAL and METAL compilation and transformation.
 """
 
 import re

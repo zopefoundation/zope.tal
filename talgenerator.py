@@ -694,7 +694,7 @@ class TALGenerator:
             todo["repldict"] = repldict
             repldict = {}
         if script:
-            todo["script"] = script    
+            todo["script"] = script
         self.emitStartTag(name, self.replaceAttrs(attrlist, repldict), isend)
         if optTag:
             self.pushProgram()
@@ -705,7 +705,7 @@ class TALGenerator:
         if content and varname:
             self.pushProgram()
         if script:
-            self.pushProgram()            
+            self.pushProgram()
         if todo and position != (None, None):
             todo["position"] = position
         self.todoPush(todo)
@@ -797,7 +797,7 @@ class TALGenerator:
             self.emitI18nVariable(varname)
         # Do not test for "msgid is not None", i.e. we only want to test for
         # explicit msgids here.  See comment above.
-        if msgid is not None: 
+        if msgid is not None:
             # in case tal:content, i18n:translate and i18n:name in the
             # same tag insertTranslation opcode has already been
             # emitted

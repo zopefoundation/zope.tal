@@ -11,7 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Interface that a TAL expression implementation provides to the METAL/TAL implementation."""
+"""Interface that a TAL expression implementation provides to the METAL/TAL
+implementation.
+"""
 
 from zope.interface import Attribute, Interface
 
@@ -165,7 +167,7 @@ class ITALExpressionEngine(Interface):
         per-language basis. In Python this usually everything the print
         statement will return.
         """
-        
+
 
 class ITALIterator(Interface):
     """A TAL iterator

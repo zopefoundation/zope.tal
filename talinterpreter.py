@@ -335,7 +335,7 @@ class TALInterpreter:
                 if evalue is None:
                     ok = 0
                 value = evalue
-                
+
         if ok:
             if xlat:
                 translated = self.translate(msgid or value, value, {})
@@ -488,7 +488,7 @@ class TALInterpreter:
             # i18n interpolation dictionary.
             value = self.engine.evaluate(expression)
 
-            # evaluate() does not do any I18n, so we do it here. 
+            # evaluate() does not do any I18n, so we do it here.
             if isinstance(value, MessageID):
                 # Translate this now.
                 value = self.engine.translate(value)
@@ -599,7 +599,7 @@ class TALInterpreter:
             self.popStream()
         code = tmpstream.getvalue()
         output = self.engine.evaluateCode(lang, code)
-        self._stream_write(output)        
+        self._stream_write(output)
     bytecode_handlers["evaluateCode"] = do_evaluateCode
 
     def do_loop(self, (name, expr, block)):
@@ -665,8 +665,8 @@ class TALInterpreter:
                 raise METALError("macro %s has incompatible mode %s" %
                                  (`macroName`, `mode`), self.position)
         self.pushMacro(macroName, compiledSlots)
-        
-        # We want 'macroname' name to be always available as a variable 
+
+        # We want 'macroname' name to be always available as a variable
         outer = self.engine.getValue('macroname')
         self.engine.setLocal('macroname', macroName.split('/')[-1])
 

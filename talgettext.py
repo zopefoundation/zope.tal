@@ -113,7 +113,7 @@ class POEngine(DummyEngine):
         # text into a comment.
         if default is not None and normalize(default) != msgid:
             msgid = MessageID(msgid, default=default)
-        
+
         if domain not in self.catalog:
             self.catalog[domain] = {}
         domain = self.catalog[domain]
