@@ -549,14 +549,8 @@ class TALInterpreter:
         #
         #     <span>default text</span>
         assert xlated_msgid is not None
-##        if xlated_msgid is None:
-##            s = default or msgid
-##            # log that an unknown id was found
-##            logging.warn('TAL/i18n: Message id %s was not found in the '
-##                         'translation table; using default text: %s' %
-##                         (msgid, default))
-        # If there are i18n variables to interpolate into this string, better
-        # do it now.
+        # If there are i18n variables to interpolate into this string,
+        # better do it now.
         self._stream_write(xlated_msgid)
     bytecode_handlers['insertTranslation'] = do_insertTranslation
 
