@@ -713,32 +713,40 @@ translated string</span>
     def test_i18n_data_with_name(self):
         # input/test29.html
         self._run_check('''\
-At the tone the time will be
+<div i18n:translate="">At the tone the time will be
 <span i18n:data="here/currentTime"
       i18n:translate="timefmt"
-      i18n:name="time">2:32 pm</span>... beep!
-''', [
-  ('rawtextBeginScope',
-   ('At the tone the time will be\n',
-    0,
-    (2, 0),
-    0,
-    {'i18n:data': 'here/currentTime',
-     'i18n:name': 'time',
-     'i18n:translate': 'timefmt'})),
-  ('insertTranslation',
-   ('timefmt',
-    [('startTag',
-      ('span',
-       [('i18n:data', 'here/currentTime', 'i18n'),
-        ('i18n:translate', 'timefmt', 'i18n'),
-        ('i18n:name', 'time', 'i18n')])),
-     ('i18nVariable', ('time', [], None))],
-    '$here/currentTime$')),
-  ('endScope', ()),
-  ('rawtextColumn', ('... beep!\n', 0))
-  ])
+      i18n:name="time">2:32 pm</span>... beep!</div>
+''',
+[('setPosition', (1, 0)),
+ ('beginScope', {'i18n:translate': ''}),
+ ('startTag', ('div', [('i18n:translate', '', 'i18n')])),
+ ('insertTranslation',
+  ('',
+   [('rawtextBeginScope',
+     ('At the tone the time will be\n',
+      0,
+      (2, 0),
+      0,
+      {'i18n:data': 'here/currentTime',
+       'i18n:name': 'time',
+       'i18n:translate': 'timefmt'})),
+    ('insertTranslation',
+     ('timefmt',
+      [('startTag',
+        ('span',
+         [('i18n:data', 'here/currentTime', 'i18n'),
+          ('i18n:translate', 'timefmt', 'i18n'),
+          ('i18n:name', 'time', 'i18n')])),
+       ('i18nVariable', ('time', [], None))],
+      '$here/currentTime$')),
+    ('endScope', ()),
+    ('rawtextOffset', ('... beep!', 9))])),
+ ('endScope', ()),
+ ('rawtextColumn', ('</div>\n', 0))]
+)
 
+ 
     def test_i18n_explicit_msgid_with_name(self):
         # input/test26.html
         self._run_check('''\

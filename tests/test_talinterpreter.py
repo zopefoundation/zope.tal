@@ -22,9 +22,9 @@ from StringIO import StringIO
 from zope.tal.taldefs import METALError, I18NError
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.dummyengine import DummyEngine
+from zope.tal.dummyengine import DummyEngine, DummyTranslationService
 from zope.tal.tests import utils
-
+from zope.i18n.messageid import MessageID
 
 class TestCaseBase(unittest.TestCase):
 
@@ -57,6 +57,79 @@ class MacroErrorsTestCase(TestCaseBase):
 
     def test_version_error(self):
         self.macro[0] = ("version", "duh")
+
+
+class I18NCornerTestCase(TestCaseBase):
+
+    def setUp(self):
+        self.engine = DummyEngine()
+        self.engine.setLocal('foo', MessageID('FoOvAlUe', 'default'))
+        self.engine.setLocal('bar', 'BaRvAlUe')
+
+    def _check(self, program, expected):
+        result = StringIO()
+        self.interpreter = TALInterpreter(program, {}, self.engine,
+                                          stream=result)
+        self.interpreter()
+        self.assertEqual(expected, result.getvalue())
+
+    def test_simple_messageid_translate(self):
+        # This test is mainly here to make sure our DummyEngine works
+        # correctly.
+        program, macros = self._compile('<span tal:content="foo"/>')
+        self._check(program, '<span>FOOVALUE</span>\n')
+
+        program, macros = self._compile('<span tal:replace="foo"/>')
+        self._check(program, 'FOOVALUE\n')
+
+    def test_replace_with_messageid_and_i18nname(self):
+        program, macros = self._compile(
+            '<div i18n:translate="" >'
+            '<span tal:replace="foo" i18n:name="foo_name"/>'
+            '</div>')
+        self._check(program, '<div>FOOVALUE</div>\n')
+
+    def test_pythonexpr_replace_with_messageid_and_i18nname(self):
+        program, macros = self._compile(
+            '<div i18n:translate="" >'
+            '<span tal:replace="python: foo" i18n:name="foo_name"/>'
+            '</div>')
+        self._check(program, '<div>FOOVALUE</div>\n')
+
+    def test_structure_replace_with_messageid_and_i18nname(self):
+        program, macros = self._compile(
+            '<div i18n:translate="" >'
+            '<span tal:replace="structure foo" i18n:name="foo_name"/>'
+            '</div>')
+        self._check(program, '<div>FOOVALUE</div>\n')
+
+    def test_complex_replace_with_messageid_and_i18nname(self):
+        program, macros = self._compile(
+            '<div i18n:translate="" >'
+            '<em i18n:name="foo_name">'
+            '<span tal:replace="foo"/>'
+            '</em>'
+            '</div>')
+        self._check(program, '<div>FOOVALUE</div>\n')
+
+    def test_content_with_messageid_and_i18nname(self):
+        program, macros = self._compile(
+            '<div i18n:translate="" >'
+            '<span tal:content="foo" i18n:name="foo_name"/>'
+            '</div>')
+        self._check(program, '<div><span>FOOVALUE</span></div>\n')
+
+    def test_content_with_messageid_and_i18nname_and_i18ntranslate(self):
+        # Let's tell the user this is incredibly silly!
+        self.assertRaises(
+            I18NError, self._compile,
+            '<span i18n:translate="" tal:content="foo" i18n:name="foo_name"/>')
+
+    def test_content_with_plaintext_and_i18nname_and_i18ntranslate(self):
+        # Let's tell the user this is incredibly silly!
+        self.assertRaises(
+            I18NError, self._compile,
+            '<span i18n:translate="" i18n:name="color_name">green</span>')
 
 
 class I18NErrorsTestCase(TestCaseBase):
@@ -124,6 +197,7 @@ def test_suite():
     suite = unittest.makeSuite(I18NErrorsTestCase)
     suite.addTest(unittest.makeSuite(MacroErrorsTestCase))
     suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
+    suite.addTest(unittest.makeSuite(I18NCornerTestCase))
     return suite
 
 if __name__ == "__main__":

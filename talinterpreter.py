@@ -487,6 +487,12 @@ class TALInterpreter:
             # Evaluate the value to be associated with the variable in the
             # i18n interpolation dictionary.
             value = self.engine.evaluate(expression)
+
+            # evaluate() does not do any I18n, so we do it here. 
+            if isinstance(value, MessageID):
+                # Translate this now.
+                value = self.engine.translate(value)
+
         # Either the i18n:name tag is nested inside an i18n:translate in which
         # case the last item on the stack has the i18n dictionary and string
         # representation, or the i18n:name and i18n:translate attributes are

@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001, 2002 Zope Corporation and Contributors.
+# Copyright (c) 2001, 2002, 2003 Zope Corporation and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -12,14 +12,16 @@
 #
 ##############################################################################
 """Dummy TAL expression engine so that I can test out the TAL implementation.
-"""
 
+$Id: dummyengine.py,v 1.12 2003/08/08 23:04:56 srichter Exp $
+"""
 import re
 
 from zope.interface import implements
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18n.interfaces import ITranslationService
+from zope.i18n.messageid import MessageID
 
 Default = object()
 
@@ -87,6 +89,7 @@ class DummyEngine:
         else:
             type = "path"
             expr = expression
+
         if type in ("string", "str"):
             return expr
         if type in ("path", "var", "global", "local"):
@@ -127,6 +130,8 @@ class DummyEngine:
 
     def evaluateText(self, expr):
         text = self.evaluate(expr)
+        if isinstance(text, (str, unicode, MessageID)):
+            return text
         if text is not None and text is not Default:
             text = str(text)
         return text
@@ -227,6 +232,11 @@ class DummyTranslationService:
         # If the domain is a string method, then transform the string
         # by calling that method.
 
+        # MessageID attributes override arguments
+        if isinstance(msgid, MessageID):
+            domain = msgid.domain
+            mapping = msgid.mapping
+            default = msgid.default
 
         # simulate an unknown msgid by returning None
         if msgid == "don't translate me":

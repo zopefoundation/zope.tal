@@ -13,7 +13,7 @@
 ##############################################################################
 """Code generator for TALInterpreter intermediate code.
 
-$Id: talgenerator.py,v 1.9 2003/07/29 14:15:22 fdrake Exp $
+$Id: talgenerator.py,v 1.10 2003/08/08 23:04:56 srichter Exp $
 """
 
 import cgi
@@ -64,6 +64,7 @@ class TALGenerator:
             self.source_file = source_file
             self.emit("setSourceFile", source_file)
         self.i18nContext = TranslationContext()
+        self.i18nLevel = 0
 
     def getCode(self):
         assert not self.stack
@@ -347,8 +348,6 @@ class TALGenerator:
             assert action == I18N_EXPRESSION
             key, expr = parseSubstitution(expression)
             cexpr = self.compileExpression(expr)
-        # XXX Would key be anything but 'text' or None?
-        assert key in ('text', None)
         self.emit('i18nVariable', varname, program, cexpr)
 
     def emitTranslation(self, msgid, i18ndata):
@@ -521,6 +520,11 @@ class TALGenerator:
         varname = i18ndict.get('name')
         i18ndata = i18ndict.get('data')
 
+        if varname and not self.i18nLevel:
+            raise I18NError(
+                "i18n:name can only occur inside a translation unit",
+                position)
+
         if i18ndata and not msgid:
             raise I18NError("i18n:data must be accompanied by i18n:translate",
                             position)
@@ -635,6 +639,7 @@ class TALGenerator:
             todo['i18nvar'] = (varname, None)
             self.pushProgram()
         if msgid is not None:
+            self.i18nLevel += 1
             todo['msgid'] = msgid
         if i18ndata:
             todo['i18ndata'] = i18ndata
@@ -733,8 +738,10 @@ class TALGenerator:
         # the opcode after the i18nVariable opcode so we can better handle
         # tags with both of them in them (and in the latter case, the contents
         # would be thrown away for msgid purposes).
-        if msgid is not None and not varname:
-            self.emitTranslation(msgid, i18ndata)
+        if msgid is not None:
+            if not varname:
+                self.emitTranslation(msgid, i18ndata)
+            self.i18nLevel -= 1
         if optTag:
             self.emitOptTag(name, optTag, isend)
         elif not isend:
