@@ -216,6 +216,14 @@ class I18NCornerTestCase(TestCaseBase):
             '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
             result.getvalue())
 
+    def test_for_handling_unicode_vars(self):
+        # Make sure that non-ASCII Unicode is substituted correctly.
+        # http://collector.zope.org/Zope3-dev/264
+        program, macros = self._compile(
+            "<div i18n:translate='' tal:define='bar python:unichr(0xC0)'>"
+            "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
+        self._check(program, u"<div>FOO \u00C0</div>\n")
+
 
 class ScriptTestCase(TestCaseBase):
 

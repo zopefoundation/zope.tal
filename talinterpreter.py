@@ -605,7 +605,7 @@ class TALInterpreter(object):
                 value = self.engine.translate(value)
 
             if not structure:
-                value = cgi.escape(str(value))
+                value = cgi.escape(unicode(value))
 
         # Either the i18n:name tag is nested inside an i18n:translate in which
         # case the last item on the stack has the i18n dictionary and string
