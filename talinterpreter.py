@@ -18,6 +18,7 @@ Interpreter for a pre-compiled TAL program.
 import getopt
 import re
 import sys
+import logging
 
 from cgi import escape
 # Do not use cStringIO here!  It's not unicode aware. :(
@@ -555,6 +556,9 @@ class TALInterpreter:
         
         if s is None:
             s = default or msgid
+
+            # log that an unknown id was found
+            logging.warn('TAL/i18n: Message id %s was not found in the translation table; using default text.' % msgid)
             
         # If there are i18n variables to interpolate into this string, better
         # do it now.
