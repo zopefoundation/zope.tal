@@ -14,7 +14,7 @@
 ##############################################################################
 """Tests for TALInterpreter.
 
-$Id: test_talinterpreter.py,v 1.8 2003/08/21 14:19:29 srichter Exp $
+$Id: test_talinterpreter.py,v 1.9 2004/03/08 23:33:58 srichter Exp $
 """
 import sys
 import unittest
@@ -24,7 +24,7 @@ from StringIO import StringIO
 from zope.tal.taldefs import METALError, I18NError
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.dummyengine import DummyEngine, DummyTranslationService
+from zope.tal.dummyengine import DummyEngine, DummyTranslationDomain
 from zope.tal.tests import utils
 from zope.i18n.messageid import MessageID
 
@@ -175,18 +175,18 @@ class I18NCornerTestCase(TestCaseBase):
 
     def test_for_correct_msgids(self):
 
-        class CollectingTranslationService(DummyTranslationService):
+        class CollectingTranslationDomain(DummyTranslationDomain):
             data = []
 
-            def translate(self, msgid, domain=None, mapping=None,
+            def translate(self, msgid, mapping=None,
                           context=None, target_language=None, default=None):
                 self.data.append(msgid)
-                return DummyTranslationService.translate(
+                return DummyTranslationDomain.translate(
                     self,
-                    msgid, domain, mapping, context, target_language, default)
+                    msgid, mapping, context, target_language, default)
 
-        xlatsvc = CollectingTranslationService()
-        self.engine.translationService = xlatsvc
+        xlatdmn = CollectingTranslationDomain()
+        self.engine.translationDomain = xlatdmn
         result = StringIO()
         program, macros = self._compile(
             '<div i18n:translate="">This is text for '
@@ -195,9 +195,9 @@ class I18NCornerTestCase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        self.assert_('BaRvAlUe' in xlatsvc.data)
+        self.assert_('BaRvAlUe' in xlatdmn.data)
         self.assert_('This is text for ${bar_name}.' in
-                     xlatsvc.data)
+                     xlatdmn.data)
         self.assertEqual(
             '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
             result.getvalue())

@@ -13,9 +13,8 @@
 ##############################################################################
 """Code generator for TALInterpreter intermediate code.
 
-$Id: talgenerator.py,v 1.13 2003/11/03 21:37:50 jeremy Exp $
+$Id: talgenerator.py,v 1.14 2004/03/08 23:33:58 srichter Exp $
 """
-
 import cgi
 import re
 
