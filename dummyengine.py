@@ -11,14 +11,14 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Dummy TALES engine so that I can test out the TAL implementation.
+"""Dummy TAL expression engine so that I can test out the TAL implementation.
 """
 
 import re
 
-from zope.tal.taldefs import NAME_RE, TALESError, ErrorInfo
-from zope.tal.interfaces import ITALESCompiler, ITALESEngine
+from zope.interface import implements
+from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
+from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18n.interfaces import ITranslationService
 
 Default = object()
@@ -33,7 +33,7 @@ class DummyEngine:
     position = None
     source_file = None
 
-    __implements__ = ITALESCompiler, ITALESEngine
+    implements(ITALExpressionCompiler, ITALExpressionEngine)
 
     def __init__(self, macros=None):
         if macros is None:
@@ -99,7 +99,7 @@ class DummyEngine:
             try:
                 return eval(expr, self.globals, self.locals)
             except:
-                raise TALESError("evaluation error in %s" % `expr`)
+                raise TALExpressionError("evaluation error in %s" % `expr`)
         if type == "position":
             # Insert the current source file name, line number,
             # and column offset.
@@ -108,7 +108,7 @@ class DummyEngine:
             else:
                 lineno, offset = None, None
             return '%s (%s,%s)' % (self.source_file, lineno, offset)
-        raise TALESError("unrecognized expression: " + `expression`)
+        raise TALExpressionError("unrecognized expression: " + `expression`)
 
     def evaluatePathOrVar(self, expr):
         expr = expr.strip()
@@ -117,7 +117,7 @@ class DummyEngine:
         elif self.globals.has_key(expr):
             return self.globals[expr]
         else:
-            raise TALESError("unknown variable: %s" % `expr`)
+            raise TALExpressionError("unknown variable: %s" % `expr`)
 
     def evaluateValue(self, expr):
         return self.evaluate(expr)
@@ -153,8 +153,8 @@ class DummyEngine:
             program, macros = driver.compilefile(file)
             macro = macros.get(localName)
             if not macro:
-                raise TALESError("macro %s not found in file %s" %
-                                 (localName, file))
+                raise TALExpressionError("macro %s not found in file %s" %
+                                         (localName, file))
         return macro
 
     def findMacroDocument(self, macroName):
@@ -167,7 +167,7 @@ class DummyEngine:
 
     def findMacroFile(self, macroName):
         if not macroName:
-            raise TALESError("empty macro name")
+            raise TALExpressionError("empty macro name")
         i = macroName.rfind('/')
         if i < 0:
             # No slash -- must be a locally defined macro

@@ -37,10 +37,10 @@ import traceback
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.dummyengine import DummyEngine
-from zope.tal.interfaces import ITALESEngine
-from zope.tal.taldefs import TALESError
+from zope.tal.interfaces import ITALExpressionEngine
+from zope.tal.taldefs import TALExpressionError
 
-__version__ = '$Revision: 1.12 $'
+__version__ = '$Revision: 1.13 $'
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -87,7 +87,7 @@ class POTALInterpreter(TALInterpreter):
 
 
 class POEngine(DummyEngine):
-    __implements__ = ITALESEngine
+    __implements__ = ITALExpressionEngine
 
     def __init__(self, macros=None):
         self.catalog = {}
@@ -106,7 +106,7 @@ class POEngine(DummyEngine):
         return True # dummy
 
     def translate(self, msgid, domain=None, mapping=None, default=None,
-                  # XXX position is not part of the ITALESEngine interface
+                  # XXX position is not part of the ITALExpressionEngine interface
                   position=None):
         # assume domain and mapping are ignored; if they are not,
         # unit test must be updated.
@@ -201,7 +201,7 @@ class UpdatePOEngine(POEngine):
     def evaluate(self, expression):
         try:
             return POEngine.evaluate(self, expression)
-        except TALESError:
+        except TALExpressionError:
             pass
 
     def evaluatePathOrVar(self, expr):

@@ -11,16 +11,16 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Interface that a TALES engine provides to the METAL/TAL implementation."""
+"""Interface that a TAL expression implementation provides to the METAL/TAL implementation."""
 
 from zope.interface import Attribute, Interface
 
 
-class ITALESCompiler(Interface):
-    """Compile-time interface provided by a TALES implementation.
+class ITALExpressionCompiler(Interface):
+    """Compile-time interface provided by a TAL expression implementation.
 
     The TAL compiler needs an instance of this interface to support
-    compilation of TALES expressions embedded in documents containing
+    compilation of TAL expressions embedded in documents containing
     TAL and METAL constructs.
     """
 
@@ -34,22 +34,22 @@ class ITALESCompiler(Interface):
         'expression' is the source text of the expression.
 
         The return value may be passed to the various evaluate*()
-        methods of the ITALESEngine interface.  No compatibility is
+        methods of the ITALExpressionEngine interface.  No compatibility is
         required for the values of the compiled expression between
-        different ITALESEngine implementations.
+        different ITALExpressionEngine implementations.
         """
 
 
-class ITALESEngine(Interface):
-    """Render-time interface provided by a TALES implementation.
+class ITALExpressionEngine(Interface):
+    """Render-time interface provided by a TAL expression implementation.
 
-    The TAL interpreter uses this interface to TALES to support
+    The TAL interpreter uses this interface to TAL expression to support
     evaluation of the compiled expressions returned by
-    ITALESCompiler.compile().
+    ITALExpressionCompiler.compile().
     """
 
     def getDefault():
-        """Return the value of the 'default' TALES expression.
+        """Return the value of the 'default' TAL expression.
 
         Checking a value for a match with 'default' should be done
         using the 'is' operator in Python.
@@ -117,7 +117,7 @@ class ITALESEngine(Interface):
         """
 
     def createErrorInfo(exception, (lineno, offset)):
-        """Returns an ITALESErrorInfo object.
+        """Returns an ITALExpressionErrorInfo object.
 
         The returned object is used to provide information about the
         error condition for the on-error handler.
@@ -136,7 +136,10 @@ class ITALESEngine(Interface):
         """
 
     def setRepeat(name, compiled_expression):
-        """
+        """Start a repetition, returning an ITALIterator.
+
+        The engine is expected to add the a value (typically the
+        returned iterator) for the name to the variable namespace.
         """
 
     def translate(msgid, domain=None, mapping=None, default=None):
@@ -144,8 +147,22 @@ class ITALESEngine(Interface):
         See ITranslationService.translate()
         """
 
+class ITALIterator(Interface):
+    """A TAL iterator
 
-class ITALESErrorInfo(Interface):
+    Not to be confused with a Python iterator.
+    """
+
+    def next():
+        """Advance to the next value in the iteration, if possible
+
+        Return a true value if it was possible to advance and return
+        a false value otherwise.
+
+        """
+
+        
+class ITALExpressionErrorInfo(Interface):
 
     type = Attribute("type",
                      "The exception class.")
