@@ -21,7 +21,6 @@ import sys
 from zope.tal.taldefs import NAME_RE, TALESError, ErrorInfo
 from zope.tal.interfaces import ITALESCompiler, ITALESEngine
 from zope.i18n.interfaces import ITranslationService
-from zope.i18n.interfaces import IDomain
 
 Default = object()
 
@@ -212,10 +211,11 @@ class Iterator:
         self.engine.setLocal(self.name, item)
         return 1
 
-class DummyDomain:
-    __implements__ = IDomain
 
-    def translate(self, msgid, mapping=None, context=None,
+class DummyTranslationService:
+    __implements__ = ITranslationService
+
+    def translate(self, domain, msgid, mapping=None, context=None,
                   target_language=None):
         # This is a fake translation service which simply uppercases non
         # ${name} placeholder text in the message id.
@@ -232,15 +232,3 @@ class DummyDomain:
             return mapping[m.group(m.lastindex).lower()]
         cre = re.compile(r'\$(?:([_A-Z]\w*)|\{([_A-Z]\w*)\})')
         return cre.sub(repl, msgid.upper())
-
-class DummyTranslationService:
-    __implements__ = ITranslationService
-
-    def translate(self, domain, msgid, mapping=None, context=None,
-                  target_language=None):
-        # Ignore domain
-        return self.getDomain(domain).translate(msgid, mapping, context,
-                                                target_language)
-
-    def getDomain(self, domain):
-        return DummyDomain()
