@@ -28,6 +28,8 @@ I18N_REPLACE = 1
 I18N_CONTENT = 2
 I18N_EXPRESSION = 3
 
+_name_rx = re.compile(NAME_RE)
+
 
 class TALGenerator:
 
@@ -326,6 +328,9 @@ class TALGenerator:
         # calculate the contents of the variable, e.g.
         # "I live in <span i18n:name="country"
         #                  tal:replace="here/countryOfOrigin" />"
+        m = _name_rx.match(varname)
+        if m is None or m.group() != varname:
+            raise TALError("illegal i18n:name: %r" % varname, self.position)
         key = cexpr = None
         program = self.popProgram()
         if action == I18N_REPLACE:
@@ -644,7 +649,8 @@ class TALGenerator:
             else:
                 repldict = {}
             if i18nattrs:
-                i18nattrs = _parseI18nAttributes(i18nattrs, self.position)
+                i18nattrs = _parseI18nAttributes(i18nattrs, self.position,
+                                                 self.xml)
             else:
                 i18nattrs = {}
             # Convert repldict's name-->expr mapping to a
@@ -776,7 +782,8 @@ class TALGenerator:
         if defineMacro:
             self.emitDefineMacro(defineMacro)
 
-def _parseI18nAttributes(i18nattrs, position):
+
+def _parseI18nAttributes(i18nattrs, position, xml):
     d = {}
     for spec in i18nattrs.split(";"):
         parts = spec.split()
@@ -789,6 +796,13 @@ def _parseI18nAttributes(i18nattrs, position):
             # len(parts) == 1
             attr = parts[0]
             msgid = None
+        if not xml:
+            attr = attr.lower()
+        if attr in d:
+            raise TALError(
+                "attribute may only be specified once in i18n:attributes: %r"
+                % attr,
+                position)
         d[attr] = msgid
     return d
 

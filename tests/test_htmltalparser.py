@@ -501,6 +501,14 @@ class TALGeneratorTestCases(TestCaseBase):
             ('endScope', ()),
             ])
 
+    def test_i18n_name_bad_name(self):
+        self._should_error("<span i18n:name='not a valid name' />")
+        self._should_error("<span i18n:name='-bad-name' />")
+
+    def test_i18n_attributes_repeated_attr(self):
+        self._should_error("<a i18n:attributes='href; href' />")
+        self._should_error("<a i18n:attributes='href; HREF' />")
+
     def test_i18n_translate(self):
         # input/test19.html
         self._run_check('''\
