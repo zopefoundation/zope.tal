@@ -21,7 +21,7 @@ import sys
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
-from zope.i18nmessageid import MessageID
+from zope.i18nmessageid import MessageID, Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode
@@ -579,7 +579,7 @@ class TALInterpreter(object):
         if text is self.Default:
             self.interpret(stuff[1])
             return
-        if isinstance(text, MessageID):
+        if isinstance(text, (MessageID, Message)):
             # Translate this now.
             text = self.engine.translate(text)
         # '&' must be done first!
@@ -618,7 +618,7 @@ class TALInterpreter(object):
                 value = self.engine.evaluate(expression)
 
             # evaluate() does not do any I18n, so we do it here.
-            if isinstance(value, MessageID):
+            if isinstance(value, (MessageID, Message)):
                 # Translate this now.
                 value = self.engine.translate(value)
 

@@ -21,7 +21,7 @@ from zope.interface import implements
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18n.interfaces import ITranslationDomain
-from zope.i18nmessageid import MessageID
+from zope.i18nmessageid import MessageID, Message
 
 Default = object()
 
@@ -137,7 +137,7 @@ class DummyEngine(object):
 
     def evaluateText(self, expr):
         text = self.evaluate(expr)
-        if isinstance(text, (str, unicode, MessageID)):
+        if isinstance(text, (str, unicode, MessageID, Message)):
             return text
         if text is not None and text is not Default:
             text = str(text)
@@ -280,10 +280,12 @@ class DummyTranslationDomain(object):
         # by calling that method.
 
         # MessageID attributes override arguments
-        if isinstance(msgid, MessageID):
+        if isinstance(msgid, (MessageID, Message)):
             domain = msgid.domain
             mapping = msgid.mapping
             default = msgid.default
+            if default is None: # Message doesn't substitute itself for
+                default = msgid # missing default
 
         # simulate an unknown msgid by returning None
         if msgid == "don't translate me":

@@ -27,7 +27,7 @@ from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.dummyengine import DummyEngine, DummyTranslationDomain
 from zope.tal.tests import utils
-from zope.i18nmessageid import MessageID
+from zope.i18nmessageid import MessageID, Message
 
 class TestCaseBase(unittest.TestCase):
 
@@ -145,11 +145,13 @@ class MacroExtendTestCase(TestCaseBase):
         self.assertEqual(actual, expected)
 
 
-class I18NCornerTestCase(TestCaseBase):
+class I18NCornerTestCaseBase(TestCaseBase):
+
+    factory = None # set in subclass to Message and MessageID
 
     def setUp(self):
         self.engine = DummyEngine()
-        self.engine.setLocal('foo', MessageID('FoOvAlUe', 'default'))
+        self.engine.setLocal('foo', self.factory('FoOvAlUe', 'default'))
         self.engine.setLocal('bar', 'BaRvAlUe')
 
     def _check(self, program, expected):
@@ -295,6 +297,11 @@ class I18NCornerTestCase(TestCaseBase):
             "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
         self._check(program, u"<div>FOO \u00C0</div>\n")
 
+class I18NCornerTestCaseMessageID(I18NCornerTestCaseBase):
+    factory = MessageID
+
+class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
+    factory = Message
 
 class ScriptTestCase(TestCaseBase):
 
@@ -515,7 +522,8 @@ def test_suite():
     suite.addTest(unittest.makeSuite(MacroExtendTestCase))
     suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
     suite.addTest(unittest.makeSuite(ScriptTestCase))
-    suite.addTest(unittest.makeSuite(I18NCornerTestCase))
+    suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessageID))
+    suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessage))
     suite.addTest(unittest.makeSuite(TestSourceAnnotations))
 
     # TODO: Deactivated test, since we have not found a solution for this and
