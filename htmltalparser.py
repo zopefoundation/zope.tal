@@ -23,28 +23,29 @@ from zope.tal.taldefs import ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS, \
 from zope.tal.talgenerator import TALGenerator
 
 
-BOOLEAN_HTML_ATTRS = [
+# TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
+BOOLEAN_HTML_ATTRS = dict.fromkeys([
     # List of Boolean attributes in HTML that may be given in
     # minimized form (e.g. <img ismap> rather than <img ismap="">)
     # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
     "compact", "nowrap", "ismap", "declare", "noshade", "checked",
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
-    ]
+    ])
 
-EMPTY_HTML_TAGS = [
+EMPTY_HTML_TAGS = dict.fromkeys([
     # List of HTML tags with an empty content model; these are
     # rendered in minimized form, e.g. <img />.
     # From http://www.w3.org/TR/xhtml1/#dtds
     "base", "meta", "link", "hr", "br", "param", "img", "area",
     "input", "col", "basefont", "isindex", "frame",
-    ]
+    ])
 
-PARA_LEVEL_HTML_TAGS = [
+PARA_LEVEL_HTML_TAGS = dict.fromkeys([
     # List of HTML elements that close open paragraph-level elements
     # and are themselves paragraph-level.
     "h1", "h2", "h3", "h4", "h5", "h6", "p",
-    ]
+    ])
 
 BLOCK_CLOSING_TAG_MAP = {
     "tr": ("tr", "td", "th"),
@@ -55,14 +56,17 @@ BLOCK_CLOSING_TAG_MAP = {
     "dt": ("dd", "dt"),
     }
 
-BLOCK_LEVEL_HTML_TAGS = [
+BLOCK_LEVEL_HTML_TAGS = dict.fromkeys([
     # List of HTML tags that denote larger sections than paragraphs.
     "blockquote", "table", "tr", "th", "td", "thead", "tfoot", "tbody",
     "noframe", "ul", "ol", "li", "dl", "dt", "dd", "div",
-    ]
+    ])
 
-TIGHTEN_IMPLICIT_CLOSE_TAGS = (PARA_LEVEL_HTML_TAGS
-                               + BLOCK_CLOSING_TAG_MAP.keys())
+SECTION_LEVEL_HTML_TAGS = PARA_LEVEL_HTML_TAGS.copy()
+SECTION_LEVEL_HTML_TAGS.update(BLOCK_LEVEL_HTML_TAGS)
+
+TIGHTEN_IMPLICIT_CLOSE_TAGS = PARA_LEVEL_HTML_TAGS.copy()
+TIGHTEN_IMPLICIT_CLOSE_TAGS.update(BLOCK_CLOSING_TAG_MAP)
 
 
 class NestingError(HTMLParseError):
@@ -199,7 +203,7 @@ class HTMLTALParser(HTMLParser):
                         close_to = i
                 elif t in BLOCK_LEVEL_HTML_TAGS:
                     close_to = -1
-        elif tag in PARA_LEVEL_HTML_TAGS + BLOCK_LEVEL_HTML_TAGS:
+        elif tag in SECTION_LEVEL_HTML_TAGS:
             i = len(self.tagstack) - 1
             while i >= 0:
                 closetag = self.tagstack[i]

@@ -19,6 +19,7 @@ import re
 from zope.tal.interfaces import ITALExpressionErrorInfo
 from zope.interface import implements
 
+
 TAL_VERSION = "1.5.1"
 
 XML_NS = "http://www.w3.org/XML/1998/namespace" # URI for XML namespace
@@ -32,14 +33,15 @@ ZOPE_I18N_NS = "http://xml.zope.org/namespaces/i18n"
 # zope.i18n.simpletranslationservice module:
 NAME_RE = "[a-zA-Z_][-a-zA-Z0-9_]*"
 
-KNOWN_METAL_ATTRIBUTES = [
+# TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
+KNOWN_METAL_ATTRIBUTES = dict.fromkeys([
     "define-macro",
     "use-macro",
     "define-slot",
     "fill-slot",
-    ]
+    ])
 
-KNOWN_TAL_ATTRIBUTES = [
+KNOWN_TAL_ATTRIBUTES = dict.fromkeys([
     "define",
     "condition",
     "content",
@@ -51,9 +53,9 @@ KNOWN_TAL_ATTRIBUTES = [
     "script",
     "tal tag",      # a pseudo attribute that holds the namespace of elements
                     # like <tal:x>, <metal:y>, <i18n:z>
-    ]
+    ])
 
-KNOWN_I18N_ATTRIBUTES = [
+KNOWN_I18N_ATTRIBUTES = dict.fromkeys([
     "translate",
     "domain",
     "target",
@@ -61,7 +63,7 @@ KNOWN_I18N_ATTRIBUTES = [
     "attributes",
     "data",
     "name",
-    ]
+    ])
 
 class TALError(Exception):
 
@@ -117,20 +119,20 @@ def parseAttributeReplacements(arg, xml):
     for part in splitParts(arg):
         m = _attr_re.match(part)
         if not m:
-            raise TALError("Bad syntax in attributes: " + `part`)
-        name, expr = m.group(1, 2)
+            raise TALError("Bad syntax in attributes: %r" % part)
+        name, expr = m.groups()
         if not xml:
             name = name.lower()
-        if dict.has_key(name):
-            raise TALError("Duplicate attribute name in attributes: " + `part`)
+        if name in dict:
+            raise TALError("Duplicate attribute name in attributes: %r" % part)
         dict[name] = expr
     return dict
 
 def parseSubstitution(arg, position=(None, None)):
     m = _subst_re.match(arg)
     if not m:
-        raise TALError("Bad syntax in substitution text: " + `arg`, position)
-    key, expr = m.group(1, 2)
+        raise TALError("Bad syntax in substitution text: %r" % arg, position)
+    key, expr = m.groups()
     if not key:
         key = "text"
     return key, expr
@@ -155,7 +157,7 @@ def isinstance_(ob, type):
         return type in ob.__class__.__mro__
     except AttributeError:
         return False
-            
+
 
 def getProgramMode(program):
     version = getProgramVersion(program)

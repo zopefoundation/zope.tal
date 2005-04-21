@@ -28,7 +28,9 @@ from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
 
-BOOLEAN_HTML_ATTRS = [
+
+# TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
+BOOLEAN_HTML_ATTRS = dict.fromkeys([
     # List of Boolean attributes in HTML that should be rendered in
     # minimized form (e.g. <img ismap> rather than <img ismap="">)
     # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
@@ -37,15 +39,7 @@ BOOLEAN_HTML_ATTRS = [
     "compact", "nowrap", "ismap", "declare", "noshade", "checked",
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
-]
-
-def _init():
-    d = {}
-    for s in BOOLEAN_HTML_ATTRS:
-        d[s] = 1
-    return d
-
-BOOLEAN_HTML_ATTRS = _init()
+])
 
 _nulljoin = ''.join
 _spacejoin = ' '.join
