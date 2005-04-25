@@ -348,6 +348,7 @@ class TALInterpreter(object):
         # for start tags with no attributes; those are optimized down
         # to rawtext events.  Hence, there is no special "fast path"
         # for that case.
+        self._currentTag = name
         L = ["<", name]
         append = L.append
         col = self.col + _len(name) + 1
@@ -655,8 +656,11 @@ class TALInterpreter(object):
         # message id.  All other useful information will be in the i18ndict on
         # the top of the i18nStack.
         default = tmpstream.getvalue()
-        if msgid == '':
-            msgid = normalize(default)
+        if not msgid:
+            if self.html and self._currentTag == "pre":
+                msgid = default
+            else:
+                msgid = normalize(default)
         self.i18nStack.pop()
         # See if there is was an i18n:data for msgid
         if len(stuff) > 2:
