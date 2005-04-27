@@ -323,18 +323,7 @@ class TALGenerator(object):
         self.emit('evaluateCode', lang, program)
 
     def emitI18nVariable(self, stuff):
-        # Used for i18n:name attributes.  arg is extra information describing
-        # how the contents of the variable should get filled in, and it will
-        # either be a 1-tuple or a 2-tuple.  If arg[0] is None, then the
-        # i18n:name value is taken implicitly from the contents of the tag,
-        # e.g. "I live in <span i18n:name="country">the USA</span>".  In this
-        # case, arg[1] is the opcode sub-program describing the contents of
-        # the tag.
-        #
-        # When arg[0] is not None, it contains the tal expression used to
-        # calculate the contents of the variable, e.g.
-        # "I live in <span i18n:name="country"
-        #                  tal:replace="here/countryOfOrigin" />"
+        # Used for i18n:name attributes.
         varname, action, expression = stuff
         m = _name_rx.match(varname)
         if m is None or m.group() != varname:
