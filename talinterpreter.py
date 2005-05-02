@@ -601,7 +601,10 @@ class TALInterpreter(object):
                     self.interpret(program)
                 finally:
                     self.popStream()
-                value = normalize(tmpstream.getvalue())
+                if self.html and self._currentTag == "pre":
+                    value = tmpstream.getvalue()
+                else:
+                    value = normalize(tmpstream.getvalue())
             finally:
                 self.restoreState(state)
         else:
@@ -646,6 +649,7 @@ class TALInterpreter(object):
         #
         # Use a temporary stream to capture the interpretation of the
         # subnodes, which should /not/ go to the output stream.
+        currentTag = self._currentTag
         tmpstream = StringIO()
         self.pushStream(tmpstream)
         try:
@@ -657,7 +661,7 @@ class TALInterpreter(object):
         # the top of the i18nStack.
         default = tmpstream.getvalue()
         if not msgid:
-            if self.html and self._currentTag == "pre":
+            if self.html and currentTag == "pre":
                 msgid = default
             else:
                 msgid = normalize(default)

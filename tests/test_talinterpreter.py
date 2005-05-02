@@ -364,6 +364,25 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<pre>THIS IS TEXT <B> FOR</B> BARVALUE.</pre>\n',
             result.getvalue())
 
+    def test_raw_msgids_and_i18ntranslate_i18nname(self):
+        xlatdmn = self._getCollectingTranslationDomain()
+        result = StringIO()
+        program, macros = self._compile(
+            '<div i18n:translate=""> This is text\n \tfor\n'
+            '<pre i18n:name="bar" i18n:translate=""> \tbar\n </pre>.</div>')
+        self.interpreter = TALInterpreter(program, {}, self.engine,
+                                          stream=result)
+        self.interpreter()
+        msgids = list(xlatdmn.data)
+        msgids.sort()
+        self.assertEqual(2, len(msgids))
+        self.assertEqual(' \tbar\n ', msgids[0][0])
+        self.assertEqual('This is text for ${bar}.', msgids[1][0])
+        self.assertEqual({'bar': '<pre> \tBAR\n </pre>'}, msgids[1][1])
+        self.assertEqual(
+            u'<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>\n',
+            result.getvalue())
+
     def test_for_handling_unicode_vars(self):
         # Make sure that non-ASCII Unicode is substituted correctly.
         # http://collector.zope.org/Zope3-dev/264
