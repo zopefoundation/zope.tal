@@ -195,7 +195,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
     def test_complex_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
-            '<em i18n:name="foo_name">'
+            '<em tal:omit-tag="" i18n:name="foo_name">'
             '<span tal:replace="foo"/>'
             '</em>'
             '</div>')
@@ -267,7 +267,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
 
             def translate(self, msgid, mapping=None,
                           context=None, target_language=None, default=None):
-                self.data.append(msgid)
+                self.data.append((msgid, mapping))
                 return DummyTranslationDomain.translate(
                     self,
                     msgid, mapping, context, target_language, default)
@@ -286,11 +286,36 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        self.assert_('BaRvAlUe' in xlatdmn.data)
-        self.assert_('This is text for ${bar_name}.' in
-                     xlatdmn.data)
+        msgids = list(xlatdmn.data)
+        msgids.sort()
+        self.assertEqual(2, len(msgids))
+        self.assertEqual('BaRvAlUe', msgids[0][0])
+        self.assertEqual('This is text for ${bar_name}.', msgids[1][0])
+        self.assertEqual({'bar_name': '<span>BARVALUE</span>'}, msgids[1][1])
         self.assertEqual(
             '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
+            result.getvalue())
+
+    def test_i18ntranslate_i18nname_and_attributes(self):
+        # Test for Issue 301: Bug with i18n:name and i18n:translate
+        # on the same element
+        xlatdmn = self._getCollectingTranslationDomain()
+        result = StringIO()
+        program, macros = self._compile(
+            '<p i18n:translate="">'
+            'Some static text and a <a tal:attributes="href string:url"'
+            ' i18n:name="link" i18n:translate="">link text</a>.</p>')
+        self.interpreter = TALInterpreter(program, {}, self.engine,
+                                          stream=result)
+        self.interpreter()
+        msgids = list(xlatdmn.data)
+        msgids.sort()
+        self.assertEqual(2, len(msgids))
+        self.assertEqual('Some static text and a ${link}.', msgids[0][0])
+        self.assertEqual({'link': '<a href="url">LINK TEXT</a>'}, msgids[0][1])
+        self.assertEqual('link text', msgids[1][0])
+        self.assertEqual(
+            '<p>SOME STATIC TEXT AND A <a href="url">LINK TEXT</a>.</p>\n',
             result.getvalue())
 
     def test_for_raw_msgids(self):
@@ -307,9 +332,11 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        self.assert_('This is text for div.' in xlatdmn.data)
-        self.assert_(' This is text\n <b>\tfor</b>\n pre. ' in
-                     xlatdmn.data)
+        msgids = list(xlatdmn.data)
+        msgids.sort()
+        self.assertEqual(2, len(msgids))
+        self.assertEqual(' This is text\n <b>\tfor</b>\n pre. ', msgids[0][0])
+        self.assertEqual('This is text for div.', msgids[1][0])
         self.assertEqual(
             '<div>THIS IS TEXT FOR DIV.</div>'
             '<pre> THIS IS TEXT\n <B>\tFOR</B>\n PRE. </pre>\n',
@@ -328,8 +355,10 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        self.assert_('This is text <b> for</b> barvalue.' in
-                     xlatdmn.data)
+        msgids = list(xlatdmn.data)
+        msgids.sort()
+        self.assertEqual(1, len(msgids))
+        self.assertEqual('This is text <b> for</b> barvalue.', msgids[0][0])
         self.assertEqual(
             '<?xml version="1.0"?>\n'
             '<pre>THIS IS TEXT <B> FOR</B> BARVALUE.</pre>\n',

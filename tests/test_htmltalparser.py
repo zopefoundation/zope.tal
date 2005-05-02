@@ -693,29 +693,55 @@ translated string</span>
         # input/test22.html
         self._run_check('''\
 <span i18n:translate="">
-  <span i18n:name="name"><b>Jim</b></span> was born in
-  <span i18n:name="country">the USA</span>.
+  <span tal:omit-tag="" i18n:name="name"><b>Jim</b></span> was born in
+  <span tal:omit-tag="" i18n:name="country">the USA</span>.
 </span>
-''', [
-  ('setPosition', (1, 0)),
-  ('beginScope', {'i18n:translate': ''}),
-  ('startTag', ('span', [('i18n:translate', '', 'i18n')])),
-  ('insertTranslation',
-   ('',
-    [('rawtextBeginScope', ('\n  ', 2, (2, 2), 0, {'i18n:name': 'name'})),
-     ('i18nVariable',
-      ('name',
-       [('rawtextOffset', ('<b>Jim</b>', 10))], None, 0)),
-     ('rawtextBeginScope',
-      (' was born in\n  ', 2, (3, 2), 1, {'i18n:name': 'country'})),
-     ('i18nVariable',
-      ('country',
-       [('rawtextOffset', ('the USA', 7))], None, 0)),
-     ('endScope', ()),
-     ('rawtextColumn', ('.\n', 0))])),
-  ('endScope', ()),
-  ('rawtextColumn', ('</span>\n', 0))
-  ])
+''', [('setPosition', (1, 0)),
+ ('beginScope', {'i18n:translate': ''}),
+ ('startTag', ('span', [('i18n:translate', '', 'i18n')])),
+ ('insertTranslation',
+  ('',
+   [('rawtextBeginScope',
+     ('\n  ', 2, (2, 2), 0, {'i18n:name': 'name', 'tal:omit-tag': ''})),
+    ('i18nVariable',
+     ('name',
+      [('optTag',
+        ('span',
+         '',
+         None,
+         0,
+         [('startTag',
+           ('span',
+            [('tal:omit-tag', '', 'tal'),
+             ('i18n:name', 'name', 'i18n')]))],
+         [('rawtextOffset', ('<b>Jim</b>', 10))]))],
+      None,
+      0)),
+    ('rawtextBeginScope',
+     (' was born in\n  ',
+      2,
+      (3, 2),
+      1,
+      {'i18n:name': 'country', 'tal:omit-tag': ''})),
+    ('i18nVariable',
+     ('country',
+      [('optTag',
+        ('span',
+         '',
+         None,
+         0,
+         [('startTag',
+           ('span',
+            [('tal:omit-tag', '', 'tal'),
+             ('i18n:name', 'country', 'i18n')]))],
+         [('rawtextOffset', ('the USA', 7))]))],
+      None,
+      0)),
+    ('endScope', ()),
+    ('rawtextColumn', ('.\n', 0))])),
+ ('endScope', ()),
+ ('rawtextColumn', ('</span>\n', 0))
+ ])
 
     def test_i18n_context_domain(self):
         self._run_check("<span i18n:domain='mydomain'/>", [
@@ -804,8 +830,7 @@ translated string</span>
 <span i18n:data="here/currentTime"
       i18n:translate="timefmt"
       i18n:name="time">2:32 pm</span>... beep!</div>
-''',
-[('setPosition', (1, 0)),
+''', [('setPosition', (1, 0)),
  ('beginScope', {'i18n:translate': ''}),
  ('startTag', ('div', [('i18n:translate', '', 'i18n')])),
  ('insertTranslation',
@@ -818,100 +843,79 @@ translated string</span>
       {'i18n:data': 'here/currentTime',
        'i18n:name': 'time',
        'i18n:translate': 'timefmt'})),
-    ('insertTranslation',
-     ('timefmt',
+    ('i18nVariable',
+     ('time',
       [('startTag',
         ('span',
          [('i18n:data', 'here/currentTime', 'i18n'),
           ('i18n:translate', 'timefmt', 'i18n'),
           ('i18n:name', 'time', 'i18n')])),
-       ('i18nVariable', ('time', [], None, 0))],
-      '$here/currentTime$')),
+       ('insertTranslation',
+        ('timefmt',
+         [('rawtextOffset', ('2:32 pm', 7))],
+         '$here/currentTime$')),
+       ('rawtextOffset', ('</span>', 7))],
+      None,
+      0)),
     ('endScope', ()),
     ('rawtextOffset', ('... beep!', 9))])),
  ('endScope', ()),
- ('rawtextColumn', ('</div>\n', 0))]
-)
-
- 
-    def test_i18n_explicit_msgid_with_name(self):
-        # input/test26.html
-        self._run_check('''\
-<span i18n:translate="jobnum">
-    Job #<span tal:replace="context/@@object_name"
-               i18n:name="jobnum">NN</span></span>
-''', [
-  ('setPosition', (1, 0)),
-  ('beginScope', {'i18n:translate': 'jobnum'}),
-  ('startTag', ('span', [('i18n:translate', 'jobnum', 'i18n')])),
-  ('insertTranslation',
-   ('jobnum',
-    [('rawtextBeginScope',
-      ('\n    Job #',
-       9,
-       (2, 9),
-       0,
-       {'i18n:name': 'jobnum', 'tal:replace': 'context/@@object_name'})),
-     ('i18nVariable',
-      ('jobnum',
-       [('startTag',
-         ('span',
-          [('tal:replace', 'context/@@object_name', 'tal'),
-           ('i18n:name', 'jobnum', 'i18n')])),
-        ('rawtextOffset', ('NN', 2)),
-        ('rawtextOffset', ('</span>', 7))],
-       '$context/@@object_name$',
-       0)),
-     ('endScope', ())])),
-  ('endScope', ()),
-  ('rawtextColumn', ('</span>\n', 0))
-  ])
+ ('rawtextColumn', ('</div>\n', 0))
+ ])
 
     def test_i18n_name_around_tal_content(self):
         # input/test28.html
         self._run_check('''\
 <p i18n:translate="verify">Your contact email address is recorded as
-    <span i18n:name="email">
+    <span tal:omit-tag="" i18n:name="email">
     <a href="mailto:user@example.com"
        tal:content="request/submitter">user@host.com</a></span>
 </p>
-''', [
-  ('setPosition', (1, 0)),
-  ('beginScope', {'i18n:translate': 'verify'}),
-  ('startTag', ('p', [('i18n:translate', 'verify', 'i18n')])),
-  ('insertTranslation',
-   ('verify',
-    [('rawtextBeginScope',
-      ('Your contact email address is recorded as\n    ',
-       4,
-       (2, 4),
-       0,
-       {'i18n:name': 'email'})),
-     ('i18nVariable',
-      ('email',
-       [('rawtextBeginScope',
-         ('\n    ',
-          4,
-          (3, 4),
-          0,
-          {'href': 'mailto:user@example.com',
-           'tal:content': 'request/submitter'})),
-        ('startTag',
-         ('a',
-          [('href', 'href="mailto:user@example.com"'),
-           ('tal:content', 'request/submitter', 'tal')])),
-        ('insertText',
-         ('$request/submitter$',
-          [('rawtextOffset', ('user@host.com', 13))])),
-        ('endScope', ()),
-        ('rawtextOffset', ('</a>', 4))],
-       None,
-       0)),
-     ('endScope', ()),
-     ('rawtextColumn', ('\n', 0))])),
-  ('endScope', ()),
-  ('rawtextColumn', ('</p>\n', 0))
-  ])
+''', [('setPosition', (1, 0)),
+ ('beginScope', {'i18n:translate': 'verify'}),
+ ('startTag', ('p', [('i18n:translate', 'verify', 'i18n')])),
+ ('insertTranslation',
+  ('verify',
+   [('rawtextBeginScope',
+     ('Your contact email address is recorded as\n    ',
+      4,
+      (2, 4),
+      0,
+      {'i18n:name': 'email', 'tal:omit-tag': ''})),
+    ('i18nVariable',
+     ('email',
+      [('optTag',
+        ('span',
+         '',
+         None,
+         0,
+         [('startTag',
+           ('span',
+            [('tal:omit-tag', '', 'tal'),
+             ('i18n:name', 'email', 'i18n')]))],
+         [('rawtextBeginScope',
+           ('\n    ',
+            4,
+            (3, 4),
+            0,
+            {'href': 'mailto:user@example.com',
+             'tal:content': 'request/submitter'})),
+          ('startTag',
+           ('a',
+            [('href', 'href="mailto:user@example.com"'),
+             ('tal:content', 'request/submitter', 'tal')])),
+          ('insertText',
+           ('$request/submitter$',
+            [('rawtextOffset', ('user@host.com', 13))])),
+          ('endScope', ()),
+          ('rawtextOffset', ('</a>', 4))]))],
+      None,
+      0)),
+    ('endScope', ()),
+    ('rawtextColumn', ('\n', 0))])),
+ ('endScope', ()),
+ ('rawtextColumn', ('</p>\n', 0))
+ ])
 
     def test_i18n_name_with_tal_content(self):
         # input/test27.html

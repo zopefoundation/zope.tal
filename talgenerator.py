@@ -24,9 +24,8 @@ from zope.tal.taldefs import I18NError, METALError, TALError
 from zope.tal.taldefs import parseSubstitution
 from zope.tal.translationcontext import TranslationContext, DEFAULT_DOMAIN
 
-I18N_REPLACE = 1
-I18N_CONTENT = 2
-I18N_EXPRESSION = 3
+I18N_CONTENT = 1
+I18N_EXPRESSION = 2
 
 _name_rx = re.compile(NAME_RE)
 
@@ -330,20 +329,11 @@ class TALGenerator(object):
             raise TALError("illegal i18n:name: %r" % varname, self.position)
         key = cexpr = None
         program = self.popProgram()
-        if action == I18N_REPLACE:
-            # This is a tag with an i18n:name and a tal:replace (implicit or
-            # explicit).  Get rid of the first and last elements of the
-            # program, which are the start and end tag opcodes of the tag.
-            program = program[1:-1]
-        elif action == I18N_CONTENT:
-            # This is a tag with an i18n:name and a tal:content
-            # (explicit-only).  Keep the first and last elements of the
-            # program, so we keep the start and end tag output.
-            pass
-        else:
-            assert action == I18N_EXPRESSION
+        if action == I18N_EXPRESSION:
             key, expr = parseSubstitution(expression)
             cexpr = self.compileExpression(expr)
+        else:
+            assert action == I18N_CONTENT
         self.emit('i18nVariable',
                   varname, program, cexpr, int(key == "structure"))
 
@@ -659,7 +649,7 @@ class TALGenerator(object):
         # i18n:name w/o tal:replace uses the content as the interpolation
         # dictionary values
         elif varname:
-            todo['i18nvar'] = (varname, I18N_REPLACE, None)
+            todo['i18nvar'] = (varname, I18N_CONTENT, None)
             self.pushProgram()
         if msgid is not None:
             self.i18nLevel += 1
@@ -793,16 +783,14 @@ class TALGenerator(object):
         elif varname:
             # o varname[0] is the variable name
             # o varname[1] is either
-            #   - I18N_REPLACE for implicit tal:replace
             #   - I18N_CONTENT for tal:content
             #   - I18N_EXPRESSION for explicit tal:replace
-            # o varname[2] will be None for the first two actions and the
-            #   replacement tal expression for the third action.  This
+            # o varname[2] will be None for the first action and the
+            #   replacement tal expression for the second action.  This
             #   can include a 'text' or 'structure' indicator.
-            assert (varname[1]
-                    in [I18N_REPLACE, I18N_CONTENT, I18N_EXPRESSION])
+            assert (varname[1] in (I18N_CONTENT, I18N_EXPRESSION))
             self.emitI18nVariable(varname)
-        # Do not test for "msgid is not None", i.e. we only want to test for
+        # Do test for "msgid is not None", i.e. we only want to test for
         # explicit msgids here.  See comment above.
         if msgid is not None:
             # in case tal:content, i18n:translate and i18n:name in the
