@@ -214,6 +214,12 @@ class I18NCornerTestCaseBase(TestCaseBase):
             I18NError, self._compile,
             '<span i18n:translate="" tal:content="foo" i18n:name="foo_name"/>')
 
+    def test_content_with_explicit_messageid(self):
+        # Let's tell the user this is incredibly silly!
+        self.assertRaises(
+            I18NError, self._compile,
+            '<span i18n:translate="ID" tal:content="foo" />')
+
     def test_content_with_plaintext_and_i18nname_and_i18ntranslate(self):
         # Let's tell the user this is incredibly silly!
         self.assertRaises(

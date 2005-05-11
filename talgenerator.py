@@ -541,6 +541,11 @@ class TALGenerator(object):
                     "i18n:translate and tal:replace are mutually exclusive",
                     position)
 
+        if content and msgid:
+            raise I18NError(
+                "explicit message id and tal:content can't be used together",
+                position)
+
         repeatWhitespace = None
         if repeat:
             # Hack to include preceding whitespace in the loop program
