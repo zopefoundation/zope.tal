@@ -18,7 +18,6 @@ $Id$
 """
 import sys
 import unittest
-import operator
 from StringIO import StringIO
 
 from zope.tal.htmltalparser import HTMLTALParser
@@ -67,7 +66,8 @@ class test_POEngine(unittest.TestCase):
             msgids += domain.keys()
         msgids.sort()
         self.assertEquals(msgids,
-                          ['A <a href="XXX">link</a>.', 'Some XXX text.'])
+            ['A <a href="${DYNAMIC_CONTENT}">link</a>.',
+            'Some ${DYNAMIC_CONTENT} text.'])
 
 
 def test_suite():

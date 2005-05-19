@@ -96,7 +96,7 @@ class POEngine(DummyEngine):
     def evaluate(*args):
         # If the result of evaluate ever gets into a message ID, we want
         # to notice the fact in the .pot file.
-        return 'XXX'
+        return '${DYNAMIC_CONTENT}'
 
     def evaluatePathOrVar(*args):
         # Actually this method is never called.

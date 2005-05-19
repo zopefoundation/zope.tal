@@ -21,6 +21,8 @@ import sys
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
+import warnings
+
 from zope.i18nmessageid import MessageID, Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
@@ -156,6 +158,7 @@ class TALInterpreter(object):
         self.engine = engine # Execution engine (aka context)
         self.Default = engine.getDefault()
         self._pending_source_annotation = False
+        self._currentTag = ""
         self._stream_stack = [stream or sys.stdout]
         self.popStream()
         self.debug = debug
@@ -566,6 +569,8 @@ class TALInterpreter(object):
 
     def do_insertText(self, stuff):
         self.interpret(stuff[1])
+    bytecode_handlers["insertText"] = do_insertText
+    bytecode_handlers["insertI18nText"] = do_insertText
 
     def do_insertText_tal(self, stuff):
         text = self.engine.evaluateText(stuff[0])
@@ -576,6 +581,10 @@ class TALInterpreter(object):
             return
         if isinstance(text, (MessageID, Message)):
             # Translate this now.
+            # BBB: Deprecated. Will be removed in 3.3
+            warnings.warn('Automatic translation of message id\'s is'
+                ' deprecated and will be removed in 3.3.'
+                ' Use explicit i18n:translate="" instead.', DeprecationWarning)
             text = self.engine.translate(text)
         # '&' must be done first!
         s = text.replace(
@@ -586,7 +595,25 @@ class TALInterpreter(object):
             self.col = self.col + len(s)
         else:
             self.col = len(s) - (i + 1)
-    bytecode_handlers["insertText"] = do_insertText
+
+    def do_insertI18nText_tal(self, stuff):
+        # TODO: Code duplication is BAD, we need to fix it later
+        text = self.engine.evaluateText(stuff[0])
+        if text is None:
+            return
+        if text is self.Default:
+            self.interpret(stuff[1])
+            return
+        text = self.translate(text, text, {})
+        # '&' must be done first!
+        s = text.replace(
+            "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        self._stream_write(s)
+        i = s.rfind('\n')
+        if i < 0:
+            self.col = self.col + len(s)
+        else:
+            self.col = len(s) - (i + 1)
 
     def do_i18nVariable(self, stuff):
         varname, program, expression, structure = stuff
@@ -608,6 +635,9 @@ class TALInterpreter(object):
             finally:
                 self.restoreState(state)
         else:
+            # TODO: Seems like this branch not used anymore, we
+            # need to remove it
+
             # Evaluate the value to be associated with the variable in the
             # i18n interpolation dictionary.
             if structure:
@@ -618,6 +648,11 @@ class TALInterpreter(object):
             # evaluate() does not do any I18n, so we do it here.
             if isinstance(value, (MessageID, Message)):
                 # Translate this now.
+                # BBB: Deprecated. Will be removed in 3.3
+                warnings.warn('Automatic translation of message id\'s is'
+                    ' deprecated and will be removed in 3.3.'
+                    ' Use explicit i18n:translate="" instead.',
+                    DeprecationWarning)
                 value = self.engine.translate(value)
 
             if not structure:
@@ -681,6 +716,8 @@ class TALInterpreter(object):
 
     def do_insertStructure(self, stuff):
         self.interpret(stuff[2])
+    bytecode_handlers["insertStructure"] = do_insertStructure
+    bytecode_handlers["insertI18nStructure"] = do_insertStructure
 
     def do_insertStructure_tal(self, (expr, repldict, block)):
         structure = self.engine.evaluateStructure(expr)
@@ -698,7 +735,24 @@ class TALInterpreter(object):
             self.insertHTMLStructure(text, repldict)
         else:
             self.insertXMLStructure(text, repldict)
-    bytecode_handlers["insertStructure"] = do_insertStructure
+
+    def do_insertI18nStructure_tal(self, (expr, repldict, block)):
+        # TODO: Code duplication is BAD, we need to fix it later
+        structure = self.engine.evaluateStructure(expr)
+        if structure is None:
+            return
+        if structure is self.Default:
+            self.interpret(block)
+            return
+        text = self.translate(structure, structure, {})
+        if not (repldict or self.strictinsert):
+            # Take a shortcut, no error checking
+            self.stream_write(text)
+            return
+        if self.html:
+            self.insertHTMLStructure(text, repldict)
+        else:
+            self.insertXMLStructure(text, repldict)
 
     def insertHTMLStructure(self, text, repldict):
         from zope.tal.htmltalparser import HTMLTALParser
@@ -910,7 +964,9 @@ class TALInterpreter(object):
     bytecode_handlers_tal["setLocal"] = do_setLocal_tal
     bytecode_handlers_tal["setGlobal"] = do_setGlobal_tal
     bytecode_handlers_tal["insertStructure"] = do_insertStructure_tal
+    bytecode_handlers_tal["insertI18nStructure"] = do_insertI18nStructure_tal
     bytecode_handlers_tal["insertText"] = do_insertText_tal
+    bytecode_handlers_tal["insertI18nText"] = do_insertI18nText_tal
     bytecode_handlers_tal["loop"] = do_loop_tal
     bytecode_handlers_tal["onError"] = do_onError_tal
     bytecode_handlers_tal["<attrAction>"] = attrAction_tal

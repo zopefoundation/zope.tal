@@ -317,6 +317,17 @@ class TALGenerator(object):
             assert key == "structure"
             self.emit("insertStructure", cexpr, attrDict, program)
 
+    def emitI18nSubstitution(self, arg, attrDict={}):
+        # TODO: Code duplication is BAD, we need to fix it later
+        key, expr = parseSubstitution(arg)
+        cexpr = self.compileExpression(expr)
+        program = self.popProgram()
+        if key == "text":
+            self.emit("insertI18nText", cexpr, program)
+        else:
+            assert key == "structure"
+            self.emit("insertI18nStructure", cexpr, attrDict, program)
+
     def emitEvaluateCode(self, lang):
         program = self.popProgram()
         self.emit('evaluateCode', lang, program)
@@ -473,6 +484,17 @@ class TALGenerator(object):
                 self.emitEndElement(name, isend)
             return
 
+        # TODO: All old tal:replace code needs to be removed.
+        # TODO: Ugly hack to work around tal:replace and i18n:translate issue.
+        # I (DV) need to cleanup the code later.
+        replaced = False
+        if ("replace" in taldict and "omit-tag" not in taldict
+            and "content" not in taldict):
+            taldict["omit-tag"] = ""
+            taldict["content"] = taldict["replace"]
+            del taldict["replace"]
+            replaced = True
+
         self.position = position
         for key, value in taldict.items():
             if key not in taldefs.KNOWN_TAL_ATTRIBUTES:
@@ -535,10 +557,6 @@ class TALGenerator(object):
             if content:
                 raise TALError(
                     "tal:content and tal:replace are mutually exclusive",
-                    position)
-            if msgid is not None:
-                raise I18NError(
-                    "i18n:translate and tal:replace are mutually exclusive",
                     position)
 
         if content and msgid:
@@ -648,9 +666,11 @@ class TALGenerator(object):
             # placeholder.
             if varname:
                 todo['i18nvar'] = (varname, I18N_EXPRESSION, replace)
+                self.pushProgram()
             else:
-                todo["replace"] = replace
-            self.pushProgram()
+                omitTag = ""
+                todo["content"] = replace
+                content = replace
         # i18n:name w/o tal:replace uses the content as the interpolation
         # dictionary values
         elif varname:
@@ -691,7 +711,7 @@ class TALGenerator(object):
                     repldict[key] = None, 1, i18nattrs.get(key)
         else:
             repldict = {}
-        if replace:
+        if replaced:
             todo["repldict"] = repldict
             repldict = {}
         if script:
@@ -701,7 +721,7 @@ class TALGenerator(object):
             self.pushProgram()
         if content and not varname:
             self.pushProgram()
-        if msgid is not None:
+        if not content and msgid is not None:
             self.pushProgram()
         if content and varname:
             self.pushProgram()
@@ -720,6 +740,9 @@ class TALGenerator(object):
             if not isend:
                 self.emitEndTag(name)
             return
+
+        # TODO: All old tal:replace code needs to be removed.
+        # I (DV) need to cleanup the code later.
 
         self.position = todo.get("position", (None, None))
         defineMacro = todo.get("defineMacro")
@@ -755,7 +778,10 @@ class TALGenerator(object):
         # If there's no tal:content or tal:replace in the tag with the
         # i18n:name, tal:replace is the default.
         if content:
-            self.emitSubstitution(content, {})
+            if msgid is not None:
+                self.emitI18nSubstitution(content, repldict)
+            else:
+                self.emitSubstitution(content, repldict)
         # If we're looking at an implicit msgid, emit the insertTranslation
         # opcode now, so that the end tag doesn't become part of the implicit
         # msgid.  If we're looking at an explicit msgid, it's better to emit
@@ -765,7 +791,7 @@ class TALGenerator(object):
         #
         # Still, we should emit insertTranslation opcode before i18nVariable
         # in case tal:content, i18n:translate and i18n:name in the same tag
-        if msgid is not None:
+        if not content and msgid is not None:
             if (not varname) or (
                 varname and (varname[1] == I18N_CONTENT)):
                 self.emitTranslation(msgid, i18ndata)
@@ -797,7 +823,7 @@ class TALGenerator(object):
             self.emitI18nVariable(varname)
         # Do test for "msgid is not None", i.e. we only want to test for
         # explicit msgids here.  See comment above.
-        if msgid is not None:
+        if not content and msgid is not None:
             # in case tal:content, i18n:translate and i18n:name in the
             # same tag insertTranslation opcode has already been
             # emitted
@@ -840,18 +866,17 @@ def _parseI18nAttributes(i18nattrs, position, xml):
     # Filter out empty items, eg:
     # i18n:attributes="value msgid; name msgid2;"
     # would result in 3 items where the last one is empty
-    attrs = filter(None, i18nattrs.split(";"))
+    attrs = [spec for spec in i18nattrs.split(";") if spec]
     for spec in attrs:
         parts = spec.split()
-        if len(parts) > 2:
-            raise TALError("illegal i18n:attributes specification: %r" % spec,
-                           position)
         if len(parts) == 2:
             attr, msgid = parts
-        else:
-            # len(parts) == 1
+        elif len(parts) == 1:
             attr = parts[0]
             msgid = None
+        else:
+            raise TALError("illegal i18n:attributes specification: %r" % spec,
+                           position)
         if not xml:
             attr = attr.lower()
         if attr in d:

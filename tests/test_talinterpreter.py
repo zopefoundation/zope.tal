@@ -148,11 +148,14 @@ class MacroExtendTestCase(TestCaseBase):
 
 class I18NCornerTestCaseBase(TestCaseBase):
 
-    factory = None # set in subclass to Message and MessageID
+    def factory(self, msgid, default, mapping={}):
+        raise NotImplementedError("abstract method")
 
     def setUp(self):
         self.engine = DummyEngine()
-        self.engine.setLocal('foo', self.factory('FoOvAlUe', 'default'))
+        # Make sure we'll translate the msgid not its unicode representation
+        self.engine.setLocal('foo',
+            self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
         self.engine.setLocal('bar', 'BaRvAlUe')
 
     def _check(self, program, expected):
@@ -165,30 +168,34 @@ class I18NCornerTestCaseBase(TestCaseBase):
     def test_simple_messageid_translate(self):
         # This test is mainly here to make sure our DummyEngine works
         # correctly.
-        program, macros = self._compile('<span tal:content="foo"/>')
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:content="foo"/>')
         self._check(program, '<span>FOOVALUE</span>\n')
 
-        program, macros = self._compile('<span tal:replace="foo"/>')
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:replace="foo"/>')
         self._check(program, 'FOOVALUE\n')
 
     def test_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
-            '<span tal:replace="foo" i18n:name="foo_name"/>'
+            '<span i18n:translate="" tal:replace="foo" i18n:name="foo_name"/>'
             '</div>')
         self._check(program, '<div>FOOVALUE</div>\n')
 
     def test_pythonexpr_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
-            '<span tal:replace="python: foo" i18n:name="foo_name"/>'
+            '<span i18n:translate="" tal:replace="python: foo"'
+            '    i18n:name="foo_name"/>'
             '</div>')
         self._check(program, '<div>FOOVALUE</div>\n')
 
     def test_structure_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
-            '<span tal:replace="structure foo" i18n:name="foo_name"/>'
+            '<span i18n:translate="" tal:replace="structure foo"'
+            '    i18n:name="foo_name"/>'
             '</div>')
         self._check(program, '<div>FOOVALUE</div>\n')
 
@@ -196,7 +203,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         program, macros = self._compile(
             '<div i18n:translate="" >'
             '<em tal:omit-tag="" i18n:name="foo_name">'
-            '<span tal:replace="foo"/>'
+            '<span i18n:translate="" tal:replace="foo"/>'
             '</em>'
             '</div>')
         self._check(program, '<div>FOOVALUE</div>\n')
@@ -204,7 +211,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
     def test_content_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
-            '<span tal:content="foo" i18n:name="foo_name"/>'
+            '<span i18n:translate="" tal:content="foo" i18n:name="foo_name"/>'
             '</div>')
         self._check(program, '<div><span>FOOVALUE</span></div>\n')
 
@@ -398,10 +405,16 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self._check(program, u"<div>FOO \u00C0</div>\n")
 
 class I18NCornerTestCaseMessageID(I18NCornerTestCaseBase):
-    factory = MessageID
+
+    def factory(self, msgid, default, mapping={}):
+        m = MessageID(msgid, default)
+        m.mapping = mapping
+        return m
 
 class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
-    factory = Message
+
+    def factory(self, msgid, default, mapping={}):
+        return Message(msgid, default, mapping=mapping)
 
 class ScriptTestCase(TestCaseBase):
 
