@@ -30,6 +30,8 @@ from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
 
+# Avoid constructing this tuple over and over
+I18nMessageTypes = (MessageID, Message)
 
 # TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
 BOOLEAN_HTML_ATTRS = dict.fromkeys([
@@ -590,7 +592,7 @@ class TALInterpreter(object):
         if text is self.Default:
             self.interpret(stuff[1])
             return
-        if isinstance(text, (MessageID, Message)):
+        if isinstance(text, I18nMessageTypes):
             # Translate this now.
             # BBB: Deprecated. Will be removed in 3.3
             warnings.warn('Automatic translation of message id\'s is'
@@ -607,7 +609,7 @@ class TALInterpreter(object):
         if text is self.Default:
             self.interpret(stuff[1])
             return
-        if isinstance(text, (MessageID, Message)):
+        if isinstance(text, I18nMessageTypes):
             text = self.engine.translate(text)
         self._writeText(text)
 
@@ -642,7 +644,7 @@ class TALInterpreter(object):
                 value = self.engine.evaluate(expression)
 
             # evaluate() does not do any I18n, so we do it here.
-            if isinstance(value, (MessageID, Message)):
+            if isinstance(value, I18nMessageTypes):
                 # Translate this now.
                 # BBB: Deprecated. Will be removed in 3.3
                 warnings.warn('Automatic translation of message id\'s is'
@@ -740,7 +742,7 @@ class TALInterpreter(object):
         if structure is self.Default:
             self.interpret(block)
             return
-        if isinstance(structure, (MessageID, Message)):
+        if isinstance(structure, I18nMessageTypes):
             text = self.engine.translate(structure)
         else:
             text = unicode(structure)
