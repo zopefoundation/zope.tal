@@ -239,7 +239,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
             '</div>')
         self._check(program,
-                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
+                    '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>\n')
 
     def test_translate_static_text_as_dynamic_from_bytecode(self):
         program =  [('version', TAL_VERSION),
@@ -301,12 +301,11 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter()
         msgids = list(xlatdmn.data)
         msgids.sort()
-        self.assertEqual(2, len(msgids))
-        self.assertEqual('BaRvAlUe', msgids[0][0])
-        self.assertEqual('This is text for ${bar_name}.', msgids[1][0])
-        self.assertEqual({'bar_name': '<span>BARVALUE</span>'}, msgids[1][1])
+        self.assertEqual(1, len(msgids))
+        self.assertEqual('This is text for ${bar_name}.', msgids[0][0])
+        self.assertEqual({'bar_name': '<span>BaRvAlUe</span>'}, msgids[0][1])
         self.assertEqual(
-            '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
+            '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>\n',
             result.getvalue())
 
     def test_i18ntranslate_i18nname_and_attributes(self):

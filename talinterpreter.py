@@ -572,6 +572,17 @@ class TALInterpreter(object):
     bytecode_handlers["insertText"] = do_insertText
     bytecode_handlers["insertI18nText"] = do_insertText
 
+    def _writeText(self, text):
+        # '&' must be done first!
+        s = text.replace(
+            "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        self._stream_write(s)
+        i = s.rfind('\n')
+        if i < 0:
+            self.col += len(s)
+        else:
+            self.col = len(s) - (i + 1)
+
     def do_insertText_tal(self, stuff):
         text = self.engine.evaluateText(stuff[0])
         if text is None:
@@ -586,15 +597,7 @@ class TALInterpreter(object):
                 ' deprecated and will be removed in 3.3.'
                 ' Use explicit i18n:translate="" instead.', DeprecationWarning)
             text = self.engine.translate(text)
-        # '&' must be done first!
-        s = text.replace(
-            "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        self._stream_write(s)
-        i = s.rfind('\n')
-        if i < 0:
-            self.col = self.col + len(s)
-        else:
-            self.col = len(s) - (i + 1)
+        self._writeText(text)
 
     def do_insertI18nText_tal(self, stuff):
         # TODO: Code duplication is BAD, we need to fix it later
@@ -604,16 +607,9 @@ class TALInterpreter(object):
         if text is self.Default:
             self.interpret(stuff[1])
             return
-        text = self.translate(text, text, {})
-        # '&' must be done first!
-        s = text.replace(
-            "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        self._stream_write(s)
-        i = s.rfind('\n')
-        if i < 0:
-            self.col = self.col + len(s)
-        else:
-            self.col = len(s) - (i + 1)
+        if isinstance(text, (MessageID, Message)):
+            text = self.engine.translate(text)
+        self._writeText(text)
 
     def do_i18nVariable(self, stuff):
         varname, program, expression, structure = stuff
@@ -744,7 +740,10 @@ class TALInterpreter(object):
         if structure is self.Default:
             self.interpret(block)
             return
-        text = self.translate(structure, structure, {})
+        if isinstance(structure, (MessageID, Message)):
+            text = self.engine.translate(structure)
+        else:
+            text = unicode(structure)
         if not (repldict or self.strictinsert):
             # Take a shortcut, no error checking
             self.stream_write(text)
