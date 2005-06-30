@@ -405,15 +405,15 @@ class I18NCornerTestCaseBase(TestCaseBase):
 
 class I18NCornerTestCaseMessageID(I18NCornerTestCaseBase):
 
-    def factory(self, msgid, default, mapping={}):
-        m = MessageID(msgid, default)
+    def factory(self, msgid, default=None, mapping={}):
+        m = MessageID(msgid, default=default)
         m.mapping = mapping
         return m
 
 class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
 
-    def factory(self, msgid, default, mapping={}):
-        return Message(msgid, default, mapping=mapping)
+    def factory(self, msgid, default=None, mapping={}):
+        return Message(msgid, default=default, mapping=mapping)
 
 class ScriptTestCase(TestCaseBase):
 
