@@ -14,7 +14,7 @@
 ##############################################################################
 """Run all tests.
 
-$Id: $
+$Id$
 """
 import sys
 import unittest
@@ -25,7 +25,7 @@ from zope.tal.tests import test_talinterpreter
 from zope.tal.tests import test_files
 from zope.tal.tests import test_sourcepos
 
-# XXX this code isn't picked up by the Zope 3 test framework..
+# TODO this code isn't picked up by the Zope 3 test framework..
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(test_htmltalparser.test_suite())
