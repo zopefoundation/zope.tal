@@ -194,6 +194,11 @@ class TALInterpreter(object):
         self.i18nContext = TranslationContext()
         self.sourceAnnotations = sourceAnnotations
 
+    def StringIO(self):
+        # Third-party products wishing to provide a full Unicode-aware
+        # StringIO can do so by monkey-patching this method.
+        return FasterStringIO()
+
     def saveState(self):
         return (self.position, self.col, self.stream, self._stream_stack,
                 self.scopeLevel, self.level, self.i18nContext)
@@ -475,7 +480,7 @@ class TALInterpreter(object):
 
     def no_tag(self, start, program):
         state = self.saveState()
-        self.stream = stream = StringIO()
+        self.stream = stream = self.StringIO()
         self._stream_write = stream.write
         self.interpret(start)
         self.restoreOutputState(state)
@@ -631,7 +636,7 @@ class TALInterpreter(object):
             # evaluate the mini-program to get the value of the variable.
             state = self.saveState()
             try:
-                tmpstream = StringIO()
+                tmpstream = self.StringIO()
                 self.pushStream(tmpstream)
                 try:
                     self.interpret(program)
@@ -691,7 +696,7 @@ class TALInterpreter(object):
         # Use a temporary stream to capture the interpretation of the
         # subnodes, which should /not/ go to the output stream.
         currentTag = self._currentTag
-        tmpstream = StringIO()
+        tmpstream = self.StringIO()
         self.pushStream(tmpstream)
         try:
             self.interpret(stuff[1])
@@ -788,7 +793,7 @@ class TALInterpreter(object):
         lang, program = stuff
         # Use a temporary stream to capture the interpretation of the
         # subnodes, which should /not/ go to the output stream.
-        tmpstream = StringIO()
+        tmpstream = self.StringIO()
         self.pushStream(tmpstream)
         try:
             self.interpret(program)
@@ -946,7 +951,7 @@ class TALInterpreter(object):
 
     def do_onError_tal(self, (block, handler)):
         state = self.saveState()
-        self.stream = stream = StringIO()
+        self.stream = stream = self.StringIO()
         self._stream_write = stream.write
         try:
             self.interpret(block)
@@ -980,3 +985,26 @@ class TALInterpreter(object):
     bytecode_handlers_tal["onError"] = do_onError_tal
     bytecode_handlers_tal["<attrAction>"] = attrAction_tal
     bytecode_handlers_tal["optTag"] = do_optTag_tal
+
+
+class FasterStringIO(StringIO):
+    """Append-only version of StringIO.
+
+    This let's us have a much faster write() method.
+    """
+    def close(self):
+        if not self.closed:
+            self.write = _write_ValueError
+            StringIO.close(self)
+
+    def seek(self, pos, mode=0):
+        raise RuntimeError("FasterStringIO.seek() not allowed")
+
+    def write(self, s):
+        #assert self.pos == self.len
+        self.buflist.append(s)
+        self.len = self.pos = self.pos + len(s)
+
+
+def _write_ValueError(s):
+    raise ValueError, "I/O operation on closed file"
