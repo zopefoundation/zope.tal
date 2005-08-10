@@ -165,6 +165,10 @@ class ITALExpressionEngine(Interface):
     def translate(msgid, domain=None, mapping=None, default=None):
         """See zope.i18n.interfaces.ITranslationDomain.translate"""
 
+        # NB: This differs from the Zope 2 equivalent in the order of
+        # the arguments.  This will be a (hopefully minor) issue when
+        # creating a unified TAL implementation.
+
     def evaluateCode(lang, code):
         """Evaluates code of the given language.
 
