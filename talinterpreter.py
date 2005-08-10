@@ -180,8 +180,9 @@ class TALInterpreter(object):
         self.html = 0
         self.endsep = "/>"
         self.endlen = len(self.endsep)
-        # macroStack contains:
-        # [(macroName, slots, definingName, extending, entering, i18ncontext)]
+        # macroStack entries are:
+        #   [macroName, slots, definingName, extending, entering, i18ncontext]
+        # the entries are mutated while on the stack
         self.macroStack = []
         self.inUseDirective = False
         self.position = None, None  # (lineno, offset)
