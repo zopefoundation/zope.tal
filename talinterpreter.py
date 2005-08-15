@@ -16,6 +16,7 @@
 $Id$
 """
 import cgi
+import operator
 import sys
 
 # Do not use cStringIO here!  It's not unicode aware. :(
@@ -85,6 +86,28 @@ class AltTALGenerator(TALGenerator):
             repldict = self.repldict
             self.repldict = None
         return TALGenerator.replaceAttrs(self, attrlist, repldict)
+
+
+
+class MacroStackItem(list):
+    # This is a `list` subclass for backward compability.
+    """Stack entry for the TALInterpreter.macroStack.
+
+    This offers convenience attributes for more readable access.
+
+    """
+    __slots__ = ()
+
+    # These would be nicer using @syntax, but that would require
+    # Python 2.4.x; this will do for now.
+
+    macroName = property(lambda self: self[0])
+    slots = property(lambda self: self[1])
+    definingName = property(lambda self: self[2])
+    extending = property(lambda self: self[3])
+    entering = property(lambda self: self[4],
+                        lambda self, value: operator.setitem(self, 4, value))
+    i18nContext = property(lambda self: self[5])
 
 
 class TALInterpreter(object):
@@ -180,8 +203,7 @@ class TALInterpreter(object):
         self.html = 0
         self.endsep = "/>"
         self.endlen = len(self.endsep)
-        # macroStack entries are:
-        #   [macroName, slots, definingName, extending, entering, i18ncontext]
+        # macroStack entries are MacroStackItem instances;
         # the entries are mutated while on the stack
         self.macroStack = []
         # `inUseDirective` is set iff we're handling a metal:use-macro
@@ -229,12 +251,13 @@ class TALInterpreter(object):
         assert self.level == level
         assert self.scopeLevel == scopeLevel
 
-    def pushMacro(self, macroName, slots, definingName, extending, entering=1):
+    def pushMacro(self, macroName, slots, definingName, extending):
         if len(self.macroStack) >= self.stackLimit:
             raise METALError("macro nesting limit (%d) exceeded "
                              "by %s" % (self.stackLimit, `macroName`))
-        self.macroStack.append([macroName, slots, definingName, extending,
-                                entering, self.i18nContext])
+        self.macroStack.append(
+            MacroStackItem((macroName, slots, definingName, extending,
+                            True, self.i18nContext)))
 
     def popMacro(self):
         return self.macroStack.pop()
@@ -412,20 +435,18 @@ class TALInterpreter(object):
             # use-macro and its extensions
             if len(macs) > 1:
                 for macro in macs[1:]:
-                    extending = macro[3]
-                    if not extending:
+                    if not macro.extending:
                         return ()
-            if not macs[-1][4]:
+            if not macs[-1].entering:
                 return ()
-            # Clear 'entering' flag
-            macs[-1][4] = 0
+            macs[-1].entering = False
             # Convert or drop depth-one METAL attributes.
             i = name.rfind(":") + 1
             prefix, suffix = name[:i], name[i:]
             if suffix == "define-macro":
                 # Convert define-macro as we enter depth one.
-                useName = macs[0][0]
-                defName = macs[0][2]
+                useName = macs[0].macroName
+                defName = macs[0].definingName
                 res = []
                 if defName:
                     res.append('%sdefine-macro=%s' % (prefix, quote(defName)))
@@ -909,7 +930,7 @@ class TALInterpreter(object):
             # Measure the extension depth of this use-macro
             depth = 1
             while depth < len_macs:
-                if macs[-depth][3]:
+                if macs[-depth].extending:
                     depth += 1
                 else:
                     break
@@ -919,8 +940,7 @@ class TALInterpreter(object):
             slot = None
             i = len_macs - depth
             while i < len_macs:
-                slots = macs[i][1]
-                slot = slots.get(slotName)
+                slot = macs[i].slots.get(slotName)
                 if slot is not None:
                     break
                 i += 1
@@ -937,7 +957,7 @@ class TALInterpreter(object):
                     self.sourceFile = prev_source
                 # Restore the stack entries.
                 for mac in chopped:
-                    mac[4] = 0  # Not entering
+                    mac.entering = False  # Not entering
                 macs.extend(chopped)
                 return
             # Falling out of the 'if' allows the macro to be interpreted.
