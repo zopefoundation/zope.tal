@@ -184,6 +184,7 @@ class TALInterpreter(object):
         #   [macroName, slots, definingName, extending, entering, i18ncontext]
         # the entries are mutated while on the stack
         self.macroStack = []
+        # `inUseDirective` is set iff we're handling a metal:use-macro
         self.inUseDirective = False
         self.position = None, None  # (lineno, offset)
         self.col = 0
@@ -839,7 +840,6 @@ class TALInterpreter(object):
     bytecode_handlers["condition"] = do_condition
 
     def do_defineMacro(self, (macroName, macro)):
-        macs = self.macroStack
         wasInUse = self.inUseDirective
         self.inUseDirective = False
         self.interpret(macro)
@@ -888,10 +888,7 @@ class TALInterpreter(object):
         # extendMacro results from a combination of define-macro and
         # use-macro.  definingName has the value of the
         # metal:define-macro attribute.
-        extending = False
-        if self.metal and self.inUseDirective:
-            # extend the calling directive.
-            extending = True
+        extending = self.metal and self.inUseDirective
         self.do_useMacro((macroName, macroExpr, compiledSlots, block),
                          definingName, extending)
     bytecode_handlers["extendMacro"] = do_extendMacro
