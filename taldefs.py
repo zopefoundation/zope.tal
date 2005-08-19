@@ -36,6 +36,7 @@ NAME_RE = "[a-zA-Z_][-a-zA-Z0-9_]*"
 # TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
 KNOWN_METAL_ATTRIBUTES = dict.fromkeys([
     "define-macro",
+    "extend-macro",
     "use-macro",
     "define-slot",
     "fill-slot",

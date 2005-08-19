@@ -508,6 +508,7 @@ class TALGenerator(object):
 
         todo = {}
         defineMacro = metaldict.get("define-macro")
+        extendMacro = metaldict.get("extend-macro")
         useMacro = metaldict.get("use-macro")
         defineSlot = metaldict.get("define-slot")
         fillSlot = metaldict.get("fill-slot")
@@ -537,11 +538,24 @@ class TALGenerator(object):
             raise I18NError("i18n:data must be accompanied by i18n:translate",
                             position)
 
-        if defineMacro or useMacro:
+        if extendMacro:
+            if useMacro:
+                raise METALError(
+                    "extend-macro cannot be used with use-macro", position)
+            if not defineMacro:
+                raise METALError(
+                    "extend-macro must be used with define-macro", position)
+
+        if defineMacro or extendMacro or useMacro:
             if fillSlot or defineSlot:
                 raise METALError(
                     "define-slot and fill-slot cannot be used with "
-                    "define-macro or use-macro", position)
+                    "define-macro, extend-macro, or use-macro", position)
+            if defineMacro and useMacro:
+                raise METALError(
+                    "define-macro may not be used with use-macro", position)
+
+            useMacro = useMacro or extendMacro
 
         if content and msgid:
             raise I18NError(

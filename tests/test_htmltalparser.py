@@ -557,6 +557,18 @@ class TALGeneratorTestCases(TestCaseBase):
         self._should_error("<p metal:foobar='x' />", exc)
         self._should_error("<p metal:define-macro='x'>", exc)
 
+    def test_extend_macro_errors(self):
+        exc = taldefs.METALError
+        # extend-macro requires define-macro:
+        self._should_error("<p metal:extend-macro='x'>xxx</p>", exc)
+        # extend-macro prevents use-macro:
+        self._should_error("<p metal:extend-macro='x'"
+                           "   metal:use-macro='x'"
+                           "   metal:define-macro='y'>xxx</p>", exc)
+        # use-macro doesn't co-exist with define-macro:
+        self._should_error("<p metal:use-macro='x'"
+                           "   metal:define-macro='y'>xxx</p>", exc)
+
     #
     #  I18N test cases
     #
