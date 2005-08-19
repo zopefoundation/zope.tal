@@ -206,7 +206,8 @@ class TALInterpreter(object):
         # macroStack entries are MacroStackItem instances;
         # the entries are mutated while on the stack
         self.macroStack = []
-        # `inUseDirective` is set iff we're handling a metal:use-macro
+        # `inUseDirective` is set iff we're handling either a
+        # metal:use-macro or a metal:extend-macro
         self.inUseDirective = False
         self.position = None, None  # (lineno, offset)
         self.col = 0
