@@ -442,12 +442,12 @@ class TALGenerator(object):
         return None
 
     def replaceAttrs(self, attrlist, repldict):
-        # Each entry in attrlist starts like (name, value).
-        # Result is (name, value, action, expr, xlat) if there is a
+        # Each entry in attrlist starts like (name, value).  Result is
+        # (name, value, action, expr, xlat, msgid) if there is a
         # tal:attributes entry for that attribute.  Additional attrs
         # defined only by tal:attributes are added here.
         #
-        # (name, value, action, expr, xlat)
+        # (name, value, action, expr, xlat, msgid)
         if not repldict:
             return attrlist
         newlist = []
