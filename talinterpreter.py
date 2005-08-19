@@ -939,12 +939,12 @@ class TALInterpreter(object):
             # most general macro.  The most general is at the top of
             # the stack.
             slot = None
-            i = len_macs - depth
-            while i < len_macs:
+            i = len_macs - 1
+            while i >= (len_macs - depth):
                 slot = macs[i].slots.get(slotName)
                 if slot is not None:
                     break
-                i += 1
+                i -= 1
             if slot is not None:
                 # Found a slot filler.  Temporarily chop the macro
                 # stack starting at the macro that filled the slot and

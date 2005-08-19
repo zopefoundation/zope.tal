@@ -99,30 +99,6 @@ class MacroExtendTestCase(TestCaseBase):
         f.close()
         return data
 
-    def test_acme_extends_pnome(self):
-        # ACME inc. has a document_list template that uses ACME's
-        # common look and feel.  ACME's look and feel is based on the
-        # work of PNOME, Inc., a company that creates Pretty Nice
-        # Object Management Environments for Zope.  This test verifies
-        # that document_list works as expected.
-        result = StringIO()
-        interpreter = TALInterpreter(
-            self.doclist_program, {}, self.engine, stream=result)
-        interpreter()
-        actual = result.getvalue().strip()
-        expected = self._read(('output', 'document_list.html')).strip()
-        self.assertEqual(actual, expected)
-
-    def test_acme_extends_pnome_source(self):
-        # Render METAL attributes in document_list
-        result = StringIO()
-        interpreter = TALInterpreter(
-            self.doclist_program, {}, self.engine, stream=result, tal=False)
-        interpreter()
-        actual = result.getvalue().strip()
-        expected = self._read(('output', 'document_list_source.html')).strip()
-        self.assertEqual(actual, expected)
-
     def test_preview_acme_template(self):
         # An ACME designer is previewing the ACME design.  For the
         # purposes of this use case, extending a macro should act the
