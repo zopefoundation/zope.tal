@@ -447,6 +447,17 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessageID):
             '     i18n:domain="lower"'
             '     tal:content="string:ToLower" />')
         self._check(program, '<div>tolower</div>\n')
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     tal:define="msgid string:ToUpper"'
+            '     tal:content="msgid" />')
+        self._check(program, '<div>TOUPPER</div>\n')
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     i18n:domain="lower"'
+            '     tal:define="msgid string:ToLower"'
+            '     tal:content="msgid" />')
+        self._check(program, '<div>tolower</div>\n')
 
     def test_unused_explicit_domain(self):
         #a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine 
