@@ -19,6 +19,8 @@ import cgi
 import operator
 import sys
 
+from types import StringType, UnicodeType
+
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
@@ -651,6 +653,8 @@ class TALInterpreter(object):
             return
         if isinstance(text, I18nMessageTypes):
             text = self.engine.translate(text)
+        elif isinstance(text, (StringType, UnicodeType)):
+            text = self.engine.translate(text, domain=self.i18nContext.domain)
         self._writeText(text)
 
     def do_i18nVariable(self, stuff):

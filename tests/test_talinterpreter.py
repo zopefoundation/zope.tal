@@ -22,9 +22,6 @@ import unittest
 
 from StringIO import StringIO
 
-from zope.interface import implements
-from zope.i18n.interfaces import ITranslationDomain
-
 from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talparser import TALParser
@@ -127,10 +124,6 @@ class MacroExtendTestCase(TestCaseBase):
         self.assertEqual(actual, expected)
 
 
-
-
-
-
 class I18NCornerTestCaseBase(TestCaseBase):
 
     def factory(self, msgid, default, mapping={}):
@@ -221,10 +214,16 @@ class I18NCornerTestCaseBase(TestCaseBase):
     def test_translate_static_text_as_dynamic(self):
         program, macros = self._compile(
             '<div i18n:translate="">This is text for '
-            '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
+            '<span tal:content="bar" i18n:name="bar_name"/>.'
             '</div>')
         self._check(program,
                     '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>\n')
+        program, macros = self._compile(
+            '<div i18n:translate="">This is text for '
+            '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
+            '</div>')
+        self._check(program,
+                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
 
     def test_translate_static_text_as_dynamic_from_bytecode(self):
         program =  [('version', TAL_VERSION),
@@ -259,32 +258,24 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self._check(program,
                     '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
 
-    def _getCollectingTranslationDomain(self):
-        class CollectingTranslationDomain(DummyTranslationDomain):
-            data = []
-
-            def translate(self, msgid, mapping=None,
-                          context=None, target_language=None, default=None):
-                self.data.append((msgid, mapping))
-                return DummyTranslationDomain.translate(
-                    self,
-                    msgid, mapping, context, target_language, default)
-
-        xlatdmn = CollectingTranslationDomain()
-        self.engine.translationDomain = xlatdmn
-        return xlatdmn
-
     def test_for_correct_msgids(self):
-        xlatdmn = self._getCollectingTranslationDomain()
+        self.engine.translationDomain.clearMsgids()
         result = StringIO()
+        #GChapelle: 
+        #I have the feeling the i18n:translate with the i18n:name is wrong
+        #
+        #program, macros = self._compile(
+        #    '<div i18n:translate="">This is text for '
+        #    '<span i18n:translate="" tal:content="bar" '
+        #    'i18n:name="bar_name"/>.</div>')
         program, macros = self._compile(
             '<div i18n:translate="">This is text for '
-            '<span i18n:translate="" tal:content="bar" '
+            '<span tal:content="bar" '
             'i18n:name="bar_name"/>.</div>')
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        msgids = list(xlatdmn.data)
+        msgids = self.engine.translationDomain.getMsgids('default')
         msgids.sort()
         self.assertEqual(1, len(msgids))
         self.assertEqual('This is text for ${bar_name}.', msgids[0][0])
@@ -293,10 +284,29 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>\n',
             result.getvalue())
 
+    def test_for_correct_msgids_translate_name(self):
+        self.engine.translationDomain.clearMsgids()
+        result = StringIO()
+        program, macros = self._compile(
+            '<div i18n:translate="">This is text for '
+            '<span i18n:translate="" tal:content="bar" '
+            'i18n:name="bar_name"/>.</div>')
+        self.interpreter = TALInterpreter(program, {}, self.engine,
+                                          stream=result)
+        self.interpreter()
+        msgids = self.engine.translationDomain.getMsgids('default')
+        msgids.sort()
+        self.assertEqual(2, len(msgids))
+        self.assertEqual('This is text for ${bar_name}.', msgids[1][0])
+        self.assertEqual({'bar_name': '<span>BARVALUE</span>'}, msgids[1][1])
+        self.assertEqual(
+            '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
+            result.getvalue())
+
     def test_i18ntranslate_i18nname_and_attributes(self):
         # Test for Issue 301: Bug with i18n:name and i18n:translate
         # on the same element
-        xlatdmn = self._getCollectingTranslationDomain()
+        self.engine.translationDomain.clearMsgids()
         result = StringIO()
         program, macros = self._compile(
             '<p i18n:translate="">'
@@ -305,7 +315,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        msgids = list(xlatdmn.data)
+        msgids = self.engine.translationDomain.getMsgids('default')
         msgids.sort()
         self.assertEqual(2, len(msgids))
         self.assertEqual('Some static text and a ${link}.', msgids[0][0])
@@ -319,7 +329,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         # Test for Issue 314: i18n:translate removes line breaks from
         # <pre>...</pre> contents
         # HTML mode
-        xlatdmn = self._getCollectingTranslationDomain()
+        self.engine.translationDomain.clearMsgids()
         result = StringIO()
         program, macros = self._compile(
             '<div i18n:translate=""> This is text\n'
@@ -329,7 +339,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        msgids = list(xlatdmn.data)
+        msgids = self.engine.translationDomain.getMsgids('default')
         msgids.sort()
         self.assertEqual(2, len(msgids))
         self.assertEqual(' This is text\n <b>\tfor</b>\n pre. ', msgids[0][0])
@@ -340,7 +350,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
             result.getvalue())
 
         # XML mode
-        xlatdmn = self._getCollectingTranslationDomain()
+        self.engine.translationDomain.clearMsgids()
         result = StringIO()
         parser = TALParser()
         parser.parseString(
@@ -352,7 +362,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        msgids = list(xlatdmn.data)
+        msgids = self.engine.translationDomain.getMsgids('default')
         msgids.sort()
         self.assertEqual(1, len(msgids))
         self.assertEqual('This is text <b> for</b> barvalue.', msgids[0][0])
@@ -362,7 +372,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
             result.getvalue())
 
     def test_raw_msgids_and_i18ntranslate_i18nname(self):
-        xlatdmn = self._getCollectingTranslationDomain()
+        self.engine.translationDomain.clearMsgids()
         result = StringIO()
         program, macros = self._compile(
             '<div i18n:translate=""> This is text\n \tfor\n'
@@ -370,7 +380,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        msgids = list(xlatdmn.data)
+        msgids = self.engine.translationDomain.getMsgids('default')
         msgids.sort()
         self.assertEqual(2, len(msgids))
         self.assertEqual(' \tbar\n ', msgids[0][0])
@@ -405,20 +415,19 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessageID):
 
     
     def setUp(self):
+        # MultipleDomainsDummyEngine is a Engine
+        # where default domain transforms to uppercase
         self.engine = MultipleDomainsDummyEngine()
-        # Make sure we'll translate the msgid not its unicode representation
         self.engine.setLocal('foo',
             self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
         self.engine.setLocal('bar', 'BaRvAlUe')
         self.engine.setLocal('baz',
             self.factory('BaZvAlUe', 'default', {}))
         # Message ids with different domains
-        self.engine.setLocal('tolower',
-            self.factory('ToLower', 'default', {}, domain='lower'))
         self.engine.setLocal('toupper',
             self.factory('ToUpper', 'default', {}))
-        self.engine.setLocal('othertolower',
-            self.factory('OtherToLower', 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine', {}, domain='lower'))
+        self.engine.setLocal('tolower',
+            self.factory('ToLower', 'default', {}, domain='lower'))
 
     def test_multiple_domains(self):
         program, macros = self._compile(
@@ -431,11 +440,30 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessageID):
         self._check(program, '<div>tolower</div>\n')
         program, macros = self._compile(
             '<div i18n:translate=""'
-            '     tal:content="othertolower" />')
-        self._check(program, '<div>othertolower</div>\n')
-
+            '     tal:content="string:ToUpper" />')
+        self._check(program, '<div>TOUPPER</div>\n')
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     i18n:domain="lower"'
+            '     tal:content="string:ToLower" />')
+        self._check(program, '<div>tolower</div>\n')
 
     def test_unused_explicit_domain(self):
+        #a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine 
+        #is a domain that transforms to lowercase
+        self.engine.setLocal('othertolower',
+            self.factory('OtherToLower', 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine', {}, domain='lower'))
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     tal:content="othertolower" />')
+        self._check(program, '<div>othertolower</div>\n')
+        #takes domain into account for strings
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
+            '     tal:content="string:ToLower" />')
+        self._check(program, '<div>tolower</div>\n')
+        #but not for messageids
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
