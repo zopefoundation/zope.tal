@@ -159,6 +159,16 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '</div>')
         self._check(program, '<div>FOOVALUE</div>\n')
 
+    def test_unused_explicit_domain(self):
+        # constructs a msgid and set it up in the namespace
+        self.engine.setLocal('baz',
+            self.factory('BaZvAlUe', 'default', {}))
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
+            '     tal:content="baz" />')
+        self._check(program, '<div>BAZVALUE</div>\n')
+
     def test_pythonexpr_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
