@@ -299,3 +299,88 @@ class DummyTranslationDomain(object):
             return unicode(mapping[m.group(m.lastindex).lower()])
         cre = re.compile(r'\$(?:([_A-Za-z][-\w]*)|\{([_A-Za-z][-\w]*)\})')
         return cre.sub(repl, text)
+
+
+class MultipleDomainsDummyEngine(DummyEngine):
+    
+    def __init__(self, macros=None):
+        if macros is None:
+            macros = {}
+        self.macros = macros
+        dict = {'nothing': None, 'default': Default}
+        self.locals = self.globals = dict
+        self.stack = [dict]
+        self.translationDomain = DummyTranslationDomain()
+        self.lowerDomain = LowerDummyDomain()
+        self.useEngineAttrDicts = False
+
+    def translate(self, msgid, domain=None, mapping=None, default=None):
+        if isinstance(msgid, (MessageID, Message)):
+            domain = msgid.domain
+        if domain in ['lower', 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine']:
+            translationDomain = self.lowerDomain
+        else:
+            translationDomain = self.translationDomain
+        translationDomain.domain = domain
+        return translationDomain.translate(
+            msgid, mapping, default=default)
+
+class LowerDummyDomain(object):
+    implements(ITranslationDomain)
+
+    domain = ''
+
+    def translate(self, msgid, mapping=None, context=None,
+                  target_language=None, default=None):
+
+        domain = self.domain
+        # This is a fake translation service which simply uppercases non
+        # ${name} placeholder text in the message id.
+        #
+        # First, transform a string with ${name} placeholders into a list of
+        # substrings.  Then lowcase everything but the placeholders, then glue
+        # things back together.
+
+        # If the domain is a string method, then transform the string
+        # by calling that method.
+
+        # MessageID attributes override arguments
+        if isinstance(msgid, (MessageID, Message)):
+            domain = msgid.domain
+            mapping = msgid.mapping
+            default = msgid.default
+            if default is None: # Message doesn't substitute itself for
+                default = msgid # missing default
+
+        # simulate an unknown msgid by returning None
+        if msgid == "don't translate me":
+            text = default
+        elif domain and hasattr('', domain):
+            text = getattr(msgid, domain)()
+        else:
+            text = msgid.lower()
+
+        def repl(m):
+            return unicode(mapping[m.group(m.lastindex).lower()])
+        cre = re.compile(r'\$(?:([_A-Za-z][-\w]*)|\{([_A-Za-z][-\w]*)\})')
+        return cre.sub(repl, text)
+
+    def translate(self, msgid, mapping=None, context=None,
+                  target_language=None, default=None):
+        # This is a fake translation service which simply lowercases non
+        # ${name} placeholder text in the message id.
+        #
+        # First, transform a string with ${name} placeholders into a list of
+        # substrings.  Then upcase everything but the placeholders, then glue
+        # things back together.
+
+        # simulate an unknown msgid by returning None
+        if msgid == "don't translate me":
+            text = default
+        else:
+            text = msgid.lower()
+
+        def repl(m, mapping=mapping):
+            return ustr(mapping[m.group(m.lastindex).lower()])
+        cre = re.compile(r'\$(?:(%s)|\{(%s)\})' % (NAME_RE, NAME_RE))
+        return cre.sub(repl, text)

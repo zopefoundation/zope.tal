@@ -22,11 +22,16 @@ import unittest
 
 from StringIO import StringIO
 
+from zope.interface import implements
+from zope.i18n.interfaces import ITranslationDomain
+
 from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talparser import TALParser
 from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.dummyengine import DummyEngine, DummyTranslationDomain
+from zope.tal.dummyengine import DummyEngine
+from zope.tal.dummyengine import MultipleDomainsDummyEngine
+from zope.tal.dummyengine import DummyTranslationDomain
 from zope.tal.tests import utils
 from zope.i18nmessageid import MessageID, Message
 
@@ -122,6 +127,10 @@ class MacroExtendTestCase(TestCaseBase):
         self.assertEqual(actual, expected)
 
 
+
+
+
+
 class I18NCornerTestCaseBase(TestCaseBase):
 
     def factory(self, msgid, default, mapping={}):
@@ -158,16 +167,6 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:replace="foo" i18n:name="foo_name"/>'
             '</div>')
         self._check(program, '<div>FOOVALUE</div>\n')
-
-    def test_unused_explicit_domain(self):
-        # constructs a msgid and set it up in the namespace
-        self.engine.setLocal('baz',
-            self.factory('BaZvAlUe', 'default', {}))
-        program, macros = self._compile(
-            '<div i18n:translate=""'
-            '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
-            '     tal:content="baz" />')
-        self._check(program, '<div>BAZVALUE</div>\n')
 
     def test_pythonexpr_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
@@ -389,12 +388,59 @@ class I18NCornerTestCaseBase(TestCaseBase):
             "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
         self._check(program, u"<div>FOO \u00C0</div>\n")
 
+    
 class I18NCornerTestCaseMessageID(I18NCornerTestCaseBase):
 
-    def factory(self, msgid, default=None, mapping={}):
+    def factory(self, msgid, default=None, mapping={}, domain=None):
         m = MessageID(msgid, default=default)
         m.mapping = mapping
         return m
+
+class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessageID):
+    
+    def factory(self, msgid, default=None, mapping={}, domain=None):
+        m = MessageID(msgid, default=default, domain=domain)
+        m.mapping = mapping
+        return m
+
+    
+    def setUp(self):
+        self.engine = MultipleDomainsDummyEngine()
+        # Make sure we'll translate the msgid not its unicode representation
+        self.engine.setLocal('foo',
+            self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
+        self.engine.setLocal('bar', 'BaRvAlUe')
+        self.engine.setLocal('baz',
+            self.factory('BaZvAlUe', 'default', {}))
+        # Message ids with different domains
+        self.engine.setLocal('tolower',
+            self.factory('ToLower', 'default', {}, domain='lower'))
+        self.engine.setLocal('toupper',
+            self.factory('ToUpper', 'default', {}))
+        self.engine.setLocal('othertolower',
+            self.factory('OtherToLower', 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine', {}, domain='lower'))
+
+    def test_multiple_domains(self):
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     tal:content="toupper" />')
+        self._check(program, '<div>TOUPPER</div>\n')
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     tal:content="tolower" />')
+        self._check(program, '<div>tolower</div>\n')
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     tal:content="othertolower" />')
+        self._check(program, '<div>othertolower</div>\n')
+
+
+    def test_unused_explicit_domain(self):
+        program, macros = self._compile(
+            '<div i18n:translate=""'
+            '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
+            '     tal:content="baz" />')
+        self._check(program, '<div>BAZVALUE</div>\n')
 
 class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
 
@@ -622,6 +668,7 @@ def test_suite():
     suite.addTest(unittest.makeSuite(ScriptTestCase))
     suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessageID))
     suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessage))
+    suite.addTest(unittest.makeSuite(UnusedExplicitDomainTestCase))
     suite.addTest(unittest.makeSuite(TestSourceAnnotations))
 
     # TODO: Deactivated test, since we have not found a solution for this and
