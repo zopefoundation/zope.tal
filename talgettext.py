@@ -40,7 +40,7 @@ from zope.tal.talinterpreter import TALInterpreter, normalize
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
-from zope.i18nmessageid import MessageID
+from zope.i18nmessageid import Message
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -113,11 +113,11 @@ class POEngine(DummyEngine):
                   # interface
                   position=None):
 
-        # Make the message is a MessageID object, if the default differs
+        # Make the message is a Message object, if the default differs
         # from the value, so that the POT generator can put the default
         # text into a comment.
         if default is not None and normalize(default) != msgid:
-            msgid = MessageID(msgid, default=default)
+            msgid = Message(msgid, default=default)
 
         if domain not in self.catalog:
             self.catalog[domain] = {}
