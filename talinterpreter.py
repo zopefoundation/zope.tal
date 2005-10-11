@@ -18,15 +18,19 @@ $Id$
 import cgi
 import operator
 import sys
+import warnings
 
 from types import StringType, UnicodeType
 
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
-import warnings
-
+# BBB 2005/10/10
+import zope.deprecation
+zope.deprecation.__show__.off()
 from zope.i18nmessageid import MessageID, Message
+zope.deprecation.__show__.on()
+
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode

@@ -21,7 +21,12 @@ from zope.interface import implements
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18n.interfaces import ITranslationDomain
+
+# BBB 2005/10/10
+import zope.deprecation
+zope.deprecation.__show__.off()
 from zope.i18nmessageid import MessageID, Message
+zope.deprecation.__show__.on()
 
 Default = object()
 

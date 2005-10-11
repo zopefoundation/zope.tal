@@ -30,7 +30,12 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
 from zope.tal.dummyengine import DummyTranslationDomain
 from zope.tal.tests import utils
+
+# BBB 2005/10/10
+import zope.deprecation
+zope.deprecation.__show__.off()
 from zope.i18nmessageid import MessageID, Message
+zope.deprecation.__show__.on()
 
 class TestCaseBase(unittest.TestCase):
 
