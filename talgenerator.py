@@ -50,9 +50,10 @@ class TALGenerator(object):
         # emitEndElement needs to finish its calculations
         self.todoStack = []
         self.macros = {}
+        # {slot-name --> default content program}
         self.slots = {}
         self.slotStack = []
-        self.xml = xml
+        self.xml = xml  # true --> XML, false --> HTML
         self.emit("version", TAL_VERSION)
         self.emit("mode", xml and "xml" or "html")
         if source_file is not None:
@@ -70,10 +71,6 @@ class TALGenerator(object):
         output = []
         collect = []
         cursor = 0
-        if self.xml:
-            endsep = "/>"
-        else:
-            endsep = " />"
         for cursor in xrange(len(program)+1):
             try:
                 item = program[cursor]
@@ -90,6 +87,7 @@ class TALGenerator(object):
                 if self.optimizeStartTag(collect, item[1], item[2], ">"):
                     continue
             if opcode == "startEndTag":
+                endsep = self.xml and "/>" or " />"
                 if self.optimizeStartTag(collect, item[1], item[2], endsep):
                     continue
             if opcode in ("beginScope", "endScope"):
