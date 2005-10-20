@@ -31,7 +31,7 @@ from zope.tal.dummyengine import MultipleDomainsDummyEngine
 from zope.tal.dummyengine import DummyTranslationDomain
 from zope.tal.tests import utils
 
-# BBB 2005/10/10
+# BBB 2005/10/10 -- MessageIDs are to be removed for Zope 3.3
 import zope.deprecation
 zope.deprecation.__show__.off()
 from zope.i18nmessageid import MessageID, Message

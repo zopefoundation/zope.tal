@@ -22,7 +22,7 @@ from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18n.interfaces import ITranslationDomain
 
-# BBB 2005/10/10
+# BBB 2005/10/10 -- MessageIDs are to be removed for Zope 3.3
 import zope.deprecation
 zope.deprecation.__show__.off()
 from zope.i18nmessageid import MessageID, Message

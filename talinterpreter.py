@@ -25,7 +25,7 @@ from types import StringType, UnicodeType
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
-# BBB 2005/10/10
+# BBB 2005/10/10 -- MessageIDs are to be removed for Zope 3.3
 import zope.deprecation
 zope.deprecation.__show__.off()
 from zope.i18nmessageid import MessageID, Message
