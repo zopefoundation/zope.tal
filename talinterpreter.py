@@ -498,7 +498,7 @@ class TALInterpreter(object):
 
         if ok:
             if xlat:
-                translated = self.translate(msgid or value, value, {})
+                translated = self.translate(msgid or value, value)
                 if translated is not None:
                     value = translated
             if value is None:
@@ -631,7 +631,7 @@ class TALInterpreter(object):
             # Translate this now.
             # BBB: Deprecated. Will be removed in 3.3
             self._i18n_deprecate()
-            text = self.engine.translate(text)
+            text = self.translate(text)
         self._writeText(text)
 
     def _i18n_deprecate(self):
@@ -656,9 +656,9 @@ class TALInterpreter(object):
             self.interpret(stuff[1])
             return
         if isinstance(text, I18nMessageTypes):
-            text = self.engine.translate(text)
+            text = self.translate(text)
         elif isinstance(text, (StringType, UnicodeType)):
-            text = self.engine.translate(text, domain=self.i18nContext.domain)
+            text = self.translate(text)
         self._writeText(text)
 
     def do_i18nVariable(self, stuff):
@@ -696,7 +696,7 @@ class TALInterpreter(object):
                 # Translate this now.
                 # BBB: Deprecated. Will be removed in 3.3
                 self._i18n_deprecate()
-                value = self.engine.translate(value)
+                value = self.translate(value)
 
             if not structure:
                 value = cgi.escape(unicode(value))
@@ -788,7 +788,7 @@ class TALInterpreter(object):
             self.interpret(block)
             return
         if isinstance(structure, I18nMessageTypes):
-            text = self.engine.translate(structure)
+            text = self.translate(structure)
         else:
             text = unicode(structure)
         if not (repldict or self.strictinsert):
@@ -845,7 +845,14 @@ class TALInterpreter(object):
             self.interpret(block)
     bytecode_handlers["loop"] = do_loop
 
-    def translate(self, msgid, default, i18ndict, obj=None):
+    def translate(self, msgid, default=None, i18ndict=None,
+                  obj=None, domain=None):
+        if default is None:
+            default = getattr(msgid, 'default', unicode(msgid))
+        if i18ndict is None:
+            i18ndict = {}
+        if domain is None:
+            domain = getattr(msgid, 'domain', self.i18nContext.domain)
         if obj:
             i18ndict.update(obj)
         if not self.i18nInterpolate:

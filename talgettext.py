@@ -71,7 +71,9 @@ def usage(code, msg=''):
 
 
 class POTALInterpreter(TALInterpreter):
-    def translate(self, msgid, default, i18ndict=None, obj=None):
+    def translate(self, msgid, default=None, i18ndict=None, obj=None):
+        if default is None:
+            default = getattr(msgid, 'default', unicode(msgid))
         # If no i18n dict exists yet, create one.
         if i18ndict is None:
             i18ndict = {}
@@ -83,7 +85,7 @@ class POTALInterpreter(TALInterpreter):
             return None
         # TODO: We need to pass in one of context or target_language
         return self.engine.translate(msgid, self.i18nContext.domain, i18ndict,
-                                     position=self.position, default=default)
+                                     default=default, position=self.position)
 
 
 class POEngine(DummyEngine):
