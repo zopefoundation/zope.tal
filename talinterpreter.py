@@ -20,8 +20,6 @@ import operator
 import sys
 import warnings
 
-from types import StringType, UnicodeType
-
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
@@ -37,8 +35,11 @@ from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
 
+
 # Avoid constructing this tuple over and over
 I18nMessageTypes = (MessageID, Message)
+
+TypesToTranslate = I18nMessageTypes + (str, unicode)
 
 # TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
 BOOLEAN_HTML_ATTRS = dict.fromkeys([
@@ -650,16 +651,13 @@ class TALInterpreter(object):
     def do_insertI18nText_tal(self, stuff):
         # TODO: Code duplication is BAD, we need to fix it later
         text = self.engine.evaluateText(stuff[0])
-        if text is None:
-            return
-        if text is self.Default:
-            self.interpret(stuff[1])
-            return
-        if isinstance(text, I18nMessageTypes):
-            text = self.translate(text)
-        elif isinstance(text, (StringType, UnicodeType)):
-            text = self.translate(text)
-        self._writeText(text)
+        if text is not None:
+            if text is self.Default:
+                self.interpret(stuff[1])
+            else:
+                if isinstance(text, TypesToTranslate):
+                    text = self.translate(text)
+                self._writeText(text)
 
     def do_i18nVariable(self, stuff):
         varname, program, expression, structure = stuff
@@ -782,23 +780,21 @@ class TALInterpreter(object):
     def do_insertI18nStructure_tal(self, (expr, repldict, block)):
         # TODO: Code duplication is BAD, we need to fix it later
         structure = self.engine.evaluateStructure(expr)
-        if structure is None:
-            return
-        if structure is self.Default:
-            self.interpret(block)
-            return
-        if isinstance(structure, I18nMessageTypes):
-            text = self.translate(structure)
-        else:
-            text = unicode(structure)
-        if not (repldict or self.strictinsert):
-            # Take a shortcut, no error checking
-            self.stream_write(text)
-            return
-        if self.html:
-            self.insertHTMLStructure(text, repldict)
-        else:
-            self.insertXMLStructure(text, repldict)
+        if structure is not None:
+            if structure is self.Default:
+                self.interpret(block)
+            else:
+                if isinstance(structure, TypesToTranslate):
+                    text = self.translate(structure)
+                else:
+                    text = unicode(structure)
+                if not (repldict or self.strictinsert):
+                    # Take a shortcut, no error checking
+                    self.stream_write(text)
+                elif self.html:
+                    self.insertHTMLStructure(text, repldict)
+                else:
+                    self.insertXMLStructure(text, repldict)
 
     def insertHTMLStructure(self, text, repldict):
         from zope.tal.htmltalparser import HTMLTALParser

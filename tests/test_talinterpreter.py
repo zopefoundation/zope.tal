@@ -159,6 +159,58 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:replace="foo"/>')
         self._check(program, 'FOOVALUE\n')
 
+    def test_text_variable_translate(self):
+        program, macros = self._compile(
+            '<span tal:content="bar"/>')
+        self._check(program, '<span>BaRvAlUe</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:content="bar"/>')
+        self._check(program, '<span>BARVALUE</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:replace="bar"/>')
+        self._check(program, 'BARVALUE\n')
+
+    def test_text_translate(self):
+        program, macros = self._compile(
+            '<span tal:content="string:BaR"/>')
+        self._check(program, '<span>BaR</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:content="string:BaR"/>')
+        self._check(program, '<span>BAR</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:replace="string:BaR"/>')
+        self._check(program, 'BAR\n')
+
+    def test_structure_text_variable_translate(self):
+        program, macros = self._compile(
+            '<span tal:content="structure bar"/>')
+        self._check(program, '<span>BaRvAlUe</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:content="structure bar"/>')
+        self._check(program, '<span>BARVALUE</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:replace="structure bar"/>')
+        self._check(program, 'BARVALUE\n')
+
+    def test_structure_text_translate(self):
+        program, macros = self._compile(
+            '<span tal:content="structure string:BaR"/>')
+        self._check(program, '<span>BaR</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:content="structure string:BaR"/>')
+        self._check(program, '<span>BAR</span>\n')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:replace="structure string:BaR"/>')
+        self._check(program, 'BAR\n')
+
     def test_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
