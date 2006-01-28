@@ -33,8 +33,7 @@ ZOPE_I18N_NS = "http://xml.zope.org/namespaces/i18n"
 # zope.i18n.simpletranslationservice module:
 NAME_RE = "[a-zA-Z_][-a-zA-Z0-9_]*"
 
-# TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
-KNOWN_METAL_ATTRIBUTES = dict.fromkeys([
+KNOWN_METAL_ATTRIBUTES = frozenset([
     "define-macro",
     "extend-macro",
     "use-macro",
@@ -42,7 +41,7 @@ KNOWN_METAL_ATTRIBUTES = dict.fromkeys([
     "fill-slot",
     ])
 
-KNOWN_TAL_ATTRIBUTES = dict.fromkeys([
+KNOWN_TAL_ATTRIBUTES = frozenset([
     "define",
     "condition",
     "content",
@@ -56,7 +55,7 @@ KNOWN_TAL_ATTRIBUTES = dict.fromkeys([
                     # like <tal:x>, <metal:y>, <i18n:z>
     ])
 
-KNOWN_I18N_ATTRIBUTES = dict.fromkeys([
+KNOWN_I18N_ATTRIBUTES = frozenset([
     "translate",
     "domain",
     "target",

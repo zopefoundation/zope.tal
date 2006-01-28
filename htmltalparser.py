@@ -23,8 +23,7 @@ from zope.tal.taldefs import ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS, \
 from zope.tal.talgenerator import TALGenerator
 
 
-# TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
-BOOLEAN_HTML_ATTRS = dict.fromkeys([
+BOOLEAN_HTML_ATTRS = frozenset([
     # List of Boolean attributes in HTML that may be given in
     # minimized form (e.g. <img ismap> rather than <img ismap="">)
     # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
@@ -33,7 +32,7 @@ BOOLEAN_HTML_ATTRS = dict.fromkeys([
     "defer"
     ])
 
-EMPTY_HTML_TAGS = dict.fromkeys([
+EMPTY_HTML_TAGS = frozenset([
     # List of HTML tags with an empty content model; these are
     # rendered in minimized form, e.g. <img />.
     # From http://www.w3.org/TR/xhtml1/#dtds
@@ -41,7 +40,7 @@ EMPTY_HTML_TAGS = dict.fromkeys([
     "input", "col", "basefont", "isindex", "frame",
     ])
 
-PARA_LEVEL_HTML_TAGS = dict.fromkeys([
+PARA_LEVEL_HTML_TAGS = frozenset([
     # List of HTML elements that close open paragraph-level elements
     # and are themselves paragraph-level.
     "h1", "h2", "h3", "h4", "h5", "h6", "p",
@@ -56,17 +55,15 @@ BLOCK_CLOSING_TAG_MAP = {
     "dt": ("dd", "dt"),
     }
 
-BLOCK_LEVEL_HTML_TAGS = dict.fromkeys([
+BLOCK_LEVEL_HTML_TAGS = frozenset([
     # List of HTML tags that denote larger sections than paragraphs.
     "blockquote", "table", "tr", "th", "td", "thead", "tfoot", "tbody",
     "noframe", "ul", "ol", "li", "dl", "dt", "dd", "div",
     ])
 
-SECTION_LEVEL_HTML_TAGS = PARA_LEVEL_HTML_TAGS.copy()
-SECTION_LEVEL_HTML_TAGS.update(BLOCK_LEVEL_HTML_TAGS)
+SECTION_LEVEL_HTML_TAGS = PARA_LEVEL_HTML_TAGS.union(BLOCK_LEVEL_HTML_TAGS)
 
-TIGHTEN_IMPLICIT_CLOSE_TAGS = PARA_LEVEL_HTML_TAGS.copy()
-TIGHTEN_IMPLICIT_CLOSE_TAGS.update(BLOCK_CLOSING_TAG_MAP)
+TIGHTEN_IMPLICIT_CLOSE_TAGS = PARA_LEVEL_HTML_TAGS.union(BLOCK_CLOSING_TAG_MAP)
 
 
 class NestingError(HTMLParseError):

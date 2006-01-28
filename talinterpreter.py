@@ -41,8 +41,7 @@ I18nMessageTypes = (MessageID, Message)
 
 TypesToTranslate = I18nMessageTypes + (str, unicode)
 
-# TODO: In Python 2.4 we can use frozenset() instead of dict.fromkeys()
-BOOLEAN_HTML_ATTRS = dict.fromkeys([
+BOOLEAN_HTML_ATTRS = frozenset([
     # List of Boolean attributes in HTML that should be rendered in
     # minimized form (e.g. <img ismap> rather than <img ismap="">)
     # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
