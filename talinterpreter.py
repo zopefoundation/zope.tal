@@ -899,7 +899,7 @@ class TALInterpreter(object):
 
         # We want 'macroname' name to be always available as a variable
         outer = self.engine.getValue('macroname')
-        self.engine.setLocal('macroname', macroName.split('/')[-1])
+        self.engine.setLocal('macroname', macroName.rsplit('/', 1)[-1])
 
         prev_source = self.sourceFile
         wasInUse = self.inUseDirective
@@ -985,6 +985,9 @@ class TALInterpreter(object):
         try:
             self.interpret(block)
         # TODO: this should not catch ZODB.POSException.ConflictError.
+        # The ITALExpressionEngine interface should provide a way of
+        # getting the set of exception types that should not be
+        # handled.
         except:
             exc = sys.exc_info()[1]
             self.restoreState(state)
