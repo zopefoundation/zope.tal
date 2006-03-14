@@ -962,14 +962,16 @@ class TALInterpreter(object):
                 chopped = macs[i:]
                 del macs[i:]
                 prev_source = self.sourceFile
-                self.interpret(slot)
-                if self.sourceFile != prev_source:
-                    self.engine.setSourceFile(prev_source)
-                    self.sourceFile = prev_source
-                # Restore the stack entries.
-                for mac in chopped:
-                    mac.entering = False  # Not entering
-                macs.extend(chopped)
+                try:
+                    self.interpret(slot)
+                finally:
+                    if self.sourceFile != prev_source:
+                        self.engine.setSourceFile(prev_source)
+                        self.sourceFile = prev_source
+                    # Restore the stack entries.
+                    for mac in chopped:
+                        mac.entering = False  # Not entering
+                    macs.extend(chopped)
                 return
             # Falling out of the 'if' allows the macro to be interpreted.
         self.interpret(block)
