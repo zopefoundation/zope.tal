@@ -24,8 +24,8 @@ except ImportError, e:
     from distutils.core import setup, Extension
 
 setup(name='zope.tal',
-      version='1.0',
-      url='http://svn.zope.org/zope.tal',
+      version='3.0.0',
+      url='http://svn.zope.org/zope.tal/3.0.0',
       license='ZPL 2.1',
       description='Zope3 Template Application Languate (TAL)',
       author='Zope Corporation and Contributors',
@@ -36,8 +36,7 @@ setup(name='zope.tal',
 
       namespace_packages=['zope',],
       tests_require = ['zope.testing'],
-      install_requires=['zope.deprecation',
-                        'zope.i18n',
+      install_requires=['zope.i18n',
                         'zope.i18nmessageid',
                         'zope.interface',
                        ],
