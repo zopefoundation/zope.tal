@@ -13,17 +13,43 @@ zope.tal version 3.2.0 (2006/01/05)
 - Corresponds to the verison of the zope.tal package shipped as part of
   the Zope 3.2.0 release.
 
+- Ensured that 'tal:content=""' got properly handled by 'i18n:translate=""'.
+  See http://www.zope.org/Collectors/Zope3-dev/455.
+
+- Corrected TALInterpreter methods to call its own 'translate', rather
+  than invoking engine directly;  this caused 'i18nextract' to fail,
+  due to mysterious lossage of file positions.
+
 zope.tal version 3.1.0 (2005/10/03)
 -----------------------------------
 
 - Corresponds to the verison of the zope.tal package shipped as part of
   the Zope 3.1.0 release.
 
+- Changed the macro stack entries to have meaningful attribute names, in
+  order to make references to individual fields easier to decipher.
+
+- Synched FasterStringIO tweak with Zope2 impelmentation.
+
+- Disabled automagic translation of message IDs in TAL.
+
+- 'talparser.py':  pass current column position to element handlers.
+
+- 'driver.py':  added command-line option to force keeping source annotations.
+  Also, modified handling of files local to the package for easier testing.
+
+- Sundry documentation / coding style cleanups.
+
 zope.tal version 3.0.1 (2005/07/27)
 -----------------------------------
 
 - Corresponds to the verison of the zope.tal package shipped as part of
   the Zope X3.0.1 release.
+
+- Fixed bug in which 'i18n:translate' would remove line breaks from
+  '<pre>...</pre>' contents.  See:
+  http://www.zope.org/Collectors/Zope3-dev/314
+
 
 zope.tal version 3.0.0 (2004/11/07)
 -----------------------------------
