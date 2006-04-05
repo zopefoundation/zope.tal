@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2004 Zope Corporation and Contributors.
+# Copyright (c) 2006 Zope Corporation and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Setup for zope.i18nmessageid package
+"""Setup for zope.tal package
 
 $Id$
 """
@@ -24,13 +24,12 @@ except ImportError, e:
     from distutils.core import setup, Extension
 
 setup(name='zope.tal',
-      version='3.2',
+      version='1.0',
       url='http://svn.zope.org/zope.tal',
       license='ZPL 2.1',
-      description='tal',
+      description='Zope3 Template Application Languate (TAL)',
       author='Zope Corporation and Contributors',
       author_email='zope3-dev@zope.org',
-      long_description='',
       
       packages=['zope', 'zope.tal'],
       package_dir = {'': os.path.join(os.path.dirname(__file__), 'src')},
