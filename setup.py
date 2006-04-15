@@ -24,7 +24,7 @@ except ImportError, e:
     from distutils.core import setup, Extension
 
 setup(name='zope.tal',
-      version='3.0.0.1',
+      version='3.0.0.2',
       url='http://svn.zope.org/zope.tal/3.0.0',
       license='ZPL 2.1',
       description='Zope3 Template Application Languate (TAL)',
@@ -32,7 +32,7 @@ setup(name='zope.tal',
       author_email='zope3-dev@zope.org',
       
       packages=['zope', 'zope.tal'],
-      package_dir = {'': os.path.join(os.path.dirname(__file__), 'src')},
+      package_dir = {'': 'src'},
 
       namespace_packages=['zope',],
       tests_require = ['zope.testing'],
