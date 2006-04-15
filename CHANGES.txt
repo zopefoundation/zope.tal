@@ -1,6 +1,11 @@
 zope.tal Package Changelog
 ==========================
 
+zope.tal version 3.2.0.2 (2006/04/16)
+-------------------------------------
+
+- Fix packaging bug:  'package_dir' must be a *relative* path.
+
 zope.tal version 3.2.0.1 (2006/04/14)
 -------------------------------------
 
