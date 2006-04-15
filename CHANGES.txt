@@ -1,11 +1,10 @@
 zope.tal Package Changelog
 ==========================
 
-zope.tal version 3.2.1 (2006/03/26)
------------------------------------
+zope.tal version 3.2.0.1 (2006/04/14)
+-------------------------------------
 
-- Corresponds to the verison of the zope.tal package shipped as part of
-  the Zope 3.2.1 release.
+- Packaging change:  suppress inclusion of 'setup.cfg' in 'sdist' builds.
 
 zope.tal version 3.2.0 (2006/01/05)
 -----------------------------------
