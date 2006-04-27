@@ -20,13 +20,8 @@ import re
 from zope.interface import implements
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
+from zope.i18nmessageid import Message
 from zope.i18n.interfaces import ITranslationDomain
-
-# BBB 2005/10/10 -- MessageIDs are to be removed for Zope 3.3
-import zope.deprecation
-zope.deprecation.__show__.off()
-from zope.i18nmessageid import MessageID, Message
-zope.deprecation.__show__.on()
 
 Default = object()
 
@@ -142,7 +137,7 @@ class DummyEngine(object):
 
     def evaluateText(self, expr):
         text = self.evaluate(expr)
-        if isinstance(text, (str, unicode, MessageID, Message)):
+        if isinstance(text, (str, unicode, Message)):
             return text
         if text is not None and text is not Default:
             text = str(text)
@@ -298,7 +293,7 @@ class DummyTranslationDomain(object):
         # by calling that method.
 
         # MessageID attributes override arguments
-        if isinstance(msgid, (MessageID, Message)):
+        if isinstance(msgid, Message):
             domain = msgid.domain
             mapping = msgid.mapping
             default = msgid.default
@@ -325,7 +320,7 @@ class MultipleDomainsDummyEngine(DummyEngine):
     
     def translate(self, msgid, domain=None, mapping=None, default=None):
         
-        if isinstance(msgid, (MessageID, Message)):
+        if isinstance(msgid, Message):
             domain = msgid.domain
         
         if domain == 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine':

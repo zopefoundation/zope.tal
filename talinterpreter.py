@@ -23,12 +23,7 @@ import warnings
 # Do not use cStringIO here!  It's not unicode aware. :(
 from StringIO import StringIO
 
-# BBB 2005/10/10 -- MessageIDs are to be removed for Zope 3.3
-import zope.deprecation
-zope.deprecation.__show__.off()
-from zope.i18nmessageid import MessageID, Message
-zope.deprecation.__show__.on()
-
+from zope.i18nmessageid import Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode
@@ -37,7 +32,7 @@ from zope.tal.translationcontext import TranslationContext
 
 
 # Avoid constructing this tuple over and over
-I18nMessageTypes = (MessageID, Message)
+I18nMessageTypes = (Message,)
 
 TypesToTranslate = I18nMessageTypes + (str, unicode)
 

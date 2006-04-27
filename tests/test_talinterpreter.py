@@ -30,12 +30,7 @@ from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
 from zope.tal.dummyengine import DummyTranslationDomain
 from zope.tal.tests import utils
-
-# BBB 2005/10/10 -- MessageIDs are to be removed for Zope 3.3
-import zope.deprecation
-zope.deprecation.__show__.off()
-from zope.i18nmessageid import MessageID, Message
-zope.deprecation.__show__.on()
+from zope.i18nmessageid import Message
 
 class TestCaseBase(unittest.TestCase):
 
@@ -455,21 +450,12 @@ class I18NCornerTestCaseBase(TestCaseBase):
             "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
         self._check(program, u"<div>FOO \u00C0</div>\n")
 
-    
-class I18NCornerTestCaseMessageID(I18NCornerTestCaseBase):
+class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
 
     def factory(self, msgid, default=None, mapping={}, domain=None):
-        m = MessageID(msgid, default=default)
-        m.mapping = mapping
-        return m
+        return Message(msgid, domain=domain, default=default, mapping=mapping)
 
-class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessageID):
-    
-    def factory(self, msgid, default=None, mapping={}, domain=None):
-        m = MessageID(msgid, default=default, domain=domain)
-        m.mapping = mapping
-        return m
-
+class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
     
     def setUp(self):
         # MultipleDomainsDummyEngine is a Engine
@@ -537,11 +523,6 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessageID):
             '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
             '     tal:content="baz" />')
         self._check(program, '<div>BAZVALUE</div>\n')
-
-class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
-
-    def factory(self, msgid, default=None, mapping={}):
-        return Message(msgid, default=default, mapping=mapping)
 
 class ScriptTestCase(TestCaseBase):
 
@@ -762,7 +743,6 @@ def test_suite():
     suite.addTest(unittest.makeSuite(MacroExtendTestCase))
     suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
     suite.addTest(unittest.makeSuite(ScriptTestCase))
-    suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessageID))
     suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessage))
     suite.addTest(unittest.makeSuite(UnusedExplicitDomainTestCase))
     suite.addTest(unittest.makeSuite(TestSourceAnnotations))
