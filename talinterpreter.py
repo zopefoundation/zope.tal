@@ -624,23 +624,8 @@ class TALInterpreter(object):
             return
         if isinstance(text, I18nMessageTypes):
             # Translate this now.
-            # BBB: Deprecated. Will be removed in 3.3
-            self._i18n_deprecate()
             text = self.translate(text)
         self._writeText(text)
-
-    def _i18n_deprecate(self):
-        if self.sourceFile is None:
-            source = "<unknown>"
-        else:
-            source = self.sourceFile
-        lineno = self.position[0]
-        if lineno is not None:
-            source += " (line %s)" % lineno
-        warnings.warn('%s: Automatic translation of message id\'s is'
-            ' deprecated and will be removed in 3.3.'
-            ' Use explicit i18n:translate="" instead.'
-            % source, DeprecationWarning, 2)
 
     def do_insertI18nText_tal(self, stuff):
         # TODO: Code duplication is BAD, we need to fix it later
@@ -686,8 +671,6 @@ class TALInterpreter(object):
             # evaluate() does not do any I18n, so we do it here.
             if isinstance(value, I18nMessageTypes):
                 # Translate this now.
-                # BBB: Deprecated. Will be removed in 3.3
-                self._i18n_deprecate()
                 value = self.translate(value)
 
             if not structure:
