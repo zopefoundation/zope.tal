@@ -154,6 +154,16 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:replace="foo"/>')
         self._check(program, 'FOOVALUE\n')
 
+        # i18n messages defined in Python are translated automatically
+        # (no i18n:translate necessary)
+        program, macros = self._compile(
+            '<span tal:content="foo" />')
+        self._check(program, '<span>FOOVALUE</span>\n')
+
+        program, macros = self._compile(
+            '<span tal:replace="foo" />')
+        self._check(program, 'FOOVALUE\n')
+
     def test_text_variable_translate(self):
         program, macros = self._compile(
             '<span tal:content="bar"/>')
