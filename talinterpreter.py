@@ -945,13 +945,9 @@ class TALInterpreter(object):
                 # render the slot filler.
                 chopped = macs[i:]
                 del macs[i:]
-                prev_source = self.sourceFile
                 try:
                     self.interpret(slot)
                 finally:
-                    if self.sourceFile != prev_source:
-                        self.engine.setSourceFile(prev_source)
-                        self.sourceFile = prev_source
                     # Restore the stack entries.
                     for mac in chopped:
                         mac.entering = False  # Not entering

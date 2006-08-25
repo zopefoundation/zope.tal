@@ -23,9 +23,11 @@ import unittest
 from StringIO import StringIO
 
 from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
+from zope.tal.taldefs import TALExpressionError
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talparser import TALParser
 from zope.tal.talinterpreter import TALInterpreter
+from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
 from zope.tal.dummyengine import DummyTranslationDomain
@@ -35,8 +37,9 @@ from zope.i18nmessageid import Message
 
 class TestCaseBase(unittest.TestCase):
 
-    def _compile(self, source):
-        parser = HTMLTALParser()
+    def _compile(self, source, source_file=None):
+        generator = TALGenerator(xml=0, source_file=source_file)
+        parser = HTMLTALParser(generator)
         parser.parseString(source)
         program, macros = parser.getCode()
         return program, macros
@@ -777,6 +780,56 @@ class TestSourceAnnotations(unittest.TestCase):
                 self.assert_(interpreter._pending_source_annotation)
 
 
+class TestErrorTracebacks(TestCaseBase):
+
+    # Regression test for http://www.zope.org/Collectors/Zope3-dev/697
+
+    def test_define_slot_does_not_clobber_source_file_on_exception(self):
+        m_program, m_macros = self._compile("""
+            <div metal:define-macro="amacro">
+              <div metal:define-slot="aslot">
+              </div>
+            </div>
+            """, source_file='macros.pt')
+        p_program, p_macros = self._compile("""
+            <div metal:use-macro="amacro">
+              <div metal:fill-slot="aslot">
+                <tal:x replace="no_such_thing" />
+              </div>
+            </div>
+            """, source_file='page.pt')
+        engine = DummyEngine(macros=m_macros)
+        interp = TALInterpreter(p_program, {}, engine, StringIO())
+        # Expect TALExpressionError: unknown variable: 'no_such_thing'
+        self.assertRaises(TALExpressionError, interp)
+        # Now the engine should know where the error occurred
+        self.assertEquals(engine.source_file, 'page.pt')
+        self.assertEquals(engine.position, (4, 16))
+
+    def test_define_slot_restores_source_file_if_no_exception(self):
+        m_program, m_macros = self._compile("""
+            <div metal:define-macro="amacro">
+              <div metal:define-slot="aslot">
+              </div>
+              <tal:x replace="no_such_thing" />
+            </div>
+            """, source_file='macros.pt')
+        p_program, p_macros = self._compile("""
+            <div metal:use-macro="amacro">
+              <div metal:fill-slot="aslot">
+              </div>
+            </div>
+            """, source_file='page.pt')
+        engine = DummyEngine(macros=m_macros)
+        interp = TALInterpreter(p_program, {}, engine, StringIO())
+        # Expect TALExpressionError: unknown variable: 'no_such_thing'
+        self.assertRaises(TALExpressionError, interp)
+        # Now the engine should know where the error occurred
+        self.assertEquals(engine.source_file, 'macros.pt')
+        self.assertEquals(engine.position, (5, 14))
+
+
+
 def test_suite():
     suite = unittest.makeSuite(I18NErrorsTestCase)
     suite.addTest(unittest.makeSuite(MacroErrorsTestCase))
@@ -786,6 +839,7 @@ def test_suite():
     suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessage))
     suite.addTest(unittest.makeSuite(UnusedExplicitDomainTestCase))
     suite.addTest(unittest.makeSuite(TestSourceAnnotations))
+    suite.addTest(unittest.makeSuite(TestErrorTracebacks))
 
     # TODO: Deactivated test, since we have not found a solution for this and
     # it is a deep and undocumented HTML parser issue.
