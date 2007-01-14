@@ -74,6 +74,11 @@ class XMLParser(object):
         self.parseStream(open(filename))
 
     def parseString(self, s):
+        if isinstance(s, unicode):
+            # Expat cannot deal with unicode strings, only with
+            # encoded ones.  Also, its range of encodings is rather
+            # limited, UTF-8 is the safest bet here.
+            s = s.encode('utf-8')
         self.parser.Parse(s, 1)
 
     def parseURL(self, url):

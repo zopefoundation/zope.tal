@@ -249,6 +249,12 @@ text
     def test_declaration_junk_chars(self):
         self._parse_error("<!DOCTYPE foo $ >")
 
+    def test_unicode_string(self):
+        output = [('starttag', u'p', []),
+                  ('data', u'\xe4\xf6\xfc\xdf'),
+                  ('endtag', u'p')]
+        self._run_check(u'<p>\xe4\xf6\xfc\xdf</p>', output)
+
 
 # Support for the Zope regression test framework:
 def test_suite(skipxml=utils.skipxml):
