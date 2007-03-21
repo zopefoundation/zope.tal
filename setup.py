@@ -21,10 +21,10 @@ import os
 from setuptools import setup, find_packages
 
 setup(name='zope.tal',
-      version='3.3dev',
+      version='3.4dev',
       url='http://svn.zope.org/zope.tal',
       license='ZPL 2.1',
-      description='Zope3 Template Application Languate (TAL)',
+      description='Zope 3 Template Application Languate (TAL)',
       author='Zope Corporation and Contributors',
       author_email='zope3-dev@zope.org',
       
@@ -34,9 +34,8 @@ setup(name='zope.tal',
       namespace_packages=['zope',],
       tests_require = ['zope.testing'],
       install_requires=['setuptools',
-                        'zope.deprecation',
-                        'zope.i18n',
                         'zope.i18nmessageid',
+                        'zope.i18n',
                         'zope.interface',
                        ],
       include_package_data = True,
