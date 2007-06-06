@@ -29,7 +29,7 @@ from zope.tal.talparser import TALParser
 
 #from zope.tal.talinterpreter import TALInterpreter
 from pypy.interpreter.mixedmodule import testmodule
-talinterpreter =  testmodule('talinterpreter', 'zope.tal')
+talinterpreter =  testmodule('_talinterpreter', 'zope.tal')
 TALInterpreter = talinterpreter.TALInterpreter
 
 from zope.tal.talgenerator import TALGenerator

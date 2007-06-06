@@ -26,6 +26,7 @@ from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.translationcontext import TranslationContext
 from zope.tal.alttalgenerator import AltTALGenerator
 
+import _talinterpreter
 
 # Avoid constructing this tuple over and over
 I18nMessageTypes = (Message,)
@@ -45,12 +46,6 @@ BOOLEAN_HTML_ATTRS = frozenset([
 
 _nulljoin = ''.join
 _spacejoin = ' '.join
-
-def normalize(text):
-    # Now we need to normalize the whitespace in implicit message ids and
-    # implicit $name substitution values by stripping leading and trailing
-    # whitespace, and folding all internal whitespace to a single space.
-    return _spacejoin(text.split())
 
 
 
@@ -610,7 +605,7 @@ class TALInterpreter(object):
                 if self.html and self._currentTag == "pre":
                     value = tmpstream.getvalue()
                 else:
-                    value = normalize(tmpstream.getvalue())
+                    value = _talinterpreter.normalize(tmpstream.getvalue())
             finally:
                 self.restoreState(state)
         else:
@@ -673,7 +668,7 @@ class TALInterpreter(object):
             if self.html and currentTag == "pre":
                 msgid = default
             else:
-                msgid = normalize(default)
+                msgid = _talinterpreter.normalize(default)
         self.i18nStack.pop()
         # See if there is was an i18n:data for msgid
         if len(stuff) > 2:
