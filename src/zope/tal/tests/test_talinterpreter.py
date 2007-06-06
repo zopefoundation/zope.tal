@@ -26,7 +26,12 @@ from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
 from zope.tal.taldefs import TALExpressionError
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talparser import TALParser
-from zope.tal.talinterpreter import TALInterpreter
+
+#from zope.tal.talinterpreter import TALInterpreter
+from pypy.interpreter.mixedmodule import testmodule
+talinterpreter =  testmodule('talinterpreter', 'zope.tal')
+TALInterpreter = talinterpreter.TALInterpreter
+
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
