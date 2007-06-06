@@ -16,19 +16,15 @@
 $Id$
 """
 import cgi
-import operator
 import sys
-import warnings
 
-# Do not use cStringIO here!  It's not unicode aware. :(
-from StringIO import StringIO
 
 from zope.i18nmessageid import Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode
-from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
+from zope.tal.alttalgenerator import AltTALGenerator
 
 
 # Avoid constructing this tuple over and over
@@ -57,59 +53,15 @@ def normalize(text):
     return _spacejoin(text.split())
 
 
-class AltTALGenerator(TALGenerator):
 
-    def __init__(self, repldict, expressionCompiler=None, xml=0):
-        self.repldict = repldict
-        self.enabled = 1
-        TALGenerator.__init__(self, expressionCompiler, xml)
-
-    def enable(self, enabled):
-        self.enabled = enabled
-
-    def emit(self, *args):
-        if self.enabled:
-            TALGenerator.emit(self, *args)
-
-    def emitStartElement(self, name, attrlist, taldict, metaldict, i18ndict,
-                         position=(None, None), isend=0):
-        metaldict = {}
-        taldict = {}
-        i18ndict = {}
-        if self.enabled and self.repldict:
-            taldict["attributes"] = "x x"
-        TALGenerator.emitStartElement(self, name, attrlist,
-                                      taldict, metaldict, i18ndict,
-                                      position, isend)
-
-    def replaceAttrs(self, attrlist, repldict):
-        if self.enabled and self.repldict:
-            repldict = self.repldict
-            self.repldict = None
-        return TALGenerator.replaceAttrs(self, attrlist, repldict)
-
-
-
-class MacroStackItem(list):
-    # This is a `list` subclass for backward compability.
-    """Stack entry for the TALInterpreter.macroStack.
-
-    This offers convenience attributes for more readable access.
-
-    """
-    __slots__ = ()
-
-    # These would be nicer using @syntax, but that would require
-    # Python 2.4.x; this will do for now.
-
-    macroName = property(lambda self: self[0])
-    slots = property(lambda self: self[1])
-    definingName = property(lambda self: self[2])
-    extending = property(lambda self: self[3])
-    entering = property(lambda self: self[4],
-                        lambda self, value: operator.setitem(self, 4, value))
-    i18nContext = property(lambda self: self[5])
-
+class MacroStackItem(object):
+    def __init__(self, macroName, slots, definingName, extending, entering, i18nContext):
+        self.macroName = macroName
+        self.slots = slots
+        self.definingName = definingName
+        self.extending = extending
+        self.entering = entering
+        self.i18nContext = i18nContext
 
 class TALInterpreter(object):
     """TAL interpreter.
@@ -145,7 +97,7 @@ class TALInterpreter(object):
     def __init__(self, program, macros, engine, stream=None,
                  debug=0, wrap=60, metal=1, tal=1, showtal=-1,
                  strictinsert=1, stackLimit=100, i18nInterpolate=1,
-                 sourceAnnotations=0):
+                 sourceAnnotations=0, altgenclass=AltTALGenerator):
         """Create a TAL interpreter.
 
         Optional arguments:
@@ -180,7 +132,6 @@ class TALInterpreter(object):
 
         """
         self.program = program
-        self.macros = macros
         self.engine = engine # Execution engine (aka context)
         self.Default = engine.getDefault()
         self._pending_source_annotation = False
@@ -219,6 +170,7 @@ class TALInterpreter(object):
         self.i18nInterpolate = i18nInterpolate
         self.i18nContext = TranslationContext()
         self.sourceAnnotations = sourceAnnotations
+        self.altgenclass = altgenclass
 
     def StringIO(self):
         # Third-party products wishing to provide a full Unicode-aware
@@ -258,8 +210,8 @@ class TALInterpreter(object):
             raise METALError("macro nesting limit (%d) exceeded "
                              "by %s" % (self.stackLimit, `macroName`))
         self.macroStack.append(
-            MacroStackItem((macroName, slots, definingName, extending,
-                            True, self.i18nContext)))
+            MacroStackItem(macroName, slots, definingName, extending,
+                            True, self.i18nContext))
 
     def popMacro(self):
         return self.macroStack.pop()
@@ -781,7 +733,7 @@ class TALInterpreter(object):
 
     def insertHTMLStructure(self, text, repldict):
         from zope.tal.htmltalparser import HTMLTALParser
-        gen = AltTALGenerator(repldict, self.engine, 0)
+        gen = self.altgenclass(repldict, self.engine, 0)
         p = HTMLTALParser(gen) # Raises an exception if text is invalid
         p.parseString(text)
         program, macros = p.getCode()
@@ -789,7 +741,7 @@ class TALInterpreter(object):
 
     def insertXMLStructure(self, text, repldict):
         from zope.tal.talparser import TALParser
-        gen = AltTALGenerator(repldict, self.engine, 0)
+        gen = self.altgenclass(repldict, self.engine, 0)
         p = TALParser(gen)
         gen.enable(0)
         p.parseFragment('<!DOCTYPE foo PUBLIC "foo" "bar"><foo>')
@@ -1000,25 +952,16 @@ class TALInterpreter(object):
     bytecode_handlers_tal["<attrAction>"] = attrAction_tal
     bytecode_handlers_tal["optTag"] = do_optTag_tal
 
-
-class FasterStringIO(StringIO):
-    """Append-only version of StringIO.
-
-    This let's us have a much faster write() method.
+class FasterStringIO:
     """
-    def close(self):
-        if not self.closed:
-            self.write = _write_ValueError
-            StringIO.close(self)
+    implement only what we need
+    """
+    def __init__(self):
+        self.buflist = []
 
-    def seek(self, pos, mode=0):
-        raise RuntimeError("FasterStringIO.seek() not allowed")
+    def getvalue(self):
+        return u''.join(self.buflist)
 
     def write(self, s):
-        #assert self.pos == self.len
         self.buflist.append(s)
-        self.len = self.pos = self.pos + len(s)
 
-
-def _write_ValueError(s):
-    raise ValueError("I/O operation on closed file")
