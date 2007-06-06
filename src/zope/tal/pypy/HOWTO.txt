@@ -1,0 +1,6 @@
+run the following command to compile (you might need to setup PYTHONPATH) :
+
+python path_to_pypy/bin/compilemodule.py test zope.tal.pypy
+
+first argument is name of module you compile
+second argument is path to the package where you find the RPython 
