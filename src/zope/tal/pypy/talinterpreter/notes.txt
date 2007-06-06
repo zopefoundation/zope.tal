@@ -1,0 +1,13 @@
+attributes
+
+_pending_source_annotation bool
+stream file
+sourceFile string
+position tuple
+formatSourceAnnotation func 
+
+functions
+
+formatSourceAnnotation func /attr ????
+__call__  func
+_annotated_stream_write 
