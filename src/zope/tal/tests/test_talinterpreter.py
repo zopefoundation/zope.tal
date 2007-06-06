@@ -27,10 +27,7 @@ from zope.tal.taldefs import TALExpressionError
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talparser import TALParser
 
-#from zope.tal.talinterpreter import TALInterpreter
-from pypy.interpreter.mixedmodule import testmodule
-talinterpreter =  testmodule('_talinterpreter', 'zope.tal')
-TALInterpreter = talinterpreter.TALInterpreter
+from zope.tal.talinterpreter import TALInterpreter
 
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
