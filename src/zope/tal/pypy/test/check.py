@@ -1,4 +1,11 @@
-import test
+import sys
+
+if len(sys.argv) == 2 and sys.argv[1] == 'so':
+    print 'so extension'
+    import test
+else:    
+    from pypy.interpreter.mixedmodule import testmodule
+    test =  testmodule('test', 'zope.tal.pypy')
 
 ip = test.Interpreter(None, 20)
 assert ip.power2() == 400
