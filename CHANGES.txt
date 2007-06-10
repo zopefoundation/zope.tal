@@ -1,0 +1,12 @@
+zope.tal package changelog
+==========================
+
+3.4.0b1
+-------
+
+- Updated dependency for zope.i18n that requires the correct version of
+  zope.security to avoid a hidden dependency issue in zope.security.
+
+
+Note: The code changes before 3.4.0b1 where not tracked as an individual
+package and have been documented in the Zope 3 changelog.

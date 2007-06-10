@@ -27,14 +27,14 @@ setup(name='zope.tal',
       description='Zope 3 Template Application Languate (TAL)',
       author='Zope Corporation and Contributors',
       author_email='zope3-dev@zope.org',
-      
+
       packages=find_packages('src'),
       package_dir = {'': 'src'},
 
       namespace_packages=['zope',],
       install_requires=['setuptools',
                         'zope.i18nmessageid',
-                        'zope.i18n',
+                        'zope.i18n>=3.4.0b1',
                         'zope.interface',
                        ],
       include_package_data = True,
