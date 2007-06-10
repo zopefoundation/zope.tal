@@ -21,7 +21,7 @@ import os
 from setuptools import setup, find_packages
 
 setup(name='zope.tal',
-      version = '3.4.0b1',
+      version = '3.4.0b2',
       url='http://svn.zope.org/zope.tal',
       license='ZPL 2.1',
       description='Zope 3 Template Application Languate (TAL)',
