@@ -9,4 +9,5 @@ class Module(MixedModule):
     }
 
     appleveldefs = {
+        'appfunc' : 'appzpt.appfunc',
     }

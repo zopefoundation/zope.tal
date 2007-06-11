@@ -1,3 +1,4 @@
+"""NOT_RPYTHON"""
 ##############################################################################
 #
 # Copyright (c) 2001, 2002 Zope Corporation and Contributors.
@@ -11,15 +12,11 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Interpreter for a pre-compiled TAL program.
 
-$Id$
-"""
 import cgi
 import sys
 
 
-from zope.i18nmessageid import Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
 from zope.tal.taldefs import getProgramVersion, getProgramMode
@@ -28,10 +25,8 @@ from zope.tal.alttalgenerator import AltTALGenerator
 
 import _talinterpreter
 
-# Avoid constructing this tuple over and over
-I18nMessageTypes = (Message,)
-
-TypesToTranslate = I18nMessageTypes + (str, unicode)
+from zope.tal.talutils import isI18nMessageTypes
+from zope.tal.talutils import isTypesToTranslate
 
 BOOLEAN_HTML_ATTRS = frozenset([
     # List of Boolean attributes in HTML that should be rendered in
@@ -47,7 +42,8 @@ BOOLEAN_HTML_ATTRS = frozenset([
 _nulljoin = ''.join
 _spacejoin = ' '.join
 
-
+def normalize(value):
+    return _talinterpreter._normalize(value)
 
 class MacroStackItem(object):
     def __init__(self, macroName, slots, definingName, extending, entering, i18nContext):
@@ -443,7 +439,7 @@ class TALInterpreter(object):
                 translated = self.translate(msgid or value, value)
                 if translated is not None:
                     value = translated
-            elif isinstance(value, I18nMessageTypes):
+            elif isI18nMessageTypes(value):
                 translated = self.translate(value)
                 if translated is not None:
                     value = translated
@@ -573,7 +569,7 @@ class TALInterpreter(object):
         if text is self.Default:
             self.interpret(stuff[1])
             return
-        if isinstance(text, I18nMessageTypes):
+        if isI18nMessageTypes(text):
             # Translate this now.
             text = self.translate(text)
         self._writeText(text)
@@ -585,7 +581,7 @@ class TALInterpreter(object):
             if text is self.Default:
                 self.interpret(stuff[1])
             else:
-                if isinstance(text, TypesToTranslate):
+                if isTypesToTranslate(text):
                     text = self.translate(text)
                 self._writeText(text)
 
@@ -605,7 +601,7 @@ class TALInterpreter(object):
                 if self.html and self._currentTag == "pre":
                     value = tmpstream.getvalue()
                 else:
-                    value = _talinterpreter.normalize(tmpstream.getvalue())
+                    value = normalize(tmpstream.getvalue())
             finally:
                 self.restoreState(state)
         else:
@@ -620,7 +616,7 @@ class TALInterpreter(object):
                 value = self.engine.evaluate(expression)
 
             # evaluate() does not do any I18n, so we do it here.
-            if isinstance(value, I18nMessageTypes):
+            if isI18nMessageTypes(value):
                 # Translate this now.
                 value = self.translate(value)
 
@@ -668,7 +664,7 @@ class TALInterpreter(object):
             if self.html and currentTag == "pre":
                 msgid = default
             else:
-                msgid = _talinterpreter.normalize(default)
+                msgid = normalize(default)
         self.i18nStack.pop()
         # See if there is was an i18n:data for msgid
         if len(stuff) > 2:
@@ -695,7 +691,7 @@ class TALInterpreter(object):
         if structure is self.Default:
             self.interpret(block)
             return
-        if isinstance(structure, I18nMessageTypes):
+        if isI18nMessageTypes(structure):
             text = self.translate(structure)
         else:
             text = unicode(structure)
@@ -715,7 +711,7 @@ class TALInterpreter(object):
             if structure is self.Default:
                 self.interpret(block)
             else:
-                if not isinstance(structure, TypesToTranslate):
+                if not isTypesToTranslate(structure):
                     structure = unicode(structure)
                 text = self.translate(structure)
                 if not (repldict or self.strictinsert):

@@ -4,11 +4,12 @@ class Module(MixedModule):
     """interpreter module."""
 
     interpleveldefs = {
-        'normalize' : 'interplevel.normalize',
+        '_normalize' : 'interplevel._normalize',
     }
 
     appleveldefs = {
         'TALInterpreter' : 'applevel.TALInterpreter',
+        'normalize' : 'applevel.normalize',
     }
 
 
