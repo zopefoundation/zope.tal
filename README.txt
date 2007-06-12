@@ -3,8 +3,8 @@ zope.tal Package Readme
 
 Overview
 --------
--
-The Zope3 Template Attribute Languate (TAL) specifies the custom namespace
+
+The Zope3 Template Attribute Language (TAL) specifies the custom namespace
 and attributes which are used by the Zope Page Templates renderer to inject
 dynamic markup into a page.  It also includes the Macro Expansion for TAL
 (METAL) macro language used in page assembly.
