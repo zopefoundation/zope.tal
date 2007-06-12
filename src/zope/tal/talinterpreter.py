@@ -1,10 +1,10 @@
 try:
     from pypy.interpreter.mixedmodule import testmodule
-    rptalinterpreter =  testmodule('rptalinterpreter', 'zope.tal')
+    _talinterpreter =  testmodule('_talinterpreter', 'zope.tal')
 except ImportError:
-    import rptalinterpreter
+    import _talinterpreter
 
 
-normalize = rptalinterpreter.normalize
-TALInterpreter = rptalinterpreter.TALInterpreter
+normalize = _talinterpreter.normalize
+TALInterpreter = _talinterpreter.TALInterpreter
 

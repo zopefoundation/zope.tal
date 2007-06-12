@@ -23,7 +23,7 @@ from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.translationcontext import TranslationContext
 from zope.tal.alttalgenerator import AltTALGenerator
 
-import _talinterpreter
+import zope.tal 
 
 from zope.tal.talutils import isI18nMessageTypes
 from zope.tal.talutils import isTypesToTranslate
@@ -43,7 +43,7 @@ _nulljoin = ''.join
 _spacejoin = ' '.join
 
 def normalize(value):
-    return _talinterpreter._normalize(value)
+    return zope.tal._talinterpreter._normalize(value)
 
 class MacroStackItem(object):
     def __init__(self, macroName, slots, definingName, extending, entering, i18nContext):
