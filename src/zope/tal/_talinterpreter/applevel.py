@@ -43,7 +43,7 @@ _nulljoin = ''.join
 _spacejoin = ' '.join
 
 def normalize(value):
-    return zope.tal._talinterpreter._normalize(value)
+    return zope.tal.talinterpreter.normalize(value)
 
 class MacroStackItem(object):
     def __init__(self, macroName, slots, definingName, extending, entering, i18nContext):
