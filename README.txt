@@ -45,12 +45,23 @@ path:
 
 Now, run the following command to compile::
 
-  $ python /path/to/pypy-dist/pypy/bin/compilemodule.py _talinterpreter zope.tal
+  $ python /path/to/pypy-dist/pypy/bin/compilemodule.py _talinterpreter -p zope.tal 
 
 The first argument is name of the RPython sub-package you want to
-compile, the second argument is path to the package where this RPython
+compile, the option `-p` specifies the name of the package where this RPython
 sub-package is found.
 
 The compiled module will be placed in
-/tmp/usession-XX/_talinterpreter/_talinterpreter.so. Move this file to
-src/zope/tal and rename _talinterpreter the package to make this work.
+/tmp/usession-XX/_talinterpreter/_talinterpreter.so. 
+
+To run the tests with the compiled module, you need to move the `.so` file to
+src/zope/tal and to rename `_talinterpreter`.
+
+Alternatilvely, you could run the following command::
+
+  $ python /path/to/pypy-dist/pypy/bin/compilemodule.py _talinterpreter -p zope.tal -d /path/to/src/zope/tal
+
+where `-d` option specifies the directory where to copy the compiled module.
+You'd still need to rename the existing `_talinterpreter` sub-package.
+
+
