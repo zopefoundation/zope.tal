@@ -313,6 +313,6 @@ class HTMLTALParser(HTMLParser):
                                     repr(keybase), self.getpos())
                 i18ndict[keybase] = value
             attrlist.append(item)
-        if namens in ('metal', 'tal'):
+        if namens in ('metal', 'tal', 'i18n'):
             taldict['tal tag'] = namens
         return name, attrlist, taldict, metaldict, i18ndict
