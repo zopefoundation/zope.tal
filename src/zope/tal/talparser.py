@@ -50,7 +50,7 @@ class TALParser(XMLParser):
             attrlist = []
             for i in range(0, len(attrs), 2):
                 key = attrs[i]
-                value = attrs[i+1]
+                value = attrs[i + 1]
                 attrlist.append((key, value))
         else:
             # attrs is a dict of {name: value}
@@ -86,6 +86,12 @@ class TALParser(XMLParser):
             taldict['tal tag'] = namens
         return name, fixedattrlist, taldict, metaldict, i18ndict
 
+    _namespaces = {
+        ZOPE_TAL_NS: "tal",
+        ZOPE_METAL_NS: "metal",
+        ZOPE_I18N_NS: "i18n",
+    }
+
     def xmlnsattrs(self):
         newlist = []
         for prefix, uri in self.nsNew:
@@ -93,7 +99,7 @@ class TALParser(XMLParser):
                 key = "xmlns:" + prefix
             else:
                 key = "xmlns"
-            if uri in (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS):
+            if uri in self._namespaces:
                 item = (key, uri, "xmlns")
             else:
                 item = (key, uri)
@@ -103,18 +109,12 @@ class TALParser(XMLParser):
 
     def fixname(self, name):
         if ' ' in name:
-            uri, name = name.split(' ')
+            uri, name = name.split(' ', 1)
             prefix = self.nsDict[uri]
             prefixed = name
             if prefix:
                 prefixed = "%s:%s" % (prefix, name)
-            ns = 'x'
-            if uri == ZOPE_TAL_NS:
-                ns = 'tal'
-            elif uri == ZOPE_METAL_NS:
-                ns = 'metal'
-            elif uri == ZOPE_I18N_NS:
-                ns = 'i18n'
+            ns = self._namespaces.get(uri, "x")
             return (prefixed, name, ns)
         return (name, name, None)
 
