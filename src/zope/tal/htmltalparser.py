@@ -18,8 +18,8 @@ $Id$
 
 from HTMLParser import HTMLParser, HTMLParseError
 
-from zope.tal.taldefs import ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS, \
-                             METALError, TALError, I18NError
+from zope.tal.taldefs import (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS,
+                              METALError, TALError, I18NError)
 from zope.tal.talgenerator import TALGenerator
 
 
@@ -47,12 +47,12 @@ PARA_LEVEL_HTML_TAGS = frozenset([
     ])
 
 BLOCK_CLOSING_TAG_MAP = {
-    "tr": ("tr", "td", "th"),
-    "td": ("td", "th"),
-    "th": ("td", "th"),
-    "li": ("li",),
-    "dd": ("dd", "dt"),
-    "dt": ("dd", "dt"),
+    "tr": frozenset(["tr", "td", "th"]),
+    "td": frozenset(["td", "th"]),
+    "th": frozenset(["td", "th"]),
+    "li": frozenset(["li"]),
+    "dd": frozenset(["dd", "dt"]),
+    "dt": frozenset(["dd", "dt"]),
     }
 
 BLOCK_LEVEL_HTML_TAGS = frozenset([
@@ -147,7 +147,7 @@ class HTMLTALParser(HTMLParser):
                 self.getpos())
         # Support for inline Python code.
         if tag == 'script':
-            type_attr = filter(lambda a: a[0] == 'type', attrlist)
+            type_attr = [a for a in attrlist if a[0] == "type"]
             if type_attr and type_attr[0][1].startswith('text/server-'):
                 attrlist.remove(type_attr[0])
                 taldict = {'script': type_attr[0][1], 'omit-tag': ''}
@@ -162,7 +162,7 @@ class HTMLTALParser(HTMLParser):
         self.scan_xmlns(attrs)
         tag, attrlist, taldict, metaldict, i18ndict \
              = self.process_ns(tag, attrs)
-        if taldict.get("content"):
+        if "content" in taldict:
             if tag in EMPTY_HTML_TAGS:
                 raise TALError(
                     "empty HTML tags cannot use tal:content: %s" % `tag`,
@@ -188,26 +188,23 @@ class HTMLTALParser(HTMLParser):
         if tag in EMPTY_HTML_TAGS:
             return
         close_to = -1
-        if BLOCK_CLOSING_TAG_MAP.has_key(tag):
+        if tag in BLOCK_CLOSING_TAG_MAP:
             blocks_to_close = BLOCK_CLOSING_TAG_MAP[tag]
-            for i in range(len(self.tagstack)):
-                t = self.tagstack[i]
+            for i, t in enumerate(self.tagstack):
                 if t in blocks_to_close:
                     if close_to == -1:
                         close_to = i
                 elif t in BLOCK_LEVEL_HTML_TAGS:
                     close_to = -1
         elif tag in SECTION_LEVEL_HTML_TAGS:
-            i = len(self.tagstack) - 1
-            while i >= 0:
+            for i in range(len(self.tagstack) - 1, -1, -1):
                 closetag = self.tagstack[i]
                 if closetag in BLOCK_LEVEL_HTML_TAGS:
                     break
-                if closetag in PARA_LEVEL_HTML_TAGS:
+                elif closetag in PARA_LEVEL_HTML_TAGS:
                     if closetag != "p":
                         raise OpenTagError(self.tagstack, tag, self.getpos())
                     close_to = i
-                i = i - 1
         if close_to >= 0:
             while len(self.tagstack) > close_to:
                 self.implied_endtag(self.tagstack[-1], 1)
@@ -261,31 +258,31 @@ class HTMLTALParser(HTMLParser):
         for key, value in attrs:
             if key.startswith("xmlns:"):
                 nsnew[key[6:]] = value
+        self.nsstack.append(self.nsdict)
         if nsnew:
-            self.nsstack.append(self.nsdict)
             self.nsdict = self.nsdict.copy()
             self.nsdict.update(nsnew)
-        else:
-            self.nsstack.append(self.nsdict)
 
     def pop_xmlns(self):
         self.nsdict = self.nsstack.pop()
+
+    _namespaces = {
+        ZOPE_TAL_NS: "tal",
+        ZOPE_METAL_NS: "metal",
+        ZOPE_I18N_NS: "i18n",
+    }
 
     def fixname(self, name):
         if ':' in name:
             prefix, suffix = name.split(':', 1)
             if prefix == 'xmlns':
                 nsuri = self.nsdict.get(suffix)
-                if nsuri in (ZOPE_TAL_NS, ZOPE_METAL_NS, ZOPE_I18N_NS):
+                if nsuri in self._namespaces:
                     return name, name, prefix
             else:
                 nsuri = self.nsdict.get(prefix)
-                if nsuri == ZOPE_TAL_NS:
-                    return name, suffix, 'tal'
-                elif nsuri == ZOPE_METAL_NS:
-                    return name, suffix,  'metal'
-                elif nsuri == ZOPE_I18N_NS:
-                    return name, suffix, 'i18n'
+                if nsuri in self._namespaces:
+                    return name, suffix, self._namespaces[nsuri]
         return name, name, 0
 
     def process_ns(self, name, attrs):
@@ -301,19 +298,19 @@ class HTMLTALParser(HTMLParser):
             if ns and ns != 'unknown':
                 item = (key, value, ns)
             if ns == 'tal':
-                if taldict.has_key(keybase):
+                if keybase in taldict:
                     raise TALError("duplicate TAL attribute " +
-                                   `keybase`, self.getpos())
+                                   repr(keybase), self.getpos())
                 taldict[keybase] = value
             elif ns == 'metal':
-                if metaldict.has_key(keybase):
+                if keybase in metaldict:
                     raise METALError("duplicate METAL attribute " +
-                                     `keybase`, self.getpos())
+                                     repr(keybase), self.getpos())
                 metaldict[keybase] = value
             elif ns == 'i18n':
-                if i18ndict.has_key(keybase):
+                if keybase in i18ndict:
                     raise I18NError("duplicate i18n attribute " +
-                                    `keybase`, self.getpos())
+                                    repr(keybase), self.getpos())
                 i18ndict[keybase] = value
             attrlist.append(item)
         if namens in ('metal', 'tal'):
