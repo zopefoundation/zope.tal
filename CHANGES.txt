@@ -1,13 +1,17 @@
-zope.tal package changelog
-==========================
+=======
+CHANGES
+=======
 
-After 3.4.0b1
--------------
+3.4.0 (2007-10-03)
+------------------
+
+- Updated package meta-data.
+
 
 3.4.0b1
 -------
 
-- Updated dependency for zope.i18n that requires the correct version of
+- Updated dependency for ``zope.i18n`` that requires the correct version of
   zope.security to avoid a hidden dependency issue in zope.security.
 
 
