@@ -21,7 +21,6 @@ from zope.interface import implements
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18nmessageid import Message
-from zope.i18n.interfaces import ITranslationDomain
 
 Default = object()
 
@@ -261,7 +260,6 @@ class Iterator(object):
 
 
 class DummyTranslationDomain(object):
-    implements(ITranslationDomain)
 
     domain = ''
 

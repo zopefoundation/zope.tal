@@ -2,6 +2,17 @@
 CHANGES
 =======
 
+Next Release
+------------
+
+- Removed unnecessary 'dummyengine' dependency on zope.i18n to
+  simplify distribution.
+
+- Supprort ability to run tests using "setup.py test".
+
+- Stop pinning (no longer required) zope.traversing and
+  zope.app.publisher versions in buildout.cfg.
+
 3.4.0 (2007-10-03)
 ------------------
 
@@ -13,7 +24,6 @@ CHANGES
 
 - Updated dependency for ``zope.i18n`` that requires the correct version of
   zope.security to avoid a hidden dependency issue in zope.security.
-
 
 Note: The code changes before 3.4.0b1 where not tracked as an individual
 package and have been documented in the Zope 3 changelog.

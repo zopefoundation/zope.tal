@@ -16,10 +16,29 @@
 $Id$
 """
 import os
+import sys
 from setuptools import setup, find_packages
 
+here = os.path.dirname(__file__)
+
 def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+    return open(os.path.join(here, *rnames)).read()
+
+def alltests():
+    # use the zope.testing testrunner machinery to find all the
+    # test suites we've put under ourselves
+    from zope.testing.testrunner import get_options
+    from zope.testing.testrunner import find_suites
+    from zope.testing.testrunner import configure_logging
+    configure_logging()
+    from unittest import TestSuite
+    here = os.path.abspath(os.path.dirname(sys.argv[0]))
+    args = sys.argv[:]
+    src = os.path.join(here, 'src')
+    defaults = ['--test-path', src]
+    options = get_options(args, defaults)
+    suites = list(find_suites(options))
+    return TestSuite(suites)
 
 setup(name='zope.tal',
       version = '3.4.1dev',
@@ -50,9 +69,12 @@ setup(name='zope.tal',
       extras_require = dict(
           test=['zope.testing',
                 ]),
+      test_suite="__main__.alltests", # to support "setup.py test"
+      tests_require = ['zope.i18nmessageid',
+                       'zope.interface',
+                       'zope.testing'],
       install_requires=['setuptools',
                         'zope.i18nmessageid',
-                        'zope.i18n',
                         'zope.interface',
                        ],
       include_package_data = True,
