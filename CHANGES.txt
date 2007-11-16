@@ -2,13 +2,17 @@
 CHANGES
 =======
 
-Next Release
-------------
+3.4.1 (2007-11-16)
+------------------
 
-- Removed unnecessary 'dummyengine' dependency on zope.i18n to
-  simplify distribution.
+- Removed unnecessary ``dummyengine`` dependency on zope.i18n to
+  simplify distribution.  The ``dummyengine.DummyTranslationDomain``
+  class no longer implements
+  ``zope.i18n.interfaces.ITranslationDomain`` as a result.  Installing
+  zope.tal with easy_install or buildout no longer pulls in many
+  unrelated distributions.
 
-- Supprort ability to run tests using "setup.py test".
+- Support ability to run tests using "setup.py test".
 
 - Stop pinning (no longer required) zope.traversing and
   zope.app.publisher versions in buildout.cfg.
