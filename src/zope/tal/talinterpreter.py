@@ -272,9 +272,6 @@ class TALInterpreter(object):
         assert self.level == 0
         assert self.scopeLevel == 0
         assert self.i18nContext.parent is None
-        if self.col > 0:
-            self._stream_write("\n")
-            self.col = 0
 
     def pushStream(self, newstream):
         self._stream_stack.append(self.stream)

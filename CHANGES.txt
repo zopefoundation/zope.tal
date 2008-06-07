@@ -2,6 +2,15 @@
 CHANGES
 =======
 
+3.5.0 (2008-06-06)
+------------------
+
+- Removed artificial addition of a trailing newline if the output doesn't end
+  in one; this allows the template source to be the full specification of what
+  should be included.
+  (See https://bugs.launchpad.net/launchpad/+bug/218706.)
+
+
 3.4.1 (2007-11-16)
 ------------------
 
@@ -16,6 +25,7 @@ CHANGES
 
 - Stop pinning (no longer required) zope.traversing and
   zope.app.publisher versions in buildout.cfg.
+
 
 3.4.0 (2007-10-03)
 ------------------

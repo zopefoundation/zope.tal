@@ -152,109 +152,109 @@ class I18NCornerTestCaseBase(TestCaseBase):
         # correctly.
         program, macros = self._compile(
             '<span i18n:translate="" tal:content="foo"/>')
-        self._check(program, '<span>FOOVALUE</span>\n')
+        self._check(program, '<span>FOOVALUE</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:replace="foo"/>')
-        self._check(program, 'FOOVALUE\n')
+        self._check(program, 'FOOVALUE')
 
         # i18n messages defined in Python are translated automatically
         # (no i18n:translate necessary)
         program, macros = self._compile(
             '<span tal:content="foo" />')
-        self._check(program, '<span>FOOVALUE</span>\n')
+        self._check(program, '<span>FOOVALUE</span>')
 
         program, macros = self._compile(
             '<span tal:replace="foo" />')
-        self._check(program, 'FOOVALUE\n')
+        self._check(program, 'FOOVALUE')
 
     def test_attributes_translation(self):
         program, macros = self._compile(
             '<span tal:attributes="test bar"/>')
-        self._check(program, '<span test="BaRvAlUe" />\n')
+        self._check(program, '<span test="BaRvAlUe" />')
 
         program, macros = self._compile(
             '<span test="bar" i18n:attributes="test"/>')
-        self._check(program, '<span test="BAR" />\n')
+        self._check(program, '<span test="BAR" />')
 
         program, macros = self._compile(
             '<span tal:attributes="test bar" i18n:attributes="test"/>')
-        self._check(program, '<span test="BARVALUE" />\n')
+        self._check(program, '<span test="BARVALUE" />')
 
         # i18n messages defined in Python are translated automatically
         # (no i18n:attributes necessary)
         program, macros = self._compile(
             '<span tal:attributes="test foo"/>')
-        self._check(program, '<span test="FOOVALUE" />\n')
+        self._check(program, '<span test="FOOVALUE" />')
 
     def test_text_variable_translate(self):
         program, macros = self._compile(
             '<span tal:content="bar"/>')
-        self._check(program, '<span>BaRvAlUe</span>\n')
+        self._check(program, '<span>BaRvAlUe</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:content="bar"/>')
-        self._check(program, '<span>BARVALUE</span>\n')
+        self._check(program, '<span>BARVALUE</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:replace="bar"/>')
-        self._check(program, 'BARVALUE\n')
+        self._check(program, 'BARVALUE')
 
     def test_text_translate(self):
         program, macros = self._compile(
             '<span tal:content="string:BaR"/>')
-        self._check(program, '<span>BaR</span>\n')
+        self._check(program, '<span>BaR</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:content="string:BaR"/>')
-        self._check(program, '<span>BAR</span>\n')
+        self._check(program, '<span>BAR</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:replace="string:BaR"/>')
-        self._check(program, 'BAR\n')
+        self._check(program, 'BAR')
 
     def test_structure_text_variable_translate(self):
         program, macros = self._compile(
             '<span tal:content="structure bar"/>')
-        self._check(program, '<span>BaRvAlUe</span>\n')
+        self._check(program, '<span>BaRvAlUe</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:content="structure bar"/>')
-        self._check(program, '<span>BARVALUE</span>\n')
+        self._check(program, '<span>BARVALUE</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:replace="structure bar"/>')
-        self._check(program, 'BARVALUE\n')
+        self._check(program, 'BARVALUE')
 
         # i18n messages defined in Python are translated automatically
         # (no i18n:translate necessary)
         program, macros = self._compile(
             '<span tal:content="structure foo"/>')
-        self._check(program, '<span>FOOVALUE</span>\n')
+        self._check(program, '<span>FOOVALUE</span>')
 
         program, macros = self._compile(
             '<span tal:replace="structure foo"/>')
-        self._check(program, 'FOOVALUE\n')
+        self._check(program, 'FOOVALUE')
 
     def test_structure_text_translate(self):
         program, macros = self._compile(
             '<span tal:content="structure string:BaR"/>')
-        self._check(program, '<span>BaR</span>\n')
+        self._check(program, '<span>BaR</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:content="structure string:BaR"/>')
-        self._check(program, '<span>BAR</span>\n')
+        self._check(program, '<span>BAR</span>')
 
         program, macros = self._compile(
             '<span i18n:translate="" tal:replace="structure string:BaR"/>')
-        self._check(program, 'BAR\n')
+        self._check(program, 'BAR')
 
     def test_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
             '<span i18n:translate="" tal:replace="foo" i18n:name="foo_name"/>'
             '</div>')
-        self._check(program, '<div>FOOVALUE</div>\n')
+        self._check(program, '<div>FOOVALUE</div>')
 
     def test_pythonexpr_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
@@ -262,7 +262,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:replace="python: foo"'
             '    i18n:name="foo_name"/>'
             '</div>')
-        self._check(program, '<div>FOOVALUE</div>\n')
+        self._check(program, '<div>FOOVALUE</div>')
 
     def test_structure_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
@@ -270,7 +270,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:replace="structure foo"'
             '    i18n:name="foo_name"/>'
             '</div>')
-        self._check(program, '<div>FOOVALUE</div>\n')
+        self._check(program, '<div>FOOVALUE</div>')
 
     def test_complex_replace_with_messageid_and_i18nname(self):
         program, macros = self._compile(
@@ -279,14 +279,14 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" tal:replace="foo"/>'
             '</em>'
             '</div>')
-        self._check(program, '<div>FOOVALUE</div>\n')
+        self._check(program, '<div>FOOVALUE</div>')
 
     def test_content_with_messageid_and_i18nname(self):
         program, macros = self._compile(
             '<div i18n:translate="" >'
             '<span i18n:translate="" tal:content="foo" i18n:name="foo_name"/>'
             '</div>')
-        self._check(program, '<div><span>FOOVALUE</span></div>\n')
+        self._check(program, '<div><span>FOOVALUE</span></div>')
 
     def test_content_with_messageid_and_i18nname_and_i18ntranslate(self):
         # Let's tell the user this is incredibly silly!
@@ -312,13 +312,13 @@ class I18NCornerTestCaseBase(TestCaseBase):
             '<span tal:content="bar" i18n:name="bar_name"/>.'
             '</div>')
         self._check(program,
-                    '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>\n')
+                    '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>')
         program, macros = self._compile(
             '<div i18n:translate="">This is text for '
             '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
             '</div>')
         self._check(program,
-                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
+                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>')
 
     def test_translate_static_text_as_dynamic_from_bytecode(self):
         program =  [('version', TAL_VERSION),
@@ -351,7 +351,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
 ('rawtextOffset', ('</div>', 6))
 ]
         self._check(program,
-                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n')
+                    '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>')
 
     def test_for_correct_msgids(self):
         self.engine.translationDomain.clearMsgids()
@@ -376,7 +376,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text for ${bar_name}.', msgids[0][0])
         self.assertEqual({'bar_name': '<span>BaRvAlUe</span>'}, msgids[0][1])
         self.assertEqual(
-            '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>\n',
+            '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>',
             result.getvalue())
 
     def test_for_correct_msgids_translate_name(self):
@@ -395,7 +395,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text for ${bar_name}.', msgids[1][0])
         self.assertEqual({'bar_name': '<span>BARVALUE</span>'}, msgids[1][1])
         self.assertEqual(
-            '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>\n',
+            '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>',
             result.getvalue())
 
     def test_i18ntranslate_i18nname_and_attributes(self):
@@ -417,7 +417,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual({'link': '<a href="url">LINK TEXT</a>'}, msgids[0][1])
         self.assertEqual('link text', msgids[1][0])
         self.assertEqual(
-            '<p>SOME STATIC TEXT AND A <a href="url">LINK TEXT</a>.</p>\n',
+            '<p>SOME STATIC TEXT AND A <a href="url">LINK TEXT</a>.</p>',
             result.getvalue())
 
     def test_for_raw_msgids(self):
@@ -441,7 +441,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text for div.', msgids[1][0])
         self.assertEqual(
             '<div>THIS IS TEXT FOR DIV.</div>'
-            '<pre> THIS IS TEXT\n <B>\tFOR</B>\n PRE. </pre>\n',
+            '<pre> THIS IS TEXT\n <B>\tFOR</B>\n PRE. </pre>',
             result.getvalue())
 
         # XML mode
@@ -463,7 +463,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text <b> for</b> barvalue.', msgids[0][0])
         self.assertEqual(
             '<?xml version="1.0"?>\n'
-            '<pre>THIS IS TEXT <B> FOR</B> BARVALUE.</pre>\n',
+            '<pre>THIS IS TEXT <B> FOR</B> BARVALUE.</pre>',
             result.getvalue())
 
     def test_raw_msgids_and_i18ntranslate_i18nname(self):
@@ -482,7 +482,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text for ${bar}.', msgids[1][0])
         self.assertEqual({'bar': '<pre> \tBAR\n </pre>'}, msgids[1][1])
         self.assertEqual(
-            u'<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>\n',
+            u'<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>',
             result.getvalue())
 
     def test_for_handling_unicode_vars(self):
@@ -491,7 +491,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
         program, macros = self._compile(
             "<div i18n:translate='' tal:define='bar python:unichr(0xC0)'>"
             "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
-        self._check(program, u"<div>FOO \u00C0</div>\n")
+        self._check(program, u"<div>FOO \u00C0</div>")
 
 class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
 
@@ -519,31 +519,31 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="toupper" />')
-        self._check(program, '<div>TOUPPER</div>\n')
+        self._check(program, '<div>TOUPPER</div>')
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="tolower" />')
-        self._check(program, '<div>tolower</div>\n')
+        self._check(program, '<div>tolower</div>')
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="string:ToUpper" />')
-        self._check(program, '<div>TOUPPER</div>\n')
+        self._check(program, '<div>TOUPPER</div>')
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="lower"'
             '     tal:content="string:ToLower" />')
-        self._check(program, '<div>tolower</div>\n')
+        self._check(program, '<div>tolower</div>')
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     tal:define="msgid string:ToUpper"'
             '     tal:content="msgid" />')
-        self._check(program, '<div>TOUPPER</div>\n')
+        self._check(program, '<div>TOUPPER</div>')
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="lower"'
             '     tal:define="msgid string:ToLower"'
             '     tal:content="msgid" />')
-        self._check(program, '<div>tolower</div>\n')
+        self._check(program, '<div>tolower</div>')
 
     def test_unused_explicit_domain(self):
         #a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine 
@@ -553,19 +553,19 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="othertolower" />')
-        self._check(program, '<div>othertolower</div>\n')
+        self._check(program, '<div>othertolower</div>')
         #takes domain into account for strings
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
             '     tal:content="string:ToLower" />')
-        self._check(program, '<div>tolower</div>\n')
+        self._check(program, '<div>tolower</div>')
         #but not for messageids
         program, macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
             '     tal:content="baz" />')
-        self._check(program, '<div>BAZVALUE</div>\n')
+        self._check(program, '<div>BAZVALUE</div>')
 
 class ScriptTestCase(TestCaseBase):
 
@@ -582,7 +582,7 @@ class ScriptTestCase(TestCaseBase):
     def test_simple(self):
         program, macros = self._compile(
             '<p tal:script="text/server-python">print "hello"</p>')
-        self._check(program, '<p>hello\n</p>\n')
+        self._check(program, '<p>hello\n</p>')
 
     def test_script_and_tal_block(self):
         program, macros = self._compile(
@@ -591,7 +591,7 @@ class ScriptTestCase(TestCaseBase):
             '  x = 1\n'
             '</tal:block>\n'
             '<span tal:replace="x" />')
-        self._check(program, '\n1\n')
+        self._check(program, '\n1')
         self.assertEqual(self.engine.codeGlobals['x'], 1)
 
     def test_script_and_tal_block_having_inside_print(self):
@@ -599,28 +599,28 @@ class ScriptTestCase(TestCaseBase):
             '<tal:block script="text/server-python">\n'
             '  print "hello"'
             '</tal:block>')
-        self._check(program, 'hello\n\n')
+        self._check(program, 'hello\n')
 
     def test_script_and_omittag(self):
         program, macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python">\n'
             '  print "hello"'
             '</p>')
-        self._check(program, 'hello\n\n')
+        self._check(program, 'hello\n')
 
     def test_script_and_inside_tags(self):
         program, macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python">\n'
             '  print "<b>hello</b>"'
             '</p>')
-        self._check(program, '<b>hello</b>\n\n')
+        self._check(program, '<b>hello</b>\n')
 
     def test_script_and_inside_tags_with_tal(self):
         program, macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python"> <!--\n'
             '  print """<b tal:replace="string:foo">hello</b>"""\n'
             '--></p>')
-        self._check(program, '<b tal:replace="string:foo">hello</b>\n\n')
+        self._check(program, '<b tal:replace="string:foo">hello</b>\n')
 
     def test_html_script(self):
         program, macros = self._compile(
@@ -683,17 +683,17 @@ class OutputPresentationTestCase(TestCaseBase):
         <html this="element" has="a" lot="of"
               attributes=", so" the="output" needs="to"
               be="line" wrapped=".">
-        </html>''' "\n"
+        </html>'''
         self.compare(INPUT, EXPECTED)
 
     def test_unicode_content(self):
         INPUT = """<p tal:content="python:u'déjà-vu'">para</p>"""
-        EXPECTED = u"""<p>déjà-vu</p>""" "\n"
+        EXPECTED = u"""<p>déjà-vu</p>"""
         self.compare(INPUT, EXPECTED)
 
     def test_unicode_structure(self):
         INPUT = """<p tal:replace="structure python:u'déjà-vu'">para</p>"""
-        EXPECTED = u"""déjà-vu""" "\n"
+        EXPECTED = u"""déjà-vu"""
         self.compare(INPUT, EXPECTED)
 
     def test_i18n_replace_number(self):
@@ -702,14 +702,14 @@ class OutputPresentationTestCase(TestCaseBase):
         <span tal:replace="python:123" i18n:name="bar">para</span>
         </p>"""
         EXPECTED = u"""
-        <p>FOO 123</p>""" "\n"
+        <p>FOO 123</p>"""
         self.compare(INPUT, EXPECTED)
 
     def test_entities(self):
         INPUT = ('<img tal:define="foo nothing" '
                  'alt="&a; &#1; &#x0a; &a &#45 &; &#0a; <>" />')
         EXPECTED = ('<img alt="&a; &#1; &#x0a; '
-                    '&amp;a &amp;#45 &amp;; &amp;#0a; &lt;&gt;" />\n')
+                    '&amp;a &amp;#45 &amp;; &amp;#0a; &lt;&gt;" />')
         self.compare(INPUT, EXPECTED)
 
     def compare(self, INPUT, EXPECTED):
