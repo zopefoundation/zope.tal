@@ -85,8 +85,8 @@ class DummyEngine(object):
         return value
 
     def evaluate(self, expression):
-        assert (expression.startswith("$") and expression.endswith("$"),
-            expression)
+        assert expression.startswith("$") and expression.endswith("$"), \
+            expression
         expression = expression[1:-1]
         m = name_match(expression)
         if m:
@@ -152,8 +152,8 @@ class DummyEngine(object):
         return self.evaluate(expr)
 
     def evaluateMacro(self, macroName):
-        assert (macroName.startswith("$") and macroName.endswith("$"),
-            macroName)
+        assert macroName.startswith("$") and macroName.endswith("$"), \
+            macroName
         macroName = macroName[1:-1]
         file, localName = self.findMacroFile(macroName)
         if not file:
