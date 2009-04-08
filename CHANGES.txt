@@ -2,6 +2,13 @@
 CHANGES
 =======
 
+3.5.1 (2009-03-08)
+------------------
+
+- Updated tests of "bad" entities for compatibility with the stricter
+  HTMLParser module shipped with Python 2.6.x.
+
+
 3.5.0 (2008-06-06)
 ------------------
 

@@ -706,10 +706,16 @@ class OutputPresentationTestCase(TestCaseBase):
         self.compare(INPUT, EXPECTED)
 
     def test_entities(self):
-        INPUT = ('<img tal:define="foo nothing" '
-                 'alt="&a; &#1; &#x0a; &a &#45 &; &#0a; <>" />')
-        EXPECTED = ('<img alt="&a; &#1; &#x0a; '
-                    '&amp;a &amp;#45 &amp;; &amp;#0a; &lt;&gt;" />')
+        if sys.version_info < (2, 6):
+            INPUT = ('<img tal:define="foo nothing" '
+                    'alt="&a; &#1; &#x0a; &a &#45 &; &#0a; <>" />')
+            EXPECTED = ('<img alt="&a; &#1; &#x0a; '
+                        '&amp;a &amp;#45 &amp;; &amp;#0a; &lt;&gt;" />')
+        else:
+            INPUT = ('<img tal:define="foo nothing" '
+                    'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
+            EXPECTED = ('<img alt="&a; \x01 \n '
+                        '&amp;a &amp;#45 &amp;; &lt;&gt;" />')
         self.compare(INPUT, EXPECTED)
 
     def compare(self, INPUT, EXPECTED):
