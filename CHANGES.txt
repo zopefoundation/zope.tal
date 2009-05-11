@@ -2,10 +2,12 @@
 CHANGES
 =======
 
-3.5.2 (unreleased)
+3.6.0 (unreleased)
 ------------------
 
-- ...
+- Launchpad #3742721 - 'structure' directive support within
+  tal:attributes
+
 
 
 3.5.1 (2009-03-08)

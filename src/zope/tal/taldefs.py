@@ -111,7 +111,7 @@ class ErrorInfo(object):
         self.offset = position[1]
 
 
-_attr_re = re.compile(r"\s*([^\s]+)\s+([^\s].*)\Z", re.S)
+_attr_re = re.compile(r"\s*([^\s]+)\s+(?:(text|structure)\s+)?([^\s].*)\Z", re.S)
 _subst_re = re.compile(r"\s*(?:(text|structure)\s+)?(.*)\Z", re.S)
 
 def parseAttributeReplacements(arg, xml):
@@ -120,12 +120,12 @@ def parseAttributeReplacements(arg, xml):
         m = _attr_re.match(part)
         if not m:
             raise TALError("Bad syntax in attributes: %r" % part)
-        name, expr = m.groups()
+        name, rep_type, expr = m.groups()
         if not xml:
             name = name.lower()
         if name in dict:
             raise TALError("Duplicate attribute name in attributes: %r" % part)
-        dict[name] = expr
+        dict[name] = expr, rep_type or 'text'
     return dict
 
 def parseSubstitution(arg, position=(None, None)):

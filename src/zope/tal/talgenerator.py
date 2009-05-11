@@ -452,13 +452,13 @@ class TALGenerator(object):
         for item in attrlist:
             key = item[0]
             if repldict.has_key(key):
-                expr, xlat, msgid = repldict[key]
-                item = item[:2] + ("replace", expr, xlat, msgid)
+                expr, repl_type, xlat, msgid = repldict[key]
+                item = item[:2] + ("replace", expr, repl_type, xlat, msgid)
                 del repldict[key]
             newlist.append(item)
         # Add dynamic-only attributes
-        for key, (expr, xlat, msgid) in repldict.items():
-            newlist.append((key, None, "insert", expr, xlat, msgid))
+        for key, (expr, repl_type, xlat, msgid) in repldict.items():
+            newlist.append((key, None, "insert", expr, repl_type, xlat, msgid))
         return newlist
 
     def emitStartElement(self, name, attrlist, taldict, metaldict, i18ndict,
@@ -681,19 +681,19 @@ class TALGenerator(object):
                                                  self.xml)
             else:
                 i18nattrs = {}
-            # Convert repldict's name-->expr mapping to a
-            # name-->(compiled_expr, translate) mapping
-            for key, value in repldict.items():
+            # Convert repldict's name-->(expr, repl_type) mapping to a
+            # name-->(compiled_expr, repl_type, translate) mapping
+            for key, (value, repl_type) in repldict.items():
                 if i18nattrs.get(key, None):
                     raise I18NError(
                         "attribute [%s] cannot both be part of tal:attributes"
                         " and have a msgid in i18n:attributes" % key,
                         position)
                 ce = self.compileExpression(value)
-                repldict[key] = ce, key in i18nattrs, i18nattrs.get(key)
+                repldict[key] = ce, repl_type, key in i18nattrs, i18nattrs.get(key)
             for key in i18nattrs:
                 if key not in repldict:
-                    repldict[key] = None, 1, i18nattrs.get(key)
+                    repldict[key] = None, 'text', 1, i18nattrs.get(key)
         else:
             repldict = {}
         if replaced:

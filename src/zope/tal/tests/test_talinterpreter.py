@@ -493,6 +493,20 @@ class I18NCornerTestCaseBase(TestCaseBase):
             "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
         self._check(program, u"<div>FOO \u00C0</div>")
 
+    def test_attributes_structure(self):
+        # test that "structure" is recognized in 'tal:attributes'
+        # Note: this test does not belong here (as it has nothing to
+        #  do with translation) -- however, there does not seem to be
+        #  a more appropriate place
+        # Note: the example shows that we need to know which entities
+        #  are replaced by the parser (there must be a single
+        #  ';' after '&quot' (as the parser replaces "&quot;" by '"')
+        #  but a double one after '&uuml' (as this is not replaced by parsing))
+        program, macros = self._compile(
+            '<span tal:attributes="test structure string:A&uuml;;&quot;Z"/>')
+        self._check(program, '<span test="A&uuml;&quot;Z" />')
+
+
 class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
 
     def factory(self, msgid, default=None, mapping={}, domain=None):

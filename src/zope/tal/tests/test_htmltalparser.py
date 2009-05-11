@@ -458,11 +458,11 @@ class TALGeneratorTestCases(TestCaseBase):
              {'tal:attributes': 'href string:http://www.zope.org; x string:y',
               'name': 'bar', 'href': 'foo'}),
             ('startTag', ('a',
-             [('href', 'foo', 'replace', '$string:http://www.zope.org$', 0, None),
+             [('href', 'foo', 'replace', '$string:http://www.zope.org$', 'text', 0, None),
               ('name', 'name="bar"'),
               ('tal:attributes',
                'href string:http://www.zope.org; x string:y', 'tal'),
-              ('x', None, 'insert', '$string:y$', 0, None)])),
+              ('x', None, 'insert', '$string:y$', 'text', 0, None)])),
             ('endScope', ()),
             rawtext('link</a>'),
             ])
@@ -485,7 +485,7 @@ class TALGeneratorTestCases(TestCaseBase):
                    ('tal:attributes', 'src string:foo.png', 'tal')]))],
                [('insertStructure',
                  ('$string:<img>$',
-                    {'src': ('$string:foo.png$', False, None)},
+                    {'src': ('$string:foo.png$', 'text', False, None)},
                      [('rawtextOffset', ('duh', 3))]))])),
              ('endScope', ())])
 
@@ -578,7 +578,7 @@ class TALGeneratorTestCases(TestCaseBase):
             ('setPosition', (1, 0)),
             ('beginScope', {'alt': 'foo', 'i18n:attributes': 'alt'}),
             ('startTag', ('img',
-             [('alt', 'foo', 'replace', None, 1, None),
+             [('alt', 'foo', 'replace', None, 'text', 1, None),
               ('i18n:attributes', 'alt', 'i18n')])),
             ('endScope', ()),
             ])
@@ -586,9 +586,9 @@ class TALGeneratorTestCases(TestCaseBase):
             ('setPosition', (1, 0)),
             ('beginScope', {'alt': 'foo', 'i18n:attributes': 'alt foo ; bar'}),
             ('startTag', ('img',
-             [('alt', 'foo', 'replace', None, 1, 'foo'),
+             [('alt', 'foo', 'replace', None, 'text', 1, 'foo'),
               ('i18n:attributes', 'alt foo ; bar', 'i18n'),
-              ('bar', None, 'insert', None, 1, None)])),
+              ('bar', None, 'insert', None, 'text', 1, None)])),
             ('endScope', ()),
             ])
 

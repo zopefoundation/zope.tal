@@ -468,7 +468,7 @@ class TALInterpreter(object):
     def attrAction_tal(self, item):
         name, value, action = item[:3]
         ok = 1
-        expr, xlat, msgid = item[3:]
+        expr, repl_type, xlat, msgid = item[3:]
         if self.html and name.lower() in BOOLEAN_HTML_ATTRS:
             evalue = self.engine.evaluateBoolean(item[3])
             if evalue is self.Default:
@@ -499,7 +499,10 @@ class TALInterpreter(object):
                     value = translated
             if value is None:
                 value = name
-            return ["%s=%s" % (name, quote(value))]
+            if repl_type == 'structure':
+                value = '"%s"' % value.replace('"', '&quot;')
+            else: value = quote(value)
+            return ["%s=%s" % (name, value)]
         else:
             return ()
     bytecode_handlers["<attrAction>"] = attrAction
