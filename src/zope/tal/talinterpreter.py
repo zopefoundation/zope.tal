@@ -607,11 +607,15 @@ class TALInterpreter(object):
         self.interpret(stuff[1])
     bytecode_handlers["insertText"] = do_insertText
     bytecode_handlers["insertI18nText"] = do_insertText
+    bytecode_handlers["insertMltext"] = do_insertText
+    bytecode_handlers["insertI18nMltext"] = do_insertText
 
-    def _writeText(self, text):
+    def _writeText(self, text, quote_amp=True):
         # '&' must be done first!
-        s = text.replace(
-            "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        s = (
+            (quote_amp and text.replace( "&", "&amp;") or text)
+            .replace("<", "&lt;").replace(">", "&gt;")
+            )
         self._stream_write(s)
         i = s.rfind('\n')
         if i < 0:
@@ -619,7 +623,7 @@ class TALInterpreter(object):
         else:
             self.col = len(s) - (i + 1)
 
-    def do_insertText_tal(self, stuff):
+    def do_insertXText_tal(self, stuff, quote_amp):
         text = self.engine.evaluateText(stuff[0])
         if text is None:
             return
@@ -629,9 +633,15 @@ class TALInterpreter(object):
         if isinstance(text, I18nMessageTypes):
             # Translate this now.
             text = self.translate(text)
-        self._writeText(text)
+        self._writeText(text, quote_amp)
 
-    def do_insertI18nText_tal(self, stuff):
+    def do_insertText_tal(self, stuff):
+        return self.do_insertXText_tal(stuff, True)
+
+    def do_insertMltext_tal(self, stuff):
+        return self.do_insertXText_tal(stuff, False)
+
+    def do_insertI18nXText_tal(self, stuff, quote_amp):
         # TODO: Code duplication is BAD, we need to fix it later
         text = self.engine.evaluateText(stuff[0])
         if text is not None:
@@ -640,7 +650,13 @@ class TALInterpreter(object):
             else:
                 if isinstance(text, TypesToTranslate):
                     text = self.translate(text)
-                self._writeText(text)
+                self._writeText(text, quote_amp)
+
+    def do_insertI18nText_tal(self, stuff):
+        return self.do_insertI18nXText_tal(stuff, True)
+
+    def do_insertI18nMltext_tal(self, stuff):
+        return self.do_insertI18nXText_tal(stuff, False)
 
     def do_i18nVariable(self, stuff):
         varname, program, expression, structure = stuff
@@ -994,7 +1010,9 @@ class TALInterpreter(object):
     bytecode_handlers_tal["insertStructure"] = do_insertStructure_tal
     bytecode_handlers_tal["insertI18nStructure"] = do_insertI18nStructure_tal
     bytecode_handlers_tal["insertText"] = do_insertText_tal
+    bytecode_handlers_tal["insertMltext"] = do_insertMltext_tal
     bytecode_handlers_tal["insertI18nText"] = do_insertI18nText_tal
+    bytecode_handlers_tal["insertI18nMltext"] = do_insertI18nMltext_tal
     bytecode_handlers_tal["loop"] = do_loop_tal
     bytecode_handlers_tal["onError"] = do_onError_tal
     bytecode_handlers_tal["<attrAction>"] = attrAction_tal

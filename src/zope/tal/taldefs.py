@@ -112,7 +112,7 @@ class ErrorInfo(object):
 
 
 _attr_re = re.compile(r"\s*([^\s]+)\s+(?:(text|structure)\s+)?([^\s].*)\Z", re.S)
-_subst_re = re.compile(r"\s*(?:(text|structure)\s+)?(.*)\Z", re.S)
+_subst_re = re.compile(r"\s*(?:(text|structure|mltext)\s+)?(.*)\Z", re.S)
 
 def parseAttributeReplacements(arg, xml):
     dict = {}

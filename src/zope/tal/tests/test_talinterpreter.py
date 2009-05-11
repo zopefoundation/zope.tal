@@ -202,16 +202,29 @@ class I18NCornerTestCaseBase(TestCaseBase):
 
     def test_text_translate(self):
         program, macros = self._compile(
-            '<span tal:content="string:BaR"/>')
-        self._check(program, '<span>BaR</span>')
+            '<span tal:content="string:&amp;BaR"/>')
+        self._check(program, '<span>&amp;BaR</span>')
 
         program, macros = self._compile(
-            '<span i18n:translate="" tal:content="string:BaR"/>')
-        self._check(program, '<span>BAR</span>')
+            '<span i18n:translate="" tal:content="string:&amp;BaR"/>')
+        self._check(program, '<span>&amp;BAR</span>')
 
         program, macros = self._compile(
-            '<span i18n:translate="" tal:replace="string:BaR"/>')
-        self._check(program, 'BAR')
+            '<span i18n:translate="" tal:replace="string:&amp;BaR"/>')
+        self._check(program, '&amp;BAR')
+
+    def test_mltext_translate(self):
+        program, macros = self._compile(
+            '<span tal:content="mltext string:&lt;&amp;amp;&gt;BaR"/>')
+        self._check(program, '<span>&lt;&amp;&gt;BaR</span>')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:content="mltext string:&lt;&amp;amp;&gt;BaR"/>')
+        self._check(program, '<span>&lt;&AMP;&gt;BAR</span>')
+
+        program, macros = self._compile(
+            '<span i18n:translate="" tal:replace="mltext string:&lt;&amp;amp;&gt;BaR"/>')
+        self._check(program, '&lt;&AMP;&gt;BAR')
 
     def test_structure_text_variable_translate(self):
         program, macros = self._compile(

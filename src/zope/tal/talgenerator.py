@@ -277,6 +277,8 @@ class TALGenerator(object):
         cexpr = self.compileExpression(expr)
         if key == "text":
             self.emit("insertText", cexpr, [])
+        elif key == "mltext":
+            self.emit("insertMltext", cexpr, [])
         else:
             assert key == "structure"
             self.emit("insertStructure", cexpr, {}, [])
@@ -308,6 +310,8 @@ class TALGenerator(object):
         program = self.popProgram()
         if key == "text":
             self.emit("insertText", cexpr, program)
+        elif key == "mltext":
+            self.emit("insertMltext", cexpr, program)
         else:
             assert key == "structure"
             self.emit("insertStructure", cexpr, attrDict, program)
@@ -319,6 +323,8 @@ class TALGenerator(object):
         program = self.popProgram()
         if key == "text":
             self.emit("insertI18nText", cexpr, program)
+        elif key == "mltext":
+            self.emit("insertI18nMltext", cexpr, program)
         else:
             assert key == "structure"
             self.emit("insertI18nStructure", cexpr, attrDict, program)

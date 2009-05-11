@@ -5,9 +5,10 @@ CHANGES
 3.6.0 (unreleased)
 ------------------
 
-- Launchpad #3742721 - 'structure' directive support within
+- Launchpad #3742721: 'structure' directive support within
   tal:attributes
 
+- Launchpad #374720: added 'mltext' (markup langugate text) directive
 
 
 3.5.1 (2009-03-08)
