@@ -5,7 +5,8 @@ CHANGES
 3.5.2 (unreleased)
 ------------------
 
-- ...
+- In talgettext.POEngine.translate, print a warning if a msgid already exists
+  in the domain with a different default.
 
 
 3.5.1 (2009-03-08)

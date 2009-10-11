@@ -115,11 +115,9 @@ class POEngine(DummyEngine):
                   # interface
                   position=None):
 
-        # Make the message is a Message object, if the default differs
-        # from the value, so that the POT generator can put the default
-        # text into a comment.
-        if default is not None and normalize(default) != msgid:
-            msgid = Message(msgid, default=default)
+        if default is not None:
+            default = normalize(default)
+        msgid = Message(msgid, default=default)
 
         if domain not in self.catalog:
             self.catalog[domain] = {}
@@ -127,6 +125,16 @@ class POEngine(DummyEngine):
 
         if msgid not in domain:
             domain[msgid] = []
+        else:
+            msgids = domain.keys()
+            idx = msgids.index(msgid)
+            existing_msgid = msgids[idx]
+            if msgid.default != existing_msgid.default:
+                references = '\n'.join([location[0]+':'+str(location[1]) for location in domain[msgid]])
+                print >> sys.stderr, "Warning: msgid '%s' in %s already exists " \
+                         "with a different default (bad: %s, should be: %s)\n" \
+                         "The references for the existent value are:\n%s\n" % \
+                         (msgid, self.file+':'+str(position), msgid.default, existing_msgid.default, references)
         domain[msgid].append((self.file, position))
         return 'x'
 
