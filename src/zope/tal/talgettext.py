@@ -117,6 +117,8 @@ class POEngine(DummyEngine):
 
         if default is not None:
             default = normalize(default)
+        if msgid == default:
+            default = None
         msgid = Message(msgid, default=default)
 
         if domain not in self.catalog:
