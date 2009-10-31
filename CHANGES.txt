@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.5.2 (unreleased)
+3.5.2 (2009-10-31)
 ------------------
 
 - In talgettext.POEngine.translate, print a warning if a msgid already exists
