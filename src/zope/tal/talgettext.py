@@ -133,10 +133,10 @@ class POEngine(DummyEngine):
             existing_msgid = msgids[idx]
             if msgid.default != existing_msgid.default:
                 references = '\n'.join([location[0]+':'+str(location[1]) for location in domain[msgid]])
-                print >> sys.stderr, "Warning: msgid '%s' in %s already exists " \
+                print >> sys.stderr, (u"Warning: msgid '%s' in %s already exists " \
                          "with a different default (bad: %s, should be: %s)\n" \
                          "The references for the existent value are:\n%s\n" % \
-                         (msgid, self.file+':'+str(position), msgid.default, existing_msgid.default, references)
+                         (msgid, self.file+':'+str(position), msgid.default.encode('utf-8'), existing_msgid.default.encode('utf-8'), references)).encode('utf-8')
         domain[msgid].append((self.file, position))
         return 'x'
 
