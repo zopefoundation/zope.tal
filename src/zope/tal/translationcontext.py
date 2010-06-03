@@ -15,8 +15,6 @@
 
 The translation context provides a container for the information
 needed to perform translation of a marked string from a page template.
-
-$Id$
 """
 DEFAULT_DOMAIN = "default"
 

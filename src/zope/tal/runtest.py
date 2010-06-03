@@ -13,8 +13,6 @@
 #
 ##############################################################################
 """Driver program to run METAL and TAL regression tests.
-
-$Id$
 """
 import glob
 import os

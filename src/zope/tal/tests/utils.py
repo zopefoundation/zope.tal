@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Helper functions for the test suite.
-
-$Id$
 """
 import os
 import sys

@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Parse XML and compile to TALInterpreter intermediate code.
-
-$Id$
 """
 from zope.tal.taldefs import XML_NS, ZOPE_I18N_NS, ZOPE_METAL_NS, ZOPE_TAL_NS
 from zope.tal.talgenerator import TALGenerator

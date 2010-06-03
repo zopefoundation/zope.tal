@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Interpreter for a pre-compiled TAL program.
-
-$Id$
 """
 import cgi
 import operator

@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Tests for the HTMLTALParser code generator.
-
-$Id$
 """
 import pprint
 import sys

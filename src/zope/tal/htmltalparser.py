@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Parse HTML and compile to TALInterpreter intermediate code.
-
-$Id$
 """
 
 from HTMLParser import HTMLParser, HTMLParseError

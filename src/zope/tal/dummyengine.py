@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Dummy TAL expression engine so that I can test out the TAL implementation.
-
-$Id$
 """
 import re
 

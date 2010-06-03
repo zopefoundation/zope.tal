@@ -35,8 +35,6 @@ Options:
         Leave I18N substitution strings un-interpolated.
     -a
         Enable source annotations
-
-$Id$
 """
 
 import os

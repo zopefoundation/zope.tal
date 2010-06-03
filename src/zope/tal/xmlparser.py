@@ -14,8 +14,6 @@
 """Generic Expat-based XML parser base class.
 
 This creates a parser with namespace processing enabled.
-
-$Id$
 """
 import logging
 

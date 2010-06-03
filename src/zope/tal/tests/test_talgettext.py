@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Tests for the talgettext utility.
-
-$Id$
 """
 import sys
 import unittest

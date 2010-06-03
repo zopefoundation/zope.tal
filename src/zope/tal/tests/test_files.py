@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Tests that run driver.py over input files comparing to output files.
-
-$Id$
 """
 
 import glob

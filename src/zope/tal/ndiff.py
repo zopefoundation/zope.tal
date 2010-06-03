@@ -54,8 +54,6 @@ recovered by piping the output through
     sed -n '/^[+ ] /s/^..//p'
 
 See module comments for details and programmatic interface.
-
-$Id$
 """
 
 __version__ = 1, 5, 0

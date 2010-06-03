@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Code generator for TALInterpreter intermediate code.
-
-$Id$
 """
 import cgi
 import re

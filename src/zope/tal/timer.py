@@ -13,8 +13,6 @@
 #
 ##############################################################################
 """Helper program to time compilation and interpretation
-
-$Id$
 """
 import getopt
 import sys
