@@ -44,10 +44,10 @@ def alltests():
     return TestSuite(suites)
 
 setup(name='zope.tal',
-      version = '3.6.0dev',
+      version = '3.6.0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
-      description='Zope 3 Template Application Languate (TAL)',
+      description='Zope Template Application Language (TAL)',
       long_description=(
           read('README.txt')
           + '\n\n' +

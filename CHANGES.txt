@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.6.0 (unreleased)
+3.6.0 (2011-08-20)
 ------------------
 
 - Updated `talinterpreter.FasterStringIO` to faster list-based implementation.
