@@ -44,7 +44,7 @@ def alltests():
     return TestSuite(suites)
 
 setup(name='zope.tal',
-      version = '3.5.3dev',
+      version = '3.6.0dev',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope 3 Template Application Languate (TAL)',
@@ -53,7 +53,7 @@ setup(name='zope.tal',
           + '\n\n' +
           read('CHANGES.txt')
           ),
-      keywords = "zope3 template xml tal",
+      keywords = "zope template xml tal",
       classifiers = [
           'Development Status :: 5 - Production/Stable',
           'Environment :: Web Environment',

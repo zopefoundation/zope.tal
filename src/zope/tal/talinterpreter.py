@@ -141,7 +141,7 @@ class TALInterpreter(object):
     """
 
     def __init__(self, program, macros, engine, stream=None,
-                 debug=0, wrap=60, metal=1, tal=1, showtal=-1,
+                 debug=0, wrap=1023, metal=1, tal=1, showtal=-1,
                  strictinsert=1, stackLimit=100, i18nInterpolate=1,
                  sourceAnnotations=0):
         """Create a TAL interpreter.
@@ -153,7 +153,7 @@ class TALInterpreter(object):
             debug -- enable debugging output to sys.stderr (off by default).
 
             wrap -- try to wrap attributes on opening tags to this number of
-            column (default: 60).
+            column (default: 1023).
 
             metal -- enable METAL macro processing (on by default).
 

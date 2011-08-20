@@ -2,8 +2,11 @@
 CHANGES
 =======
 
-3.5.3 (unreleased)
+3.6.0 (unreleased)
 ------------------
+
+- Increase the default value of the `wrap` argument from 60 to 1023 characters,
+  to avoid extra whitespace and line breaks.
 
 - Fix printing of error messages for msgid conflict with non-ASCII texts.
 
