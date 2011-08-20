@@ -18,9 +18,6 @@ import operator
 import sys
 import warnings
 
-# Do not use cStringIO here!  It's not unicode aware. :(
-from StringIO import StringIO
-
 from zope.i18nmessageid import Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError
 from zope.tal.taldefs import isCurrentVersion
@@ -996,23 +993,18 @@ class TALInterpreter(object):
     bytecode_handlers_tal["optTag"] = do_optTag_tal
 
 
-class FasterStringIO(StringIO):
-    """Append-only version of StringIO.
-
-    This let's us have a much faster write() method.
+class FasterStringIO(list):
+    """Unicode-aware append-only version of StringIO.
     """
-    def close(self):
-        if not self.closed:
-            self.write = _write_ValueError
-            StringIO.close(self)
+    write = list.append
 
-    def seek(self, pos, mode=0):
-        raise RuntimeError("FasterStringIO.seek() not allowed")
+    def __init__(self, value=None):
+        list.__init__(self)
+        if value is not None:
+            self.append(value)
 
-    def write(self, s):
-        #assert self.pos == self.len
-        self.buflist.append(s)
-        self.len = self.pos = self.pos + len(s)
+    def getvalue(self):
+        return u''.join(self)
 
 
 def _write_ValueError(s):
