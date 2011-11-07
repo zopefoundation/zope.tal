@@ -5,6 +5,7 @@ CHANGES
 3.6.1 (unreleased)
 ------------------
 
+- Fixed documentation link in README.txt.
 
 3.6.0 (2011-08-20)
 ------------------

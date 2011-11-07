@@ -10,6 +10,8 @@ dynamic markup into a page.  It also includes the Macro Expansion for TAL
 (METAL) macro language used in page assembly.
 
 The dynamic values themselves are specified using a companion language,
-TALES (see the 'zope.tales' package for more).
+TALES (see the `zope.tales`_ package for more).
 
-See: http://www.zope.org/Wikis/DevSite/Projects/ZPT/TAL%20Specification%201.4
+See: http://wiki.zope.org/ZPT/TALSpecification14
+
+.. _`zope.tales` :  http://pypi.python.org/pypi/zope.tales
