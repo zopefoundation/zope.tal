@@ -446,6 +446,12 @@ class TALGeneratorTestCases(TestCaseBase):
             ('rawtextOffset',
              ('<script type="text/javascript">code</script>', 44))
             ])
+    
+    def test_script_5(self):
+        self._run_check("""<script type="text/javascript">var foo = '<div></div>';</script>""", [
+            ('rawtextOffset',
+             ("""<script type="text/javascript">var foo = '<div></div>';</script>""", 64))
+            ])
 
     def test_attributes_1(self):
         self._run_check("<a href='foo' name='bar' tal:attributes="

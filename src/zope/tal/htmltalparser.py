@@ -174,6 +174,9 @@ class HTMLTALParser(HTMLParser):
         self.pop_xmlns()
 
     def handle_endtag(self, tag):
+        if self.tagstack and self.tagstack[-1] == 'script' and tag != 'script':
+            self.handle_data('</%s>' % tag)
+            return
         if tag in EMPTY_HTML_TAGS:
             # </img> etc. in the source is an error
             raise EmptyTagError(tag, self.getpos())
