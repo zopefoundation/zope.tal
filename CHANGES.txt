@@ -2,11 +2,11 @@
 CHANGES
 =======
 
-3.6.1 (unreleased)
+3.6.1 (2012-03-09)
 ------------------
 
-- Avoid handling end tags within <script> tags. This works around
-  http://bugs.python.org/issue670664
+- Avoid handling end tags within <script> tags in the HTML parser. This works
+  around http://bugs.python.org/issue670664
 
 - Fixed documentation link in README.txt.
 

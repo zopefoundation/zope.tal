@@ -44,7 +44,7 @@ def alltests():
     return TestSuite(suites)
 
 setup(name='zope.tal',
-      version = '3.6.1dev',
+      version = '3.6.1',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
