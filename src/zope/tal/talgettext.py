@@ -32,7 +32,7 @@ import time
 import getopt
 import traceback
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter, normalize
 from zope.tal.dummyengine import DummyEngine
@@ -86,8 +86,8 @@ class POTALInterpreter(TALInterpreter):
                                      default=default, position=self.position)
 
 
+@implementer(ITALExpressionEngine)
 class POEngine(DummyEngine):
-    implements(ITALExpressionEngine)
 
     def __init__(self, macros=None):
         self.catalog = {}

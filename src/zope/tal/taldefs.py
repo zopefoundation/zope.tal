@@ -15,7 +15,7 @@
 """
 import re
 from zope.tal.interfaces import ITALExpressionErrorInfo
-from zope.interface import implements
+from zope.interface import implementer
 
 
 TAL_VERSION = "1.6"
@@ -95,8 +95,8 @@ class I18NError(TALError):
     pass
 
 
+@implementer(ITALExpressionErrorInfo)
 class ErrorInfo(object):
-    implements(ITALExpressionErrorInfo)
 
     def __init__(self, err, position=(None, None)):
         if isinstance(err, Exception):

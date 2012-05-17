@@ -15,7 +15,7 @@
 """
 import re
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18nmessageid import Message
@@ -27,12 +27,13 @@ name_match = re.compile(r"(?s)(%s):(.*)\Z" % NAME_RE).match
 class CompilerError(Exception):
     pass
 
+
+@implementer(ITALExpressionCompiler, ITALExpressionEngine)
 class DummyEngine(object):
 
     position = None
     source_file = None
 
-    implements(ITALExpressionCompiler, ITALExpressionEngine)
 
     def __init__(self, macros=None):
         if macros is None:
