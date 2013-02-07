@@ -129,7 +129,7 @@ def get_signal_name(sig):
             return name
     return None
 
-data = {'x':'X', 'r2': range(2), 'r8': range(8), 'r64': range(64)}
+data = {'x':'X', 'r2': [0, 1], 'r8': list(range(8)), 'r64': list(range(64))}
 for i in range(10):
     data['x%s' % i] = 'X%s' % i
 
