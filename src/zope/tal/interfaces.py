@@ -61,8 +61,10 @@ class ITALExpressionEngine(Interface):
         using the 'is' operator in Python.
         """
 
-    def setPosition((lineno, offset)):
+    def setPosition(position):
         """Inform the engine of the current position in the source file.
+
+        ``position`` is a tuple (lineno, offset).
 
         This is used to allow the evaluation engine to report
         execution errors so that site developers can more easily
@@ -128,8 +130,10 @@ class ITALExpressionEngine(Interface):
         No constraints are imposed on the return value.
         """
 
-    def createErrorInfo(exception, (lineno, offset)):
+    def createErrorInfo(exception, position):
         """Returns an ITALExpressionErrorInfo object.
+
+        ``position`` is a tuple (lineno, offset).
 
         The returned object is used to provide information about the
         error condition for the on-error handler.
