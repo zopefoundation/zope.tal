@@ -225,7 +225,7 @@ class DummyEngine(object):
         tmp = sys.stdout
         sys.stdout = StringIO.StringIO()
         try:
-            exec code in globals, locals
+            exec(code, globals, locals)
         finally:
             result = sys.stdout
             sys.stdout = tmp
