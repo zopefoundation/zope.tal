@@ -23,7 +23,12 @@ import sys
 import traceback
 import difflib
 
-from cStringIO import StringIO
+try:
+    # Python 2.x
+    from cStringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
 
 if __name__ == "__main__":
     from . import setpath               # Local hack to tweak sys.path etc.

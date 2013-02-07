@@ -18,7 +18,12 @@ import os
 import sys
 import unittest
 
-from StringIO import StringIO
+try:
+    # Python 2.x
+    from StringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
 
 from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
 from zope.tal.taldefs import TALExpressionError

@@ -15,6 +15,13 @@
 """
 import re
 
+try:
+    # Python 2.x
+    from StringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
+
 from zope.interface import implementer
 from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
@@ -209,7 +216,7 @@ class DummyEngine(object):
             locals = self.locals.copy()
 
         assert lang == 'text/server-python'
-        import sys, StringIO
+        import sys
 
         # Removing probable comments
         if code.strip().startswith('<!--') and code.strip().endswith('-->'):
@@ -223,7 +230,7 @@ class DummyEngine(object):
         if code.startswith(' ') or code.startswith('\t'):
             code = 'if 1 == 1:\n' + code + '\n'
         tmp = sys.stdout
-        sys.stdout = StringIO.StringIO()
+        sys.stdout = StringIO()
         try:
             exec(code, globals, locals)
         finally:

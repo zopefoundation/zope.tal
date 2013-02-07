@@ -15,7 +15,12 @@
 """
 import unittest
 
-from StringIO import StringIO
+try:
+    # Python 2.x
+    from StringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
 
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talinterpreter import TALInterpreter
