@@ -60,7 +60,7 @@ class test_POEngine(unittest.TestCase):
                          metal=False)()
         msgids = []
         for domain in engine.catalog.values():
-            msgids += domain.keys()
+            msgids += list(domain)
         msgids.sort()
         self.assertEquals(msgids,
             ['A <a href="${DYNAMIC_CONTENT}">link</a>.',

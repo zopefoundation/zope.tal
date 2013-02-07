@@ -30,7 +30,7 @@ class TALParserTestCase(unittest.TestCase):
             "  </m>\n"
             "</doc>")
         bytecode, macros = parser.getCode()
-        self.assertEqual(macros.keys(), ["MACRO"])
+        self.assertEqual(list(macros), ["MACRO"])
 
 
 def test_suite():

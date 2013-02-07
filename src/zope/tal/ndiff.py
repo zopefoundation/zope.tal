@@ -224,7 +224,7 @@ class SequenceMatcher(object):
         # saved.
         isjunk, junkdict = self.isjunk, {}
         if isjunk:
-            for elt in b2j.keys():
+            for elt in list(b2j):
                 if isjunk(elt):
                     junkdict[elt] = 1   # value irrelevant; it's a set
                     del b2j[elt]

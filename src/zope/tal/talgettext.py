@@ -129,7 +129,7 @@ class POEngine(DummyEngine):
         if msgid not in domain:
             domain[msgid] = []
         else:
-            msgids = domain.keys()
+            msgids = list(domain)
             idx = msgids.index(msgid)
             existing_msgid = msgids[idx]
             if msgid.default != existing_msgid.default:
@@ -298,7 +298,7 @@ def main():
         outfile = file(outfile, update_mode and "a" or "w")
 
     catalog = {}
-    for domain in engine.catalog.keys():
+    for domain in engine.catalog:
         catalog.update(engine.catalog[domain])
 
     messages = catalog.copy()
@@ -310,9 +310,8 @@ def main():
         print(pot_header % {'time': time.ctime(), 'version': __version__},
               file=outfile)
 
-    msgids = catalog.keys()
     # TODO: You should not sort by msgid, but by filename and position. (SR)
-    msgids.sort()
+    msgids = sorted(catalog)
     for msgid in msgids:
         positions = engine.catalog[msgid]
         for filename, position in positions:
