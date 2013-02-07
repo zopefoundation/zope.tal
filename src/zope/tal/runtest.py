@@ -126,7 +126,10 @@ def main():
             if not quiet and expected is not None:
                 showdiff(expected, actual)
     if errors:
-        sys.exit(1)
+        if unittesting:
+            return 1
+        else:
+            sys.exit(1)
 
 def readlines(f):
     L = []

@@ -19,6 +19,13 @@ import os
 import sys
 import unittest
 
+try:
+    # Python 2.x
+    from cStringIO import StringIO
+except ImportError:
+    # Python 3.x
+    from io import StringIO
+
 import zope.tal.runtest
 
 from zope.tal.tests import utils
@@ -38,8 +45,6 @@ class FileTestCase(unittest.TestCase):
 
     def runTest(self):
         basename = os.path.basename(self.__file)
-        #sys.stdout.write(basename + " ")
-        sys.stdout.flush()
         if basename.startswith('test_sa'):
             sys.argv = ["", "-Q", "-a", self.__file]
         elif basename.startswith('test_metal'):
@@ -48,14 +53,17 @@ class FileTestCase(unittest.TestCase):
             sys.argv = ["", "-Q", self.__file]
         pwd = os.getcwd()
         try:
-            try:
-                os.chdir(self.__dir)
-                zope.tal.runtest.main()
-            finally:
-                os.chdir(pwd)
-        except SystemExit as what:
-            if what.code:
-                self.fail("output for %s didn't match" % self.__file)
+            os.chdir(self.__dir)
+            old_stdout = sys.stdout
+            sys.stdout = StringIO()
+            failed = zope.tal.runtest.main()
+        finally:
+            captured_stdout = sys.stdout.getvalue()
+            sys.stdout = old_stdout
+            os.chdir(pwd)
+        if failed:
+            self.fail("output for %s didn't match:\n%s"
+                      % (self.__file, captured_stdout))
 
 try:
     script = __file__
