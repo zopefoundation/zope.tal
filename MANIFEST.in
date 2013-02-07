@@ -1,0 +1,6 @@
+include *.py
+include *.txt
+include buildout.cfg
+recursive-include src *.pt
+recursive-include src *.xml
+recursive-include src *.html

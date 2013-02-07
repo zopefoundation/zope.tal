@@ -28,12 +28,10 @@ def read(*rnames):
     return open(os.path.join(here, *rnames)).read()
 
 def alltests():
-    # use the zope.testing testrunner machinery to find all the
+    # use the zope.testrunner machinery to find all the
     # test suites we've put under ourselves
-    from zope.testing.testrunner import get_options
-    from zope.testing.testrunner import find_suites
-    from zope.testing.testrunner import configure_logging
-    configure_logging()
+    from zope.testrunner.options import get_options
+    from zope.testrunner.find import find_suites
     from unittest import TestSuite
     here = os.path.abspath(os.path.dirname(sys.argv[0]))
     args = sys.argv[:]
@@ -44,7 +42,7 @@ def alltests():
     return TestSuite(suites)
 
 setup(name='zope.tal',
-      version = '4.0.0dev',
+      version='4.0.0dev',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
@@ -76,7 +74,7 @@ setup(name='zope.tal',
           test=['zope.testing',
                 ]),
       test_suite="__main__.alltests", # to support "setup.py test"
-      tests_require = ['zope.testing'],
+      tests_require=['zope.testrunner'],
       install_requires=['setuptools',
                         'zope.i18nmessageid',
                         'zope.interface',
