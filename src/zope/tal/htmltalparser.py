@@ -14,7 +14,13 @@
 """Parse HTML and compile to TALInterpreter intermediate code.
 """
 
-from HTMLParser import HTMLParser, HTMLParseError
+# When Python 3 becomes mainstream please swap the try and except parts.
+try:
+    # Python 2.x
+    from HTMLParser import HTMLParser, HTMLParseError
+except ImportError:
+    # Python 3.x
+    from html.parser import HTMLParser, HTMLParseError
 
 from zope.tal.taldefs import (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS,
                               METALError, TALError, I18NError)

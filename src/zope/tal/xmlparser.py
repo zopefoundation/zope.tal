@@ -17,6 +17,13 @@ This creates a parser with namespace processing enabled.
 """
 import logging
 
+try:
+    # Python 2.x
+    from urllib import urlopen
+except ImportError:
+    # Python 3.x
+    from urllib.request import urlopen
+
 
 class XMLParser(object):
 
@@ -80,8 +87,7 @@ class XMLParser(object):
         self.parser.Parse(s, 1)
 
     def parseURL(self, url):
-        import urllib
-        self.parseStream(urllib.urlopen(url))
+        self.parseStream(urlopen(url))
 
     def parseStream(self, stream):
         self.parser.ParseFile(stream)
