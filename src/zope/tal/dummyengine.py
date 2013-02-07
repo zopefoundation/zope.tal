@@ -217,7 +217,7 @@ class DummyEngine(object):
 
         # Prepare code.
         lines = code.split('\n')
-        lines = filter(lambda l: l.strip() != '', lines)
+        lines = [l for l in lines if l.strip() != '']
         code = '\n'.join(lines)
         # This saves us from all indentation issues :)
         if code.startswith(' ') or code.startswith('\t'):
