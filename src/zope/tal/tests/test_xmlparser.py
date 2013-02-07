@@ -86,8 +86,12 @@ class SegmentedFile(object):
     def __init__(self, parts):
         self.parts = list(parts)
 
-    def read(self, bytes):
-        if self.parts:
+    def read(self, nbytes=None):
+        if nbytes is None:
+            # PyPy's expat wants to read everything in one go
+            s = b''.join(self.parts)
+            del self.parts[:]
+        elif self.parts:
             s = self.parts.pop(0)
         else:
             s = b''

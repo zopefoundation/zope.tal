@@ -10,8 +10,8 @@ CHANGES
 
 - Dropped support for Python 2.4 and 2.5.
 
-- Experimental Python 3.3 support (all tests pass, but test coverage
-  is not complete).
+- Experimental Python 3.3 and PyPy support (all tests pass, but test
+  coverage is not complete).
 
 
 3.6.1 (2012-03-09)
