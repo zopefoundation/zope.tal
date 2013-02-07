@@ -26,6 +26,7 @@ os.environ['NO_SECURITY'] = 'true'
 import getopt
 import sys
 import time
+import errno
 
 from cStringIO import StringIO
 
