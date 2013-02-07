@@ -491,8 +491,8 @@ class I18NCornerTestCaseBase(TestCaseBase):
         # Make sure that non-ASCII Unicode is substituted correctly.
         # http://collector.zope.org/Zope3-dev/264
         program, macros = self._compile(
-            "<div i18n:translate='' tal:define='bar python:unichr(0xC0)'>"
-            "Foo <span tal:replace='bar' i18n:name='bar' /></div>")
+            r'''<div i18n:translate='' tal:define='bar python:u"\u00C0"'>'''
+            r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
         self._check(program, u"<div>FOO \u00C0</div>")
 
 class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
@@ -583,7 +583,7 @@ class ScriptTestCase(TestCaseBase):
 
     def test_simple(self):
         program, macros = self._compile(
-            '<p tal:script="text/server-python">print "hello"</p>')
+            '<p tal:script="text/server-python">print("hello")</p>')
         self._check(program, '<p>hello\n</p>')
 
     def test_script_and_tal_block(self):
@@ -599,35 +599,35 @@ class ScriptTestCase(TestCaseBase):
     def test_script_and_tal_block_having_inside_print(self):
         program, macros = self._compile(
             '<tal:block script="text/server-python">\n'
-            '  print "hello"'
+            '  print("hello")'
             '</tal:block>')
         self._check(program, 'hello\n')
 
     def test_script_and_omittag(self):
         program, macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python">\n'
-            '  print "hello"'
+            '  print("hello")'
             '</p>')
         self._check(program, 'hello\n')
 
     def test_script_and_inside_tags(self):
         program, macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python">\n'
-            '  print "<b>hello</b>"'
+            '  print("<b>hello</b>")'
             '</p>')
         self._check(program, '<b>hello</b>\n')
 
     def test_script_and_inside_tags_with_tal(self):
         program, macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python"> <!--\n'
-            '  print """<b tal:replace="string:foo">hello</b>"""\n'
+            '  print("""<b tal:replace="string:foo">hello</b>""")\n'
             '--></p>')
         self._check(program, '<b tal:replace="string:foo">hello</b>\n')
 
     def test_html_script(self):
         program, macros = self._compile(
             '<script type="text/server-python">\n'
-            '  print "Hello world!"\n'
+            '  print("Hello world!")\n'
             '</script>')
         self._check(program, 'Hello world!\n')
 
@@ -635,7 +635,7 @@ class ScriptTestCase(TestCaseBase):
         program, macros = self._compile(
             '<script type="text/javascript" src="somefile.js" />\n'
             '<script type="text/server-python">\n'
-            '  print "Hello world!"\n'
+            '  print("Hello world!")\n'
             '</script>')
         self._check(program,
                     '<script type="text/javascript" src="somefile.js" />\n'
