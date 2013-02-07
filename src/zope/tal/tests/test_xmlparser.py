@@ -90,7 +90,7 @@ class SegmentedFile(object):
         if self.parts:
             s = self.parts.pop(0)
         else:
-            s = ''
+            s = b''
         return s
 
 
@@ -209,20 +209,20 @@ text
 
     def test_buffer_artefacts(self):
         output = [("starttag", "a", ["b", "<"]), ("endtag", "a")]
-        self._run_check(["<a b='&lt;'/>"], output)
-        self._run_check(["<a ", "b='&lt;'/>"], output)
-        self._run_check(["<a b", "='&lt;'/>"], output)
-        self._run_check(["<a b=", "'&lt;'/>"], output)
-        self._run_check(["<a b='&lt;", "'/>"], output)
-        self._run_check(["<a b='&lt;'", "/>"], output)
+        self._run_check([b"<a b='&lt;'/>"], output)
+        self._run_check([b"<a ", b"b='&lt;'/>"], output)
+        self._run_check([b"<a b", b"='&lt;'/>"], output)
+        self._run_check([b"<a b=", b"'&lt;'/>"], output)
+        self._run_check([b"<a b='&lt;", b"'/>"], output)
+        self._run_check([b"<a b='&lt;'", b"/>"], output)
 
         output = [("starttag", "a", ["b", ">"]), ("endtag", "a")]
-        self._run_check(["<a b='&gt;'/>"], output)
-        self._run_check(["<a ", "b='&gt;'/>"], output)
-        self._run_check(["<a b", "='&gt;'/>"], output)
-        self._run_check(["<a b=", "'&gt;'/>"], output)
-        self._run_check(["<a b='&gt;", "'/>"], output)
-        self._run_check(["<a b='&gt;'", "/>"], output)
+        self._run_check([b"<a b='&gt;'/>"], output)
+        self._run_check([b"<a ", b"b='&gt;'/>"], output)
+        self._run_check([b"<a b", b"='&gt;'/>"], output)
+        self._run_check([b"<a b=", b"'&gt;'/>"], output)
+        self._run_check([b"<a b='&gt;", b"'/>"], output)
+        self._run_check([b"<a b='&gt;'", b"/>"], output)
 
     def test_starttag_junk_chars(self):
         self._parse_error("<")
