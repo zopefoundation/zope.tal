@@ -16,7 +16,6 @@
 import cgi
 import operator
 import sys
-import warnings
 
 from zope.i18nmessageid import Message
 from zope.tal.taldefs import quote, TAL_VERSION, METALError

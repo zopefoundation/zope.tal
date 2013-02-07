@@ -28,7 +28,6 @@ from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
-from zope.tal.dummyengine import DummyTranslationDomain
 from zope.tal.tests import utils
 from zope.i18nmessageid import Message
 
