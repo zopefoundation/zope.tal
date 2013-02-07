@@ -82,7 +82,8 @@ class XMLParser(object):
         return expat.ParserCreate(encoding, ' ')
 
     def parseFile(self, filename):
-        self.parseStream(open(filename))
+        with open(filename, 'rb') as f:
+            self.parseStream(f)
 
     def parseString(self, s):
         if isinstance(s, unicode):
