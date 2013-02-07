@@ -460,7 +460,7 @@ class TALGenerator(object):
                 del repldict[key]
             newlist.append(item)
         # Add dynamic-only attributes
-        for key, (expr, xlat, msgid) in repldict.items():
+        for key, (expr, xlat, msgid) in sorted(repldict.items()):
             newlist.append((key, None, "insert", expr, xlat, msgid))
         return newlist
 
@@ -686,7 +686,7 @@ class TALGenerator(object):
                 i18nattrs = {}
             # Convert repldict's name-->expr mapping to a
             # name-->(compiled_expr, translate) mapping
-            for key, value in repldict.items():
+            for key, value in sorted(repldict.items()):
                 if i18nattrs.get(key, None):
                     raise I18NError(
                         "attribute [%s] cannot both be part of tal:attributes"
@@ -694,7 +694,7 @@ class TALGenerator(object):
                         position)
                 ce = self.compileExpression(value)
                 repldict[key] = ce, key in i18nattrs, i18nattrs.get(key)
-            for key in i18nattrs:
+            for key in sorted(i18nattrs):
                 if key not in repldict:
                     repldict[key] = None, 1, i18nattrs.get(key)
         else:
