@@ -180,6 +180,6 @@ if __name__ == "__main__":
         p.sort_stats('time', 'calls')
         try:
             p.print_stats(20)
-        except IOError, e:
+        except IOError as e:
             if e.errno != errno.EPIPE:
                 raise

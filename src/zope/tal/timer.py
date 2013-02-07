@@ -27,7 +27,7 @@ def main():
     count = 10
     try:
         opts, args = getopt.getopt(sys.argv[1:], "n:")
-    except getopt.error, msg:
+    except getopt.error as msg:
         print msg
         sys.exit(2)
     for o, a in opts:

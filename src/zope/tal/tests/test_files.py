@@ -53,7 +53,7 @@ class FileTestCase(unittest.TestCase):
                 zope.tal.runtest.main()
             finally:
                 os.chdir(pwd)
-        except SystemExit, what:
+        except SystemExit as what:
             if what.code:
                 self.fail("output for %s didn't match" % self.__file)
 

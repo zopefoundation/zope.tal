@@ -197,7 +197,7 @@ class TALGenerator(object):
     def compileExpression(self, expr):
         try:
             return self.expressionCompiler.compile(expr)
-        except self.CompilerError, err:
+        except self.CompilerError as err:
             raise TALError('%s in expression %s' % (err.args[0], `expr`),
                            self.position)
 

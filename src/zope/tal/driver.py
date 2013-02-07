@@ -120,7 +120,7 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hHxlmstia",
                                    ['help', 'html', 'xml'])
-    except getopt.error, msg:
+    except getopt.error as msg:
         usage(2, msg)
     for opt, arg in opts:
         if opt in ('-h', '--help'):
