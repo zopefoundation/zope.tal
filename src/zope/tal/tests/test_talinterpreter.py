@@ -709,13 +709,13 @@ class OutputPresentationTestCase(TestCaseBase):
 
     def test_entities(self):
         if sys.version_info < (3, 0):
+            # HTMLParser.HTMLParser in Python 2.x parses "&#45" as "&#45"
             INPUT = ('<img tal:define="foo nothing" '
                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
                         '&amp;a &amp;#45 &amp;; &lt;&gt;" />')
         else:
-            # XXX: why does &#45 with no terminating ; become a - on
-            # Python 3.3 and is that acceptable or a regression?
+            # html.parser.HTMLParser in Python 3.3 parses "&#45" as "-"
             INPUT = ('<img tal:define="foo nothing" '
                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
