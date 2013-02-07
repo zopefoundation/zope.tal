@@ -247,7 +247,7 @@ class Iterator(object):
         self.engine = engine
         self.nextIndex = 0
 
-    def next(self):
+    def __next__(self):
         i = self.nextIndex
         try:
             item = self.seq[i]
@@ -256,6 +256,7 @@ class Iterator(object):
         self.nextIndex = i+1
         self.engine.setLocal(self.name, item)
         return 1
+    next = __next__ # Python 2 compatibility
 
 
 class DummyTranslationDomain(object):

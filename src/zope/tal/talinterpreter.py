@@ -820,7 +820,7 @@ class TALInterpreter(object):
     def do_loop_tal(self, stuff):
         (name, expr, block) = stuff
         iterator = self.engine.setRepeat(name, expr)
-        while iterator.next():
+        while next(iterator):
             self.interpret(block)
     bytecode_handlers["loop"] = do_loop
 
