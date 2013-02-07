@@ -36,7 +36,7 @@ class test_POEngine(unittest.TestCase):
             engine.translate(key, 'domain')
 
         for key in test_keys:
-            self.failIf(key not in engine.catalog['domain'],
+            self.assertTrue(key in engine.catalog['domain'],
                         "POEngine catalog does not properly store message ids"
                         )
 
@@ -62,7 +62,7 @@ class test_POEngine(unittest.TestCase):
         for domain in engine.catalog.values():
             msgids += list(domain)
         msgids.sort()
-        self.assertEquals(msgids,
+        self.assertEqual(msgids,
             ['A <a href="${DYNAMIC_CONTENT}">link</a>.',
             'Some ${DYNAMIC_CONTENT} text.'])
 

@@ -44,12 +44,12 @@ class TestCaseBase(unittest.TestCase):
         got_program, got_macros = parser.getCode()
         program = self._merge(self.initial_program, program)
         program = self._merge(program, self.final_program)
-        self.assert_(got_program == program,
-                     "Program:\n" + pprint.pformat(got_program)
-                     + "\nExpected:\n" + pprint.pformat(program))
-        self.assert_(got_macros == macros,
-                     "Macros:\n" + pprint.pformat(got_macros)
-                     + "\nExpected:\n" + pprint.pformat(macros))
+        self.assertEqual(got_program, program,
+                         "Program:\n" + pprint.pformat(got_program)
+                         + "\nExpected:\n" + pprint.pformat(program))
+        self.assertEqual(got_macros, macros,
+                         "Macros:\n" + pprint.pformat(got_macros)
+                         + "\nExpected:\n" + pprint.pformat(macros))
 
     def _should_error(self, source, exc=taldefs.TALError):
         def parse(self=self, source=source):

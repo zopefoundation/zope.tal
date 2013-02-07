@@ -102,7 +102,7 @@ class XMLParserTestCase(unittest.TestCase):
             parser.parseStream(SegmentedFile(source))
         else:
             parser.parseString(source)
-        self.assertEquals(parser.get_events(),events)
+        self.assertEqual(parser.get_events(), events)
 
     def _run_check_extra(self, source, events):
         self._run_check(source, events, EventCollectorExtra)
@@ -158,8 +158,8 @@ text
                 ])
         except:
             e = sys.exc_info()[1]
-            self.assert_(e.lineno == 1,
-                         "did not receive correct position information")
+            self.assertEqual(e.lineno, 1,
+                             "did not receive correct position information")
         else:
             self.fail("expected parse error: bad nesting")
 

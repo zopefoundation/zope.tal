@@ -740,7 +740,7 @@ class TestSourceAnnotations(unittest.TestCase):
         interpreter = self.interpreter
         interpreter.sourceFile = '/path/to/source.pt'
         interpreter.position = (123, 42)
-        self.assertEquals(interpreter.formatSourceAnnotation(),
+        self.assertEqual(interpreter.formatSourceAnnotation(),
             "<!--\n" +
             "=" * 78 + "\n" +
             "/path/to/source.pt (line 123)\n" +
@@ -751,7 +751,7 @@ class TestSourceAnnotations(unittest.TestCase):
         interpreter = self.interpreter
         interpreter.sourceFile = '/path/to/source.pt'
         interpreter.position = (None, None)
-        self.assertEquals(interpreter.formatSourceAnnotation(),
+        self.assertEqual(interpreter.formatSourceAnnotation(),
             "<!--\n" +
             "=" * 78 + "\n" +
             "/path/to/source.pt\n" +
@@ -776,11 +776,11 @@ class TestSourceAnnotations(unittest.TestCase):
             self.sio.truncate()
             interpreter._pending_source_annotation = True
             interpreter._annotated_stream_write(input)
-            self.assertEquals(self.sio.getvalue(), output)
+            self.assertEqual(self.sio.getvalue(), output)
             if '@' in output:
-                self.assert_(not interpreter._pending_source_annotation)
+                self.assertFalse(interpreter._pending_source_annotation)
             else:
-                self.assert_(interpreter._pending_source_annotation)
+                self.assertTrue(interpreter._pending_source_annotation)
 
 
 class TestErrorTracebacks(TestCaseBase):
@@ -806,8 +806,8 @@ class TestErrorTracebacks(TestCaseBase):
         # Expect TALExpressionError: unknown variable: 'no_such_thing'
         self.assertRaises(TALExpressionError, interp)
         # Now the engine should know where the error occurred
-        self.assertEquals(engine.source_file, 'page.pt')
-        self.assertEquals(engine.position, (4, 16))
+        self.assertEqual(engine.source_file, 'page.pt')
+        self.assertEqual(engine.position, (4, 16))
 
     def test_define_slot_restores_source_file_if_no_exception(self):
         m_program, m_macros = self._compile("""
@@ -828,8 +828,8 @@ class TestErrorTracebacks(TestCaseBase):
         # Expect TALExpressionError: unknown variable: 'no_such_thing'
         self.assertRaises(TALExpressionError, interp)
         # Now the engine should know where the error occurred
-        self.assertEquals(engine.source_file, 'macros.pt')
-        self.assertEquals(engine.position, (5, 14))
+        self.assertEqual(engine.source_file, 'macros.pt')
+        self.assertEqual(engine.position, (5, 14))
 
 
 
