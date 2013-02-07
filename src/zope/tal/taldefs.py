@@ -193,7 +193,9 @@ def attrEscape(s):
     s = s.replace('"', '&quot;')
     return s
 
-import cgi
-def quote(s, escape=cgi.escape):
-    return '"%s"' % escape(s, 1)
-del cgi
+def quote(s):
+    s = s.replace("&", "&amp;") # Must be done first!
+    s = s.replace("<", "&lt;")
+    s = s.replace(">", "&gt;")
+    s = s.replace('"', "&quot;")
+    return '"%s"' % s

@@ -13,8 +13,14 @@
 ##############################################################################
 """Code generator for TALInterpreter intermediate code.
 """
-import cgi
 import re
+
+try:
+    # Python 3.x
+    from html import escape
+except ImportError:
+    # Python 2.x
+    from cgi import escape
 
 from zope.tal import taldefs
 from zope.tal.taldefs import NAME_RE, TAL_VERSION
@@ -257,7 +263,7 @@ class TALGenerator(object):
         self.emit("rawtext", text)
 
     def emitText(self, text):
-        self.emitRawText(cgi.escape(text))
+        self.emitRawText(escape(text, False))
 
     def emitDefines(self, defines):
         for part in taldefs.splitParts(defines):
