@@ -25,13 +25,13 @@ import traceback
 from cStringIO import StringIO
 
 if __name__ == "__main__":
-    import setpath                      # Local hack to tweak sys.path etc.
+    from . import setpath               # Local hack to tweak sys.path etc.
 
 import zope.tal.driver
 import zope.tal.tests.utils
 
 def showdiff(a, b):
-    import ndiff
+    from . import ndiff # XXX consider using difflib
     cruncher = ndiff.SequenceMatcher(ndiff.IS_LINE_JUNK, a, b)
     for tag, alo, ahi, blo, bhi in cruncher.get_opcodes():
         if tag == "equal":

@@ -160,7 +160,7 @@ class DummyEngine(object):
             macro = self.macros[localName]
         else:
             # External macro
-            import driver
+            from . import driver
             program, macros = driver.compilefile(file)
             macro = macros.get(localName)
             if not macro:

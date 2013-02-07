@@ -28,7 +28,7 @@ def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(test_htmltalparser.test_suite())
     if not utils.skipxml:
-        import test_xmlparser
+        from . import test_xmlparser
         suite.addTest(test_xmlparser.test_suite())
     suite.addTest(test_talinterpreter.test_suite())
     suite.addTest(test_files.test_suite())

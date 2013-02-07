@@ -45,7 +45,7 @@ import sys
 import getopt
 
 if __name__ == "__main__":
-    import setpath                      # Local hack to tweak sys.path etc.
+    from . import setpath               # Local hack to tweak sys.path etc.
 
 # Import local classes
 import zope.tal.taldefs
