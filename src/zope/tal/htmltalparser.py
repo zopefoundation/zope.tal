@@ -141,7 +141,7 @@ class HTMLTALParser(HTMLParser):
              = self.process_ns(tag, attrs)
         if tag in EMPTY_HTML_TAGS and "content" in taldict:
             raise TALError(
-                "empty HTML tags cannot use tal:content: %s" % `tag`,
+                "empty HTML tags cannot use tal:content: %s" % repr(tag),
                 self.getpos())
         # Support for inline Python code.
         if tag == 'script':
@@ -163,7 +163,7 @@ class HTMLTALParser(HTMLParser):
         if "content" in taldict:
             if tag in EMPTY_HTML_TAGS:
                 raise TALError(
-                    "empty HTML tags cannot use tal:content: %s" % `tag`,
+                    "empty HTML tags cannot use tal:content: %s" % repr(tag),
                     self.getpos())
             self.gen.emitStartElement(tag, attrlist, taldict, metaldict,
                                       i18ndict, self.getpos())

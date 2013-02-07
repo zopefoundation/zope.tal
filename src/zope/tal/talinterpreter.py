@@ -251,7 +251,7 @@ class TALInterpreter(object):
     def pushMacro(self, macroName, slots, definingName, extending):
         if len(self.macroStack) >= self.stackLimit:
             raise METALError("macro nesting limit (%d) exceeded "
-                             "by %s" % (self.stackLimit, `macroName`))
+                             "by %s" % (self.stackLimit, repr(macroName)))
         self.macroStack.append(
             MacroStackItem((macroName, slots, definingName, extending,
                             True, self.i18nContext)))
@@ -865,12 +865,12 @@ class TALInterpreter(object):
         else:
             if not isCurrentVersion(macro):
                 raise METALError("macro %s has incompatible version %s" %
-                                 (`macroName`, `getProgramVersion(macro)`),
+                                 (repr(macroName), repr(getProgramVersion(macro))),
                                  self.position)
             mode = getProgramMode(macro)
             if mode != (self.html and "html" or "xml"):
                 raise METALError("macro %s has incompatible mode %s" %
-                                 (`macroName`, `mode`), self.position)
+                                 (repr(macroName), repr(mode)), self.position)
         self.pushMacro(macroName, compiledSlots, definingName, extending)
 
         # We want 'macroname' name to be always available as a variable

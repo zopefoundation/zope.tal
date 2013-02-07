@@ -512,7 +512,7 @@ def fancy_replace(a, alo, ahi, b, blo, bhi):
                 atags = atags + ' ' * la
                 btags = btags + ' ' * lb
             else:
-                raise ValueError('unknown tag ' + `tag`)
+                raise ValueError('unknown tag ' + repr(tag))
         printq(aelt, belt, atags, btags)
     else:
         # the synch pair is identical
@@ -586,7 +586,7 @@ def fcompare(f1name, f2name):
         elif tag == 'equal':
             dump(' ', a, alo, ahi)
         else:
-            raise ValueError('unknown tag ' + `tag`)
+            raise ValueError('unknown tag ' + repr(tag))
 
     return 1
 

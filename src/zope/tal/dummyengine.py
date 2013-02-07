@@ -106,7 +106,7 @@ class DummyEngine(object):
             try:
                 return eval(expr, self.globals, self.locals)
             except:
-                raise TALExpressionError("evaluation error in %s" % `expr`)
+                raise TALExpressionError("evaluation error in %s" % repr(expr))
         if type == "position":
             # Insert the current source file name, line number,
             # and column offset.
@@ -115,7 +115,7 @@ class DummyEngine(object):
             else:
                 lineno, offset = None, None
             return '%s (%s,%s)' % (self.source_file, lineno, offset)
-        raise TALExpressionError("unrecognized expression: " + `expression`)
+        raise TALExpressionError("unrecognized expression: " + repr(expression))
 
     # implementation; can be overridden
     def evaluatePathOrVar(self, expr):
@@ -125,7 +125,7 @@ class DummyEngine(object):
         elif self.globals.has_key(expr):
             return self.globals[expr]
         else:
-            raise TALExpressionError("unknown variable: %s" % `expr`)
+            raise TALExpressionError("unknown variable: %s" % repr(expr))
 
     def evaluateValue(self, expr):
         return self.evaluate(expr)
