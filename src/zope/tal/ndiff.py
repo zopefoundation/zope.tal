@@ -56,6 +56,8 @@ recovered by piping the output through
 See module comments for details and programmatic interface.
 """
 
+from __future__ import print_function
+
 __version__ = 1, 5, 0
 
 # SequenceMatcher tries to compute a "human-friendly diff" between
@@ -314,8 +316,8 @@ class SequenceMatcher(object):
             bestsize = bestsize + 1
 
         if TRACE:
-            print "get_matching_blocks", alo, ahi, blo, bhi
-            print "    returns", besti, bestj, bestsize
+            print("get_matching_blocks", alo, ahi, blo, bhi)
+            print("    returns", besti, bestj, bestsize)
         return besti, bestj, bestsize
 
     def get_matching_blocks(self):
@@ -326,7 +328,7 @@ class SequenceMatcher(object):
         self.__helper(0, la, 0, lb, self.matching_blocks)
         self.matching_blocks.append((la, lb, 0))
         if TRACE:
-            print '*** matching blocks', self.matching_blocks
+            print('*** matching blocks', self.matching_blocks)
         return self.matching_blocks
 
     # builds list of matching blocks covering a[alo:ahi] and
@@ -418,7 +420,7 @@ class SequenceMatcher(object):
 # meant for dumping lines
 def dump(tag, x, lo, hi):
     for i in xrange(lo, hi):
-        print tag, x[i],
+        print(tag, x[i], end=' ')
 
 def plain_replace(a, alo, ahi, b, blo, bhi):
     assert alo < ahi and blo < bhi
@@ -438,7 +440,7 @@ def plain_replace(a, alo, ahi, b, blo, bhi):
 
 def fancy_replace(a, alo, ahi, b, blo, bhi):
     if TRACE:
-        print '*** fancy_replace', alo, ahi, blo, bhi
+        print('*** fancy_replace', alo, ahi, blo, bhi)
         dump('>', a, alo, ahi)
         dump('<', b, blo, bhi)
 
@@ -486,7 +488,7 @@ def fancy_replace(a, alo, ahi, b, blo, bhi):
     # a[best_i] very similar to b[best_j]; eqi is None iff they're not
     # identical
     if TRACE:
-        print '*** best_ratio', best_ratio, best_i, best_j
+        print('*** best_ratio', best_ratio, best_i, best_j)
         dump('>', a, best_i, best_i+1)
         dump('<', b, best_j, best_j+1)
 
@@ -516,7 +518,7 @@ def fancy_replace(a, alo, ahi, b, blo, bhi):
         printq(aelt, belt, atags, btags)
     else:
         # the synch pair is identical
-        print ' ', aelt,
+        print(' ', aelt, end=' ')
 
     # pump out diffs from after the synch point
     fancy_helper(a, best_i+1, ahi, b, best_j+1, bhi)
@@ -537,12 +539,12 @@ def printq(aline, bline, atags, btags):
     common = min(count_leading(aline, "\t"),
                  count_leading(bline, "\t"))
     common = min(common, count_leading(atags[:common], " "))
-    print "-", aline,
+    print("-", aline, end=' ')
     if count_leading(atags, " ") < len(atags):
-        print "?", "\t" * common + atags[common:]
-    print "+", bline,
+        print("?", "\t" * common + atags[common:])
+    print("+", bline, end=' ')
     if count_leading(btags, " ") < len(btags):
-        print "?", "\t" * common + btags[common:]
+        print("?", "\t" * common + btags[common:])
 
 def count_leading(line, ch):
     i, n = 0, len(line)
@@ -621,8 +623,8 @@ def main(args):
         return fail("need 2 filename args")
     f1name, f2name = args
     if noisy:
-        print '-:', f1name
-        print '+:', f2name
+        print('-:', f1name)
+        print('+:', f2name)
     return fcompare(f1name, f2name)
 
 def restore(which):
@@ -631,7 +633,7 @@ def restore(which):
     prefixes = ("  ", tag)
     for line in sys.stdin.readlines():
         if line[:2] in prefixes:
-            print line[2:],
+            print(line[2:], end=' ')
 
 if __name__ == '__main__':
     import sys

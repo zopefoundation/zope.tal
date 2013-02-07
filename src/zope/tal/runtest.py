@@ -14,6 +14,9 @@
 ##############################################################################
 """Driver program to run METAL and TAL regression tests.
 """
+
+from __future__ import print_function
+
 import glob
 import os
 import sys
@@ -33,10 +36,10 @@ def showdiff(a, b):
     for tag, alo, ahi, blo, bhi in cruncher.get_opcodes():
         if tag == "equal":
             continue
-        print nicerange(alo, ahi) + tag[0] + nicerange(blo, bhi)
+        print(nicerange(alo, ahi) + tag[0] + nicerange(blo, bhi))
         ndiff.dump('<', a, alo, ahi)
         if a and b:
-            print '---'
+            print('---')
         ndiff.dump('>', b, blo, bhi)
 
 def nicerange(lo, hi):
@@ -80,10 +83,10 @@ def main():
         if arg.find("_sa") >= 0 and "-a" not in opts:
             locopts.append("-a")
         if not unittesting:
-            print arg,
+            print(arg, end=' ')
             sys.stdout.flush()
         if zope.tal.tests.utils.skipxml and arg.endswith(".xml"):
-            print "SKIPPED (XML parser not available)"
+            print("SKIPPED (XML parser not available)")
             continue
         save = sys.stdout, sys.argv
         try:
@@ -98,13 +101,13 @@ def main():
         except:
             errors = 1
             if quiet:
-                print sys.exc_type
+                print(sys.exc_info()[0])
                 sys.stdout.flush()
             else:
                 if unittesting:
-                    print
+                    print()
                 else:
-                    print "Failed:"
+                    print("Failed:")
                     sys.stdout.flush()
                 traceback.print_exc()
             continue
@@ -116,7 +119,7 @@ def main():
             f = open(outfile)
         except IOError:
             expected = None
-            print "(missing file %s)" % outfile,
+            print("(missing file %s)" % outfile, end=' ')
         else:
             expected = f.readlines()
             f.close()
@@ -127,12 +130,12 @@ def main():
             actual = readlines(stdout)
         if actual == expected:
             if not unittesting:
-                print "OK"
+                print("OK")
         else:
             if unittesting:
-                print
+                print()
             else:
-                print "not OK"
+                print("not OK")
             errors = 1
             if not quiet and expected is not None:
                 showdiff(expected, actual)

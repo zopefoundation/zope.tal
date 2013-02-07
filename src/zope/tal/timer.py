@@ -28,7 +28,7 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "n:")
     except getopt.error as msg:
-        print msg
+        print(msg)
         sys.exit(2)
     for o, a in opts:
         if o == "-n":
@@ -36,7 +36,7 @@ def main():
     if not args:
         args = [FILE]
     for file in args:
-        print file
+        print(file)
         dummyfile = StringIO()
         it = timefunc(count, compilefile, file)
         timefunc(count, interpretit, it, None, dummyfile)

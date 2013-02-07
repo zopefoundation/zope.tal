@@ -15,6 +15,8 @@
 """Run benchmarks of TAL vs. DTML
 """
 
+from __future__ import print_function
+
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -108,14 +110,14 @@ def compare(n, count, profiler=None, verbose=1):
         t1 = int(time_zpt(tal_fn % n, count) * 1000 + 0.5)
         t2 = int(time_tal(tal_fn % n, count) * 1000 + 0.5)
         t3 = 'n/a' # int(time_dtml(dtml_fn % n, count) * 1000 + 0.5)
-        print '%.2d: %10s %10s %10s' % (n, t1, t2, t3)
+        print('%.2d: %10s %10s %10s' % (n, t1, t2, t3))
     if profiler:
         profile_tal(tal_fn % n, count, profiler)
 
 def main(count, profiler=None, verbose=1):
     n = 1
     if verbose:
-        print '##: %10s %10s %10s' % ('ZPT', 'TAL', 'DTML')
+        print('##: %10s %10s %10s' % ('ZPT', 'TAL', 'DTML'))
     while os.path.isfile(tal_fn % n) and os.path.isfile(dtml_fn % n):
         compare(n, count, profiler, verbose)
         n = n + 1
@@ -160,9 +162,9 @@ if __name__ == "__main__":
             sys.exit(rc)
         elif rc < 0:
             sig = -rc
-            print >>sys.stderr, (
+            print((
                 "Process exited, signal %d (%s)."
-                % (sig, get_signal_name(sig) or "<unknown signal>"))
+                % (sig, get_signal_name(sig) or "<unknown signal>")), file=sys.stderr)
             sys.exit(1)
         os.chdir(pwd)
 

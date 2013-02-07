@@ -27,6 +27,9 @@ Options:
         Update the existing translation <file> with any new translation strings
         found.
 """
+
+from __future__ import print_function
+
 import sys
 import time
 import getopt
@@ -62,9 +65,9 @@ NLSTR = '"\n"'
 
 def usage(code, msg=''):
     # Python 2.1 required
-    print >> sys.stderr, __doc__
+    print(__doc__, file=sys.stderr)
     if msg:
-        print >> sys.stderr, msg
+        print(msg, file=sys.stderr)
     sys.exit(code)
 
 
@@ -131,10 +134,10 @@ class POEngine(DummyEngine):
             existing_msgid = msgids[idx]
             if msgid.default != existing_msgid.default:
                 references = '\n'.join([location[0]+':'+str(location[1]) for location in domain[msgid]])
-                print >> sys.stderr, (u"Warning: msgid '%s' in %s already exists " \
-                         "with a different default (bad: %s, should be: %s)\n" \
-                         "The references for the existent value are:\n%s\n" % \
-                         (msgid, self.file+':'+str(position), msgid.default.encode('utf-8'), existing_msgid.default.encode('utf-8'), references)).encode('utf-8')
+                print(("Warning: msgid '%s' in %s already exists "
+                       "with a different default (bad: %s, should be: %s)\n"
+                       "The references for the existent value are:\n%s\n" %
+                         (msgid, self.file+':'+str(position), msgid.default.encode('utf-8'), existing_msgid.default.encode('utf-8'), references)).encode('utf-8'), file=sys.stderr)
         domain[msgid].append((self.file, position))
         return 'x'
 
@@ -171,7 +174,7 @@ class UpdatePOEngine(POEngine):
         try:
             lines = open(self._filename).readlines()
         except IOError as msg:
-            print >> sys.stderr, msg
+            print(msg, file=sys.stderr)
             sys.exit(1)
 
         section = None
@@ -213,9 +216,9 @@ class UpdatePOEngine(POEngine):
             elif section == STR:
                 msgstr += '%s\n' % l
             else:
-                print >> sys.stderr, 'Syntax error on %s:%d' % (infile, lno), \
-                      'before:'
-                print >> sys.stderr, l
+                print('Syntax error on %s:%d' % (infile, lno),
+                      'before:', file=sys.stderr)
+                print(l, file=sys.stderr)
                 sys.exit(1)
         # Add last entry
         if section == STR:
@@ -261,7 +264,7 @@ def main():
             engine = UpdatePOEngine(filename=arg)
 
     if not args:
-        print 'nothing to do'
+        print('nothing to do')
         return
 
     # We don't care about the rendered output of the .pt file
@@ -284,7 +287,7 @@ def main():
             POTALInterpreter(program, macros, engine, stream=Devnull(),
                              metal=False)()
         except: # Hee hee, I love bare excepts!
-            print 'There was an error processing', filename
+            print('There was an error processing', filename)
             traceback.print_exc()
 
     # Now output the keys in the engine.  Write them to a file if --output or
@@ -304,8 +307,8 @@ def main():
     except AttributeError:
         pass
     if '' not in messages:
-        print >> outfile, pot_header % {'time': time.ctime(),
-                                        'version': __version__}
+        print(pot_header % {'time': time.ctime(), 'version': __version__},
+              file=outfile)
 
     msgids = catalog.keys()
     # TODO: You should not sort by msgid, but by filename and position. (SR)

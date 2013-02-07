@@ -37,6 +37,8 @@ Options:
         Enable source annotations
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -104,9 +106,9 @@ ENGINES = {'test23.html': TestEngine,
            }
 
 def usage(code, msg=''):
-    print >> sys.stderr, __doc__
+    print(__doc__, file=sys.stderr)
     if msg:
-        print >> sys.stderr, msg
+        print(msg, file=sys.stderr)
     sys.exit(code)
 
 def main():

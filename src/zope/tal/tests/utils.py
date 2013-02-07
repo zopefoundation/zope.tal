@@ -50,8 +50,8 @@ def run_suite(suite, outf=None, errf=None):
 ##         print
     newerrs = len(result.errors) + len(result.failures)
     if newerrs:
-        print "'Errors' indicate exceptions other than AssertionError."
-        print "'Failures' indicate AssertionError"
+        print("'Errors' indicate exceptions other than AssertionError.")
+        print("'Failures' indicate AssertionError")
         if errf is None:
             errf = sys.stderr
         errf.write("%d errors, %d failures\n"
