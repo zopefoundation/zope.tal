@@ -27,6 +27,13 @@ from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
 from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18nmessageid import Message
 
+
+try:
+    unicode
+except NameError:
+    unicode = str # Python 3.x
+
+
 Default = object()
 
 name_match = re.compile(r"(?s)(%s):(.*)\Z" % NAME_RE).match
