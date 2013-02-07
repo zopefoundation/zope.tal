@@ -346,7 +346,7 @@ class TALGenerator(object):
     def emitDefineMacro(self, macroName):
         program = self.popProgram()
         macroName = macroName.strip()
-        if self.macros.has_key(macroName):
+        if macroName in self.macros:
             raise METALError("duplicate macro definition: %s" % repr(macroName),
                              self.position)
         if not re.match('%s$' % NAME_RE, macroName):
@@ -381,7 +381,7 @@ class TALGenerator(object):
     def emitFillSlot(self, slotName):
         program = self.popProgram()
         slotName = slotName.strip()
-        if self.slots.has_key(slotName):
+        if slotName in self.slots:
             raise METALError("duplicate fill-slot name: %s" % repr(slotName),
                              self.position)
         if not re.match('%s$' % NAME_RE, slotName):
@@ -449,7 +449,7 @@ class TALGenerator(object):
         newlist = []
         for item in attrlist:
             key = item[0]
-            if repldict.has_key(key):
+            if key in repldict:
                 expr, xlat, msgid = repldict[key]
                 item = item[:2] + ("replace", expr, xlat, msgid)
                 del repldict[key]

@@ -101,7 +101,7 @@ class DummyEngine(object):
         if type == "not":
             return not self.evaluate(expr)
         if type == "exists":
-            return self.locals.has_key(expr) or self.globals.has_key(expr)
+            return expr in self.locals or expr in self.globals
         if type == "python":
             try:
                 return eval(expr, self.globals, self.locals)
@@ -120,9 +120,9 @@ class DummyEngine(object):
     # implementation; can be overridden
     def evaluatePathOrVar(self, expr):
         expr = expr.strip()
-        if self.locals.has_key(expr):
+        if expr in self.locals:
             return self.locals[expr]
-        elif self.globals.has_key(expr):
+        elif expr in self.globals:
             return self.globals[expr]
         else:
             raise TALExpressionError("unknown variable: %s" % repr(expr))
@@ -265,7 +265,7 @@ class DummyTranslationDomain(object):
     msgids = {} 
 
     def appendMsgid(self, domain, data):
-        if not self.msgids.has_key(domain):
+        if domain not in self.msgids:
             self.msgids[domain] = []
         self.msgids[domain].append(data)    
     
