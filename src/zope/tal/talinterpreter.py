@@ -25,6 +25,11 @@ from zope.tal.taldefs import getProgramVersion, getProgramMode
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
 
+try:
+    unicode
+except NameError:
+    unicode = str # Python 3.x
+
 
 # Avoid constructing this tuple over and over
 I18nMessageTypes = (Message,)

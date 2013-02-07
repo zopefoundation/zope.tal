@@ -22,6 +22,11 @@ from zope.tal.taldefs import I18NError, METALError, TALError
 from zope.tal.taldefs import parseSubstitution
 from zope.tal.translationcontext import TranslationContext, DEFAULT_DOMAIN
 
+try:
+    xrange
+except NameError:
+    xrange = range # Python 3.x
+
 
 _name_rx = re.compile(NAME_RE)
 

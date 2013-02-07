@@ -25,6 +25,12 @@ except ImportError:
     from urllib.request import urlopen
 
 
+try:
+    unicode
+except NameError:
+    unicode = str # Python 3.x
+
+
 class XMLParser(object):
 
     ordered_attributes = 0

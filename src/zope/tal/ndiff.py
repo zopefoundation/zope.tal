@@ -57,6 +57,14 @@ See module comments for details and programmatic interface.
 """
 
 from __future__ import print_function
+from functools import reduce
+
+
+try:
+    xrange
+except NameError:
+    xrange = range # Python 3.x
+
 
 __version__ = 1, 5, 0
 
