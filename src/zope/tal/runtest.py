@@ -21,6 +21,7 @@ import glob
 import os
 import sys
 import traceback
+import difflib
 
 from cStringIO import StringIO
 
@@ -31,22 +32,7 @@ import zope.tal.driver
 import zope.tal.tests.utils
 
 def showdiff(a, b):
-    from . import ndiff # XXX consider using difflib
-    cruncher = ndiff.SequenceMatcher(ndiff.IS_LINE_JUNK, a, b)
-    for tag, alo, ahi, blo, bhi in cruncher.get_opcodes():
-        if tag == "equal":
-            continue
-        print(nicerange(alo, ahi) + tag[0] + nicerange(blo, bhi))
-        ndiff.dump('<', a, alo, ahi)
-        if a and b:
-            print('---')
-        ndiff.dump('>', b, blo, bhi)
-
-def nicerange(lo, hi):
-    if hi <= lo+1:
-        return str(lo+1)
-    else:
-        return "%d,%d" % (lo+1, hi)
+    print(''.join(difflib.ndiff(a, b)))
 
 def main():
     opts = []
