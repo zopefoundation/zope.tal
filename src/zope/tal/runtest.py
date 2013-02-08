@@ -119,6 +119,11 @@ def main():
             actual = stdout.readlines()
         else:
             actual = readlines(stdout)
+        # EOL normalization makes the tests pass on Windows.
+        # XXX: somebody who *cares* please figure out if tal is doing sane
+        # things with newlines on insane platforms and file a bug if not.
+        actual = [l.replace('\r\n', '\n') for l in actual]
+        expected = [l.replace('\r\n', '\n') for l in expected]
         if actual == expected:
             if not unittesting:
                 print("OK")
