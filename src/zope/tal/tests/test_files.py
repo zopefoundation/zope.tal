@@ -43,6 +43,11 @@ class FileTestCase(unittest.TestCase):
         path = os.path.basename(self.__file)
         return '%s (%s)' % (path, self.__class__)
 
+    def id(self):
+        return os.path.relpath(self.__file, os.path.dirname(__file__))
+
+    __str__ = id
+
     def runTest(self):
         basename = os.path.basename(self.__file)
         if basename.startswith('test_sa'):
