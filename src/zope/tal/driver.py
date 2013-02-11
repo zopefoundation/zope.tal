@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ##############################################################################
 #
-# Copyright (c) 2001, 2002 Zope Foundation and Contributors.
+# Copyright (c) 2001, 2002, 2013 Zope Foundation and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -13,43 +13,19 @@
 #
 ##############################################################################
 """Driver program to test METAL and TAL implementation.
-
-Usage: driver.py [options] [file]
-Options:
-    -h / --help
-        Print this message and exit.
-    -H / --html
-    -x / --xml
-        Explicitly choose HTML or XML input.  The default is to automatically
-        select based on the file extension.  These options are mutually
-        exclusive.
-    -l
-        Lenient structure insertion.
-    -m
-        Macro expansion only
-    -s
-        Print intermediate opcodes only
-    -t
-        Leave TAL/METAL attributes in output
-    -i
-        Leave I18N substitution strings un-interpolated.
-    -a
-        Enable source annotations
 """
 
 from __future__ import print_function
 
 import os
+import optparse
 import sys
-
-import getopt
 
 # Import local classes
 import zope.tal.taldefs
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import DummyTranslationDomain
 
-FILE = "tests/input/test01.xml"
 
 class TestTranslations(DummyTranslationDomain):
     def translate(self, msgid, mapping=None, context=None,
@@ -89,8 +65,7 @@ class TestEngine(DummyEngine):
 
 
 # This is a disgusting hack so that we can use engines that actually know
-# something about certain object paths.  TimeEngine knows about
-# here/currentTime.
+# something about certain object paths.
 ENGINES = {'test23.html': TestEngine,
            'test24.html': TestEngine,
            'test26.html': TestEngine,
@@ -102,66 +77,52 @@ ENGINES = {'test23.html': TestEngine,
            'test32.html': TestEngine,
            }
 
-def usage(code, msg=''):
-    print(__doc__, file=sys.stderr)
-    if msg:
-        print(msg, file=sys.stderr)
-    sys.exit(code)
-
 def main():
-    macros = 0
-    mode = None
-    showcode = 0
-    showtal = -1
-    sourceAnnotations = 0
-    strictinsert = 1
-    i18nInterpolate = 1
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hHxlmstia",
-                                   ['help', 'html', 'xml'])
-    except getopt.error as msg:
-        usage(2, msg)
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            usage(0)
-        if opt in ('-H', '--html'):
-            if mode == 'xml':
-                usage(1, '--html and --xml are mutually exclusive')
-            mode = "html"
-        if opt == '-l':
-            strictinsert = 0
-        if opt == '-m':
-            macros = 1
-        if opt in ('-x', '--xml'):
-            if mode == 'html':
-                usage(1, '--html and --xml are mutually exclusive')
-            mode = "xml"
-        if opt == '-s':
-            showcode = 1
-        if opt == '-t':
-            showtal = 1
-        if opt == '-i':
-            i18nInterpolate = 0
-        if opt == '-a':
-            sourceAnnotations = 1
-    if args:
-        file = args[0]
-    else:
-        file = FILE
-    it = compilefile(file, mode)
-    if showcode:
+    parser = optparse.OptionParser('usage: %prog [options] testfile',
+                                   description=__doc__)
+    parser.add_option('-H', '--html',
+            action='store_const', const='html', dest='mode',
+            help='explicitly choose HTML input (default: use file extension)')
+    parser.add_option('-x', '--xml',
+            action='store_const', const='xml', dest='mode',
+            help='explicitly choose XML input (default: use file extension)')
+    parser.add_option('-l', '--lenient', action='store_true',
+            help='lenient structure insertion')
+            # aka don't validate HTML/XML inserted by
+            # tal:content="structure expr"
+    parser.add_option('-m', '--macro-only', action='store_true',
+            help='macro expansion only')
+    parser.add_option('-s', '--show-code', action='store_true',
+            help='print intermediate opcodes only')
+    parser.add_option('-t', '--show-tal', action='store_true',
+            help='leave TAL/METAL attributes in output')
+    parser.add_option('-i', '--show-i18n', action='store_true',
+            help='leave I18N substitution string un-interpolated')
+    parser.add_option('-a', '--annotate', action='store_true',
+            help='enable source annotations')
+    opts, args = parser.parse_args()
+    if not args:
+        parser.print_help()
+        sys.exit(1)
+    if len(args) > 1:
+        parser.error('Too many arguments')
+    file = args[0]
+
+    it = compilefile(file, opts.mode)
+    if opts.show_code:
         showit(it)
     else:
         # See if we need a special engine for this test
         engine = None
         engineClass = ENGINES.get(os.path.basename(file))
         if engineClass is not None:
-            engine = engineClass(macros)
+            engine = engineClass(opts.macro_only)
         interpretit(it, engine=engine,
-                    tal=(not macros), showtal=showtal,
-                    strictinsert=strictinsert,
-                    i18nInterpolate=i18nInterpolate,
-                    sourceAnnotations=sourceAnnotations)
+                    tal=not opts.macro_only,
+                    showtal=1 if opts.show_tal else -1,
+                    strictinsert=not opts.lenient,
+                    i18nInterpolate=not opts.show_i18n,
+                    sourceAnnotations=opts.annotate)
 
 def interpretit(it, engine=None, stream=None, tal=1, showtal=-1,
                 strictinsert=1, i18nInterpolate=1, sourceAnnotations=0):
