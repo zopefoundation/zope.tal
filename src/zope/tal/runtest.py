@@ -30,9 +30,6 @@ except ImportError:
     # Python 3.x
     from io import StringIO
 
-if __name__ == "__main__":
-    from . import setpath               # Local hack to tweak sys.path etc.
-
 import zope.tal.driver
 import zope.tal.tests.utils
 
