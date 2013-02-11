@@ -49,6 +49,9 @@ def main():
     internal_options.add_option('-Q', '--very-quiet',
             action='store_true', dest='unittesting',
             help="no output on success, only diff/traceback on failure")
+    internal_options.add_option('-N', '--normalize-newlines',
+            action='store_true', dest='normalize_newlines',
+            help="ignore differences between CRLF and LF")
     parser.add_option_group(internal_options)
     driver_options = optparse.OptionGroup(parser, 'Driver options',
             "(for debugging only; supplying these *will* cause test failures)")
@@ -74,9 +77,9 @@ def main():
     errors = 0
     for arg in args:
         locopts = []
-        if arg.find("metal") >= 0 and not opts.macro_only:
+        if "metal" in arg and not opts.macro_only:
             locopts.append("-m")
-        if arg.find("_sa") >= 0 and not opts.annotate:
+        if "_sa" in arg and not opts.annotate:
             locopts.append("-a")
         if not opts.unittesting:
             print(arg, end=' ')
@@ -124,11 +127,23 @@ def main():
             actual = stdout.readlines()
         else:
             actual = readlines(stdout)
-        # EOL normalization makes the tests pass on Windows.
-        # XXX: somebody who *cares* please figure out if tal is doing sane
-        # things with newlines on insane platforms and file a bug if not.
-        actual = [l.replace('\r\n', '\n') for l in actual]
-        expected = [l.replace('\r\n', '\n') for l in expected]
+        if opts.normalize_newlines or "_sa" in arg or arg.endswith('.xml'):
+            # EOL normalization makes the tests pass:
+            # - XML files, on Windows, have \r\n line endings.  Because
+            #   expat insists on byte streams on Python 3, we end up with
+            #   those \r\n's going through the entire TAL engine and
+            #   showing up in the actual output.  Expected output, on the
+            #   other hand, has just \n's, since we read the file as text.
+            # - Source annotation tests: when a developer converts all the
+            #   input and output files to \r\n line endings and runs
+            #   tests on Linux (because they're trying to debug Windows
+            #   problems but can't be forced to use an inferior OS), we
+            #   also have \r\n's going through the TAL engine and showing
+            #   up both in actual and expected lists.  Except for source
+            #   annotation lines added by TAL, which always use just \n.
+            actual = [l.replace('\r\n', '\n') for l in actual]
+            if expected is not None:
+                expected = [l.replace('\r\n', '\n') for l in expected]
         if actual == expected:
             if not opts.unittesting:
                 print("OK")

@@ -436,7 +436,7 @@ class TALGenerator(object):
             if re.match(r"\A[ \t]*\Z", text):
                 collect.append(text)
                 continue
-            m = re.match(r"(?s)^(.*)(\n[ \t]*)\Z", text)
+            m = re.match(r"(?s)^(.*?)(\r?\n[ \t]*)\Z", text)
             if not m:
                 break
             text, rest = m.group(1, 2)
