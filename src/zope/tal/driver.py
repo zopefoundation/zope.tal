@@ -12,7 +12,8 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Driver program to test METAL and TAL implementation.
+"""Driver program to test METAL and TAL implementation:
+interprets a file, prints results to stdout.
 """
 
 from __future__ import print_function
@@ -77,30 +78,35 @@ ENGINES = {'test23.html': TestEngine,
            'test32.html': TestEngine,
            }
 
-def main():
-    parser = optparse.OptionParser('usage: %prog [options] testfile',
-                                   description=__doc__)
-    parser.add_option('-H', '--html',
+
+OPTIONS = [
+    optparse.make_option('-H', '--html',
             action='store_const', const='html', dest='mode',
-            help='explicitly choose HTML input (default: use file extension)')
-    parser.add_option('-x', '--xml',
+            help='explicitly choose HTML input (default: use file extension)'),
+    optparse.make_option('-x', '--xml',
             action='store_const', const='xml', dest='mode',
-            help='explicitly choose XML input (default: use file extension)')
-    parser.add_option('-l', '--lenient', action='store_true',
-            help='lenient structure insertion')
+            help='explicitly choose XML input (default: use file extension)'),
+    optparse.make_option('-l', '--lenient', action='store_true',
+            help='lenient structure insertion'),
             # aka don't validate HTML/XML inserted by
             # tal:content="structure expr"
-    parser.add_option('-m', '--macro-only', action='store_true',
-            help='macro expansion only')
-    parser.add_option('-s', '--show-code', action='store_true',
-            help='print intermediate opcodes only')
-    parser.add_option('-t', '--show-tal', action='store_true',
-            help='leave TAL/METAL attributes in output')
-    parser.add_option('-i', '--show-i18n', action='store_true',
-            help='leave I18N substitution string un-interpolated')
-    parser.add_option('-a', '--annotate', action='store_true',
-            help='enable source annotations')
-    opts, args = parser.parse_args()
+    optparse.make_option('-m', '--macro-only', action='store_true',
+            help='macro expansion only'),
+    optparse.make_option('-s', '--show-code', action='store_true',
+            help='print intermediate opcodes only'),
+    optparse.make_option('-t', '--show-tal', action='store_true',
+            help='leave TAL/METAL attributes in output'),
+    optparse.make_option('-i', '--show-i18n', action='store_true',
+            help='leave I18N substitution string un-interpolated'),
+    optparse.make_option('-a', '--annotate', action='store_true',
+            help='enable source annotations'),
+]
+
+def main(values=None):
+    parser = optparse.OptionParser('usage: %prog [options] testfile',
+                                   description=__doc__,
+                                   option_list=OPTIONS)
+    opts, args = parser.parse_args(values=values)
     if not args:
         parser.print_help()
         sys.exit(1)
@@ -144,12 +150,18 @@ def compilefile(file, mode=None):
             mode = "html"
         else:
             mode = "xml"
-    from zope.tal.talgenerator import TALGenerator
-    filename = os.path.abspath(file)
+    # make sure we can find the file
     prefix = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
+    if (not os.path.exists(file)
+        and os.path.exists(os.path.join(prefix, file))):
+        file = os.path.join(prefix, file)
+    # normalize filenames for test output
+    filename = os.path.abspath(file)
     if filename.startswith(prefix):
         filename = filename[len(prefix):]
     filename = filename.replace(os.sep, '/') # test files expect slashes
+    # parse
+    from zope.tal.talgenerator import TALGenerator
     if mode == "html":
         from zope.tal.htmltalparser import HTMLTALParser
         p = HTMLTALParser(gen=TALGenerator(source_file=filename, xml=0))

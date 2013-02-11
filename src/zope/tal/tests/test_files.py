@@ -51,11 +51,11 @@ class FileTestCase(unittest.TestCase):
     def runTest(self):
         basename = os.path.basename(self.__file)
         if basename.startswith('test_sa'):
-            sys.argv = ["", "-Q", "-a", self.__file]
+            sys.argv = ["runtest.py", "-Q", "-a", self.__file]
         elif basename.startswith('test_metal'):
-            sys.argv = ["", "-Q", "-m", self.__file]
+            sys.argv = ["runtest.py", "-Q", "-m", self.__file]
         else:
-            sys.argv = ["", "-Q", self.__file]
+            sys.argv = ["runtest.py", "-Q", self.__file]
         pwd = os.getcwd()
         try:
             os.chdir(self.__dir)

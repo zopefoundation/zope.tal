@@ -12,7 +12,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Driver program to run METAL and TAL regression tests.
+"""Driver program to run METAL and TAL regression tests:
+compares interpeted test files with expected output files in a sibling
+directory.
 """
 
 from __future__ import print_function
@@ -22,6 +24,8 @@ import os
 import sys
 import traceback
 import difflib
+import copy
+import optparse
 
 try:
     # Python 2.x
@@ -37,21 +41,25 @@ def showdiff(a, b):
     print(''.join(difflib.ndiff(a, b)))
 
 def main():
-    opts = []
-    args = sys.argv[1:]
-    quiet = 0
-    unittesting = 0
-    if args and args[0] == "-q":
-        quiet = 1
-        del args[0]
-    if args and args[0] == "-Q":
-        unittesting = 1
-        del args[0]
-    while args and args[0].startswith('-'):
-        opts.append(args[0])
-        del args[0]
+    parser = optparse.OptionParser('usage: %prog [options] [testfile ...]',
+                                   description=__doc__)
+    parser.add_option('-q', '--quiet', action='store_true',
+            help="less verbose output")
+    internal_options = optparse.OptionGroup(parser, 'Internal options')
+    internal_options.add_option('-Q', '--very-quiet',
+            action='store_true', dest='unittesting',
+            help="no output on success, only diff/traceback on failure")
+    parser.add_option_group(internal_options)
+    driver_options = optparse.OptionGroup(parser, 'Driver options',
+            "(for debugging only; supplying these *will* cause test failures)")
+    for option in zope.tal.driver.OPTIONS:
+        driver_options.add_option(option)
+    parser.add_option_group(driver_options)
+    opts, args = parser.parse_args()
+
     if not args:
-        prefix = os.path.join("tests", "input", "test*.")
+        here = os.path.dirname(__file__)
+        prefix = os.path.join(here, "tests", "input", "test*.")
         if zope.tal.tests.utils.skipxml:
             xmlargs = []
         else:
@@ -66,11 +74,11 @@ def main():
     errors = 0
     for arg in args:
         locopts = []
-        if arg.find("metal") >= 0 and "-m" not in opts:
+        if arg.find("metal") >= 0 and not opts.macro_only:
             locopts.append("-m")
-        if arg.find("_sa") >= 0 and "-a" not in opts:
+        if arg.find("_sa") >= 0 and not opts.annotate:
             locopts.append("-a")
-        if not unittesting:
+        if not opts.unittesting:
             print(arg, end=' ')
             sys.stdout.flush()
         if zope.tal.tests.utils.skipxml and arg.endswith(".xml"):
@@ -80,19 +88,19 @@ def main():
         try:
             try:
                 sys.stdout = stdout = StringIO()
-                sys.argv = [""] + opts + locopts + [arg]
-                zope.tal.driver.main()
+                sys.argv = ["driver.py"] + locopts + [arg]
+                zope.tal.driver.main(copy.copy(opts))
             finally:
                 sys.stdout, sys.argv = save
         except SystemExit:
             raise
         except:
             errors = 1
-            if quiet:
-                print(sys.exc_info()[0])
+            if opts.quiet:
+                print(sys.exc_info()[0].__name__)
                 sys.stdout.flush()
             else:
-                if unittesting:
+                if opts.unittesting:
                     print()
                 else:
                     print("Failed:")
@@ -122,18 +130,18 @@ def main():
         actual = [l.replace('\r\n', '\n') for l in actual]
         expected = [l.replace('\r\n', '\n') for l in expected]
         if actual == expected:
-            if not unittesting:
+            if not opts.unittesting:
                 print("OK")
         else:
-            if unittesting:
+            if opts.unittesting:
                 print()
             else:
                 print("not OK")
             errors = 1
-            if not quiet and expected is not None:
+            if not opts.quiet and expected is not None:
                 showdiff(expected, actual)
     if errors:
-        if unittesting:
+        if opts.unittesting:
             return 1
         else:
             sys.exit(1)
@@ -148,4 +156,4 @@ def readlines(f):
     return L
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
