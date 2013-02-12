@@ -47,9 +47,9 @@ setup(name='zope.tal',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
       long_description=(
-          read('README.txt')
+          read('README.rst')
           + '\n\n' +
-          read('CHANGES.txt')
+          read('CHANGES.rst')
           ),
       keywords = "zope template xml tal",
       classifiers = [
