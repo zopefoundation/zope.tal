@@ -2,8 +2,8 @@
 CHANGES
 =======
 
-4.0.0 (unreleased)
-------------------
+4.0.0a1 (2013-02-15)
+--------------------
 
 - Replaced deprecated ``zope.interface.implements`` usage with equivalent
   ``zope.interface.implementer`` decorator.
