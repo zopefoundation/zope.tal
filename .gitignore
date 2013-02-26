@@ -3,3 +3,5 @@ bin/
 eggs/
 develop-eggs/
 *.egg-info/
+*.pyc
+.tox

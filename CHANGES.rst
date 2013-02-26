@@ -19,6 +19,9 @@ CHANGES
 - Experimental Python 3.3 and PyPy support (all tests pass, but test
   coverage is not complete).
 
+- Output generated attributes (via tal:attributes and i18n:attributes
+  directives) in alphabetical order.
+
 
 3.6.1 (2012-03-09)
 ------------------
