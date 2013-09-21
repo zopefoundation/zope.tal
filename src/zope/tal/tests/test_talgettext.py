@@ -46,6 +46,35 @@ class test_POEngine(unittest.TestCase):
                         "POEngine catalog does not properly store message ids"
                         )
 
+    def test_translate_existing(self):
+        engine = POEngine()
+        # This tries to reproduce a big surfacing in a template of
+        # PloneSoftwareCenter when using the i18ndude package to
+        # extract translatable strings, which uses zope.tal.  The
+        # relevant html snippet is this:
+        #
+        # <a href="#" title="Read more&hellip;"
+        #    i18n:attributes="title label_read_more"
+        #    tal:attributes="href release/absolute_url">
+        #    <span i18n:translate="label_read_more">Read more&hellip;</span>
+        # </a>
+        #
+        # Due to the different ways that i18n:attributes and
+        # i18n:translate are handled, the attribute gets passed to the
+        # translate method with the html entity interpreted as a
+        # unicode, and the i18n:translate gets passed as a simple
+        # string with the html entity intact.  That may need a fix
+        # elsewhere, but at the moment it gives a warning.  The very
+        # least we can do is make sure that this does not give a
+        # UnicodeDecodeError, which is what we test here.
+        engine.file = 'psc_release_listing.pt'
+        # position is position in file.
+        engine.translate('foo', 'domain', default=u'Read more\u2026', position=7)
+        # Adding the same key with the same default is fine.
+        engine.translate('foo', 'domain', default=u'Read more\u2026', position=13)
+        # Adding the same key with a different default is bad and triggers a warning.
+        engine.translate('foo', 'domain', default='Read still more&hellip;', position=42)
+
     def test_dynamic_msgids(self):
         sample_source = """
             <p i18n:translate="">
