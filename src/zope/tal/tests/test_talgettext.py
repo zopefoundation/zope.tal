@@ -69,11 +69,15 @@ class test_POEngine(unittest.TestCase):
         # UnicodeDecodeError, which is what we test here.
         engine.file = 'psc_release_listing.pt'
         # position is position in file.
-        engine.translate('foo', 'domain', default=u'Read more\u2026', position=7)
+        engine.translate('foo', 'domain',
+                         default=u'Read more\u2026', position=7)
         # Adding the same key with the same default is fine.
-        engine.translate('foo', 'domain', default=u'Read more\u2026', position=13)
-        # Adding the same key with a different default is bad and triggers a warning.
-        engine.translate('foo', 'domain', default='Read still more&hellip;', position=42)
+        engine.translate('foo', 'domain',
+                         default=u'Read more\u2026', position=13)
+        # Adding the same key with a different default is bad and
+        # triggers a warning.
+        engine.translate('foo', 'domain',
+                         default='Read still more&hellip;', position=42)
 
     def test_dynamic_msgids(self):
         sample_source = """
