@@ -2,8 +2,8 @@
 CHANGES
 =======
 
-4.0.0a2 (unreleased)
---------------------
+4.0.0 (2014-01-13)
+------------------
 
 - Fix possible UnicodeDecodeError in warning when msgid already exists.
 
