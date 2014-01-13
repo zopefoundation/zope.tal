@@ -13,7 +13,11 @@
 ##############################################################################
 """Tests for the talgettext utility.
 """
+
+from __future__ import print_function
+
 import sys
+import tempfile
 import unittest
 import warnings
 
@@ -82,8 +86,12 @@ class test_POEngine(unittest.TestCase):
             engine.translate('foo', 'domain',
                              default='Read still more&hellip;', position=42)
             self.assertEqual(len(log), 1)
-            self.assertTrue("already exists with a different default"
-                            in log[0].message.message)
+            message = log[0].message
+            with tempfile.TemporaryFile('w+') as printfile:
+                print(message, file=printfile)
+                printfile.seek(0)
+                self.assertTrue("already exists with a different default"
+                                in printfile.read())
 
     def test_dynamic_msgids(self):
         sample_source = """
