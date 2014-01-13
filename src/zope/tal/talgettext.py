@@ -34,6 +34,7 @@ import sys
 import time
 import getopt
 import traceback
+import warnings
 
 from zope.interface import implementer
 from zope.tal.htmltalparser import HTMLTALParser
@@ -133,11 +134,20 @@ class POEngine(DummyEngine):
             idx = msgids.index(msgid)
             existing_msgid = msgids[idx]
             if msgid.default != existing_msgid.default:
-                references = '\n'.join([location[0]+':'+str(location[1]) for location in domain[msgid]])
-                print(("Warning: msgid '%s' in %s already exists "
-                       "with a different default (bad: %s, should be: %s)\n"
-                       "The references for the existent value are:\n%s\n" %
-                         (msgid, self.file+':'+str(position), msgid.default.encode('utf-8'), existing_msgid.default.encode('utf-8'), references)).encode('utf-8'), file=sys.stderr)
+                references = '\n'.join([location[0]+':'+str(location[1])
+                                        for location in domain[msgid]])
+                # Note: a lot of encode calls here are needed so
+                # Python 3 does not break.
+                warnings.warn(
+                    "Warning: msgid '%s' in %s already exists "
+                    "with a different default (bad: %s, should be: %s)\n"
+                    "The references for the existent value are:\n%s\n" %
+                    (msgid.encode('utf-8'),
+                     self.file.encode('utf-8') + ':'.encode('utf-8')
+                     + str(position).encode('utf-8'),
+                     msgid.default.encode('utf-8'),
+                     existing_msgid.default.encode('utf-8'),
+                     references.encode('utf-8')))
         domain[msgid].append((self.file, position))
         return 'x'
 
