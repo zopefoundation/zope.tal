@@ -15,6 +15,7 @@
 """
 import sys
 import unittest
+import warnings
 
 try:
     # Python 2.x
@@ -76,8 +77,13 @@ class test_POEngine(unittest.TestCase):
                          default=u'Read more\u2026', position=13)
         # Adding the same key with a different default is bad and
         # triggers a warning.
-        engine.translate('foo', 'domain',
-                         default='Read still more&hellip;', position=42)
+        with warnings.catch_warnings(record=True) as log:
+            warnings.simplefilter("always")
+            engine.translate('foo', 'domain',
+                             default='Read still more&hellip;', position=42)
+            self.assertEqual(len(log), 1)
+            self.assertTrue("already exists with a different default"
+                            in log[0].message.message)
 
     def test_dynamic_msgids(self):
         sample_source = """
