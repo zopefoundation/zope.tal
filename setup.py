@@ -25,7 +25,8 @@ from setuptools import setup, find_packages
 here = os.path.dirname(__file__)
 
 def read(*rnames):
-    return open(os.path.join(here, *rnames)).read()
+    with open(os.path.join(here, *rnames)) as f:
+        return f.read()
 
 def alltests():
     # use the zope.testrunner machinery to find all the
@@ -42,7 +43,7 @@ def alltests():
     return TestSuite(suites)
 
 setup(name='zope.tal',
-      version='4.0.1dev',
+      version='4.1.0.dev0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
@@ -63,6 +64,7 @@ setup(name='zope.tal',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: Implementation :: CPython',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Natural Language :: English',

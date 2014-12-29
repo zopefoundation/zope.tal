@@ -714,11 +714,18 @@ class OutputPresentationTestCase(TestCaseBase):
                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
                         '&amp;a &amp;#45 &amp;; &lt;&gt;" />')
-        else:
+        elif sys.version_info < (3, 4):
             # html.parser.HTMLParser in Python 3.3 parses "&#45" as "-"
             INPUT = ('<img tal:define="foo nothing" '
                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
+                        '&amp;a - &amp;; &lt;&gt;" />')
+        else:
+            # html.parser.HTMLParser in Python 3.4 parses "&#1" as ""
+            # because '1' is an "invalid codepoint".
+            INPUT = ('<img tal:define="foo nothing" '
+                    'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
+            EXPECTED = ('<img alt="&a;  \n '
                         '&amp;a - &amp;; &lt;&gt;" />')
         self.compare(INPUT, EXPECTED)
 
