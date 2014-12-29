@@ -1,8 +1,8 @@
-Template Attribute Language (TAL)
-=================================
+``zope.tal``
+============
 
-Overview
---------
+.. image:: https://travis-ci.org/zopefoundation/zope.tal.png?branch=master
+        :target: https://travis-ci.org/zopefoundation/zope.tal
 
 The Zope3 Template Attribute Languate (TAL) specifies the custom namespace
 and attributes which are used by the Zope Page Templates renderer to inject

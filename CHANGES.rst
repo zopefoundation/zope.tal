@@ -1,11 +1,10 @@
-=======
-CHANGES
+Changes
 =======
 
 4.0.1 (unreleased)
 ------------------
 
-- TBD
+- Add support for testing on Travis.
 
 4.0.0 (2014-01-13)
 ------------------
@@ -16,16 +15,15 @@ CHANGES
 4.0.0a1 (2013-02-15)
 --------------------
 
-- Replaced deprecated ``zope.interface.implements`` usage with equivalent
+- Replace deprecated ``zope.interface.implements`` usage with equivalent
   ``zope.interface.implementer`` decorator.
 
-- Dropped support for Python 2.4 and 2.5.
+- Add support for Python 3.3 and PyPy.
 
-- Experimental Python 3.3 and PyPy support (all tests pass, but test
-  coverage is not complete).
+- Drop support for Python 2.4 and 2.5.
 
-- Output generated attributes (via tal:attributes and i18n:attributes
-  directives) in alphabetical order.
+- Output attributes generate via ``tal:attributes`` and ``i18n:attributes``
+  directives in alphabetical order.
 
 
 3.6.1 (2012-03-09)
@@ -34,12 +32,12 @@ CHANGES
 - Avoid handling end tags within <script> tags in the HTML parser. This works
   around http://bugs.python.org/issue670664
 
-- Fixed documentation link in README.txt.
+- Fix documentation link in README.txt.
 
 3.6.0 (2011-08-20)
 ------------------
 
-- Updated `talinterpreter.FasterStringIO` to faster list-based implementation.
+- Update `talinterpreter.FasterStringIO` to faster list-based implementation.
 
 - Increase the default value of the `wrap` argument from 60 to 1023 characters,
   to avoid extra whitespace and line breaks.
@@ -50,8 +48,8 @@ CHANGES
 3.5.2 (2009-10-31)
 ------------------
 
-- In talgettext.POEngine.translate, print a warning if a msgid already exists
-  in the domain with a different default.
+- In ``talgettext.POEngine.translate``, print a warning if a msgid already
+  exists in the domain with a different default.
 
 
 3.5.1 (2009-03-08)
@@ -73,30 +71,33 @@ CHANGES
 3.4.1 (2007-11-16)
 ------------------
 
-- Removed unnecessary ``dummyengine`` dependency on zope.i18n to
+- Remove unnecessary ``dummyengine`` dependency on zope.i18n to
   simplify distribution.  The ``dummyengine.DummyTranslationDomain``
   class no longer implements
   ``zope.i18n.interfaces.ITranslationDomain`` as a result.  Installing
   zope.tal with easy_install or buildout no longer pulls in many
   unrelated distributions.
 
-- Support ability to run tests using "setup.py test".
+- Support running tests using ``setup.py test``.
 
-- Stop pinning (no longer required) zope.traversing and
-  zope.app.publisher versions in buildout.cfg.
+- Stop pinning (no longer required) ``zope.traversing`` and
+  ``zope.app.publisher`` versions in buildout.cfg.
 
 
 3.4.0 (2007-10-03)
 ------------------
 
-- Updated package meta-data.
+- Update package meta-data.
 
 
 3.4.0b1
 -------
 
-- Updated dependency for ``zope.i18n`` that requires the correct version of
-  zope.security to avoid a hidden dependency issue in zope.security.
+- Update dependency on ``zope.i18n`` to a verions requiring the correct
+  version of ``zope.security``, avoiding a hidden dependency issue in
+  ``zope.security``.
 
-Note: The code changes before 3.4.0b1 where not tracked as an individual
-package and have been documented in the Zope 3 changelog.
+.. note::
+   
+   Changes before 3.4.0b1 where not tracked as an individual
+   package and have been documented in the Zope 3 changelog.
