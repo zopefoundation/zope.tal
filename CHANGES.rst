@@ -4,7 +4,9 @@ Changes
 4.1.1 (unreleased)
 ------------------
 
-- TBD
+- Suppress deprecation under Python 3.4 for default ``convert_charrefs``
+  argument (passed to ``HTMLParser``).  Also ensures that upcoming change
+  to the default in Python 3.5 will not affect us.
 
 
 4.1.0 (2014-12-19)

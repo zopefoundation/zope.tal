@@ -27,6 +27,11 @@ from zope.tal.taldefs import (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS,
 from zope.tal.talgenerator import TALGenerator
 
 
+_html_parser_extras = {}
+if 'convert_charrefs' in HTMLParser.__init__.__code__.co_names:
+    _html_parser_extras['convert_charrefs'] = False  # pragma: NO COVER py34
+
+
 BOOLEAN_HTML_ATTRS = frozenset([
     # List of Boolean attributes in HTML that may be given in
     # minimized form (e.g. <img ismap> rather than <img ismap="">)
@@ -107,7 +112,7 @@ class HTMLTALParser(HTMLParser):
     # External API
 
     def __init__(self, gen=None):
-        HTMLParser.__init__(self)
+        HTMLParser.__init__(self, **_html_parser_extras)
         if gen is None:
             gen = TALGenerator(xml=0)
         self.gen = gen
