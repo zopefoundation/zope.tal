@@ -121,5 +121,4 @@ class test_POEngine(unittest.TestCase):
 
 
 def test_suite():
-    suite = unittest.makeSuite(test_POEngine)
-    return suite
+    return unittest.makeSuite(test_POEngine)

@@ -1014,7 +1014,8 @@ translated string</span>
 
 
 def test_suite():
-    suite = unittest.makeSuite(HTMLTALParserTestCases)
-    suite.addTest(unittest.makeSuite(METALGeneratorTestCases))
-    suite.addTest(unittest.makeSuite(TALGeneratorTestCases))
-    return suite
+    return unittest.TestSuite((
+        unittest.makeSuite(HTMLTALParserTestCases),
+        unittest.makeSuite(METALGeneratorTestCases),
+        unittest.makeSuite(TALGeneratorTestCases),
+    ))

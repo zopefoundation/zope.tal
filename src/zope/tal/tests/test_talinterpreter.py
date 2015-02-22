@@ -848,19 +848,19 @@ class TestErrorTracebacks(TestCaseBase):
 
 
 def test_suite():
-    suite = unittest.makeSuite(I18NErrorsTestCase)
-    suite.addTest(unittest.makeSuite(MacroErrorsTestCase))
-    suite.addTest(unittest.makeSuite(MacroExtendTestCase))
-    suite.addTest(unittest.makeSuite(OutputPresentationTestCase))
-    suite.addTest(unittest.makeSuite(ScriptTestCase))
-    suite.addTest(unittest.makeSuite(I18NCornerTestCaseMessage))
-    suite.addTest(unittest.makeSuite(UnusedExplicitDomainTestCase))
-    suite.addTest(unittest.makeSuite(TestSourceAnnotations))
-    suite.addTest(unittest.makeSuite(TestErrorTracebacks))
+    return unittest.TestSuite((
+        unittest.makeSuite(I18NErrorsTestCase),
+        unittest.makeSuite(MacroErrorsTestCase),
+        unittest.makeSuite(MacroExtendTestCase),
+        unittest.makeSuite(OutputPresentationTestCase),
+        unittest.makeSuite(ScriptTestCase),
+        unittest.makeSuite(I18NCornerTestCaseMessage),
+        unittest.makeSuite(UnusedExplicitDomainTestCase),
+        unittest.makeSuite(TestSourceAnnotations),
+        unittest.makeSuite(TestErrorTracebacks),
 
-    # TODO: Deactivated test, since we have not found a solution for this and
-    # it is a deep and undocumented HTML parser issue.
-    # Fred is looking into this.
-    #suite.addTest(unittest.makeSuite(MacroFunkyErrorTest))
-
-    return suite
+        # TODO: Deactivated test, since we have not found a solution for this
+        # and it is a deep and undocumented HTML parser issue.
+        # Fred is looking into this.
+        #unittest.makeSuite(MacroFunkyErrorTest),
+    ))
