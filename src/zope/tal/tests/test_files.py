@@ -30,68 +30,63 @@ import zope.tal.runtest
 
 from zope.tal.tests import utils
 
+HERE = os.path.abspath(os.path.dirname(__file__))
+PARENTDIR = os.path.dirname(HERE)
+PREFIX = os.path.join(HERE, "input", "test*.")
 
-class _FileTestCase(unittest.TestCase):
 
-    def __init__(self, file, dir):
-        self.__file = file
-        self.__dir = dir
-        unittest.TestCase.__init__(self)
+def _factory(filename, dirname):
 
-    # For unittest.
-    def shortDescription(self):
-        path = os.path.basename(self.__file)
-        return '%s (%s)' % (path, self.__class__)
+    old_stdout = sys.stdout
+    pwd = os.getcwd()
+    short_path = os.path.relpath(filename, os.path.dirname(__file__))
 
-    def id(self):
-        return os.path.relpath(self.__file, os.path.dirname(__file__))
+    def setUp():
+        os.chdir(dirname)
+        sys.stdout = StringIO()
 
-    __str__ = id
+    def tearDown():
+        os.chdir(pwd)
+        sys.stdout = old_stdout
 
-    def runTest(self):
-        basename = os.path.basename(self.__file)
+    def runTest():
+        basename = os.path.basename(filename)
         if basename.startswith('test_sa'):
-            sys.argv = ["runtest.py", "-Q", "-a", self.__file]
+            sys.argv = ["runtest.py", "-Q", "-a", filename]
         elif basename.startswith('test_metal'):
-            sys.argv = ["runtest.py", "-Q", "-m", self.__file]
+            sys.argv = ["runtest.py", "-Q", "-m", filename]
         else:
-            sys.argv = ["runtest.py", "-Q", self.__file]
-        pwd = os.getcwd()
+            sys.argv = ["runtest.py", "-Q", filename]
         try:
-            os.chdir(self.__dir)
-            old_stdout = sys.stdout
-            sys.stdout = StringIO()
             failed = zope.tal.runtest.main()
         finally:
             captured_stdout = sys.stdout.getvalue()
-            sys.stdout = old_stdout
-            os.chdir(pwd)
         if failed:
-            self.fail("output for %s didn't match:\n%s"
-                      % (self.__file, captured_stdout))
+            raise AssertionError("output for %s didn't match:\n%s"
+                                    % (filename, captured_stdout))
 
-try:
-    script = __file__
-except NameError:
-    script = sys.argv[0]
+    return unittest.FunctionTestCase(runTest, setUp, tearDown, short_path)
 
-def test_suite():
-    suite = unittest.TestSuite()
-    dir = os.path.dirname(script)
-    dir = os.path.abspath(dir)
-    parentdir = os.path.dirname(dir)
-    prefix = os.path.join(dir, "input", "test*.")
+
+def _find_files():
     if utils.skipxml:
         xmlargs = []
     else:
-        xmlargs = glob.glob(prefix + "xml")
-        xmlargs.sort()
-    htmlargs = glob.glob(prefix + "html")
-    htmlargs.sort()
+        xmlargs = sorted(glob.glob(PREFIX + "xml"))
+    htmlargs = sorted(glob.glob(PREFIX + "html"))
+
     args = xmlargs + htmlargs
     if not args:
         sys.stderr.write("Warning: no test input files found!!!\n")
-    for arg in args:
-        case = _FileTestCase(arg, parentdir)
-        suite.addTest(case)
-    return suite
+    return args
+
+# Nose doesn't handle 'test_suite' in the same was as zope.testrunner,
+# so we'll use its generator-as-test-factory feature.  See:
+# https://nose.readthedocs.org/en/latest/writing_tests.html#test-generators
+def test_for_nose_discovery():
+    for arg in _find_files():
+        yield _factory(arg, PARENTDIR)
+
+def test_suite():
+    return unittest.TestSuite(
+        [_factory(arg, PARENTDIR) for arg in _find_files()])
