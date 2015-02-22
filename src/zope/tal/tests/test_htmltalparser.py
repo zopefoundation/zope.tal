@@ -1018,8 +1018,3 @@ def test_suite():
     suite.addTest(unittest.makeSuite(METALGeneratorTestCases))
     suite.addTest(unittest.makeSuite(TALGeneratorTestCases))
     return suite
-
-
-if __name__ == "__main__":
-    errs = utils.run_suite(test_suite())
-    sys.exit(errs and 1 or 0)

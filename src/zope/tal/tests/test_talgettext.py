@@ -123,7 +123,3 @@ class test_POEngine(unittest.TestCase):
 def test_suite():
     suite = unittest.makeSuite(test_POEngine)
     return suite
-
-if __name__ == "__main__":
-    errs = utils.run_suite(test_suite())
-    sys.exit(errs and 1 or 0)

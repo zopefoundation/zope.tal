@@ -264,7 +264,3 @@ def test_suite(skipxml=utils.skipxml):
         return unittest.TestSuite()
     else:
         return unittest.makeSuite(XMLParserTestCase)
-
-if __name__ == "__main__":
-    errs = utils.run_suite(test_suite(skipxml=0))
-    sys.exit(errs and 1 or 0)

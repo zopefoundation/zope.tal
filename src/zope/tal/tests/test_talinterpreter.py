@@ -864,7 +864,3 @@ def test_suite():
     #suite.addTest(unittest.makeSuite(MacroFunkyErrorTest))
 
     return suite
-
-if __name__ == "__main__":
-    errs = utils.run_suite(test_suite())
-    sys.exit(errs and 1 or 0)
