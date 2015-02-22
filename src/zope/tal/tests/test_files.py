@@ -37,30 +37,28 @@ PREFIX = os.path.join(HERE, "input", "test*.")
 
 def _factory(filename, dirname):
 
-    old_stdout = sys.stdout
     pwd = os.getcwd()
     short_path = os.path.relpath(filename, os.path.dirname(__file__))
 
     def setUp():
         os.chdir(dirname)
-        sys.stdout = StringIO()
 
     def tearDown():
         os.chdir(pwd)
-        sys.stdout = old_stdout
 
     def runTest():
+        buf = StringIO()
         basename = os.path.basename(filename)
         if basename.startswith('test_sa'):
-            sys.argv = ["runtest.py", "-Q", "-a", filename]
+            argv = ["-Q", "-a", filename]
         elif basename.startswith('test_metal'):
-            sys.argv = ["runtest.py", "-Q", "-m", filename]
+            argv = ["-Q", "-m", filename]
         else:
-            sys.argv = ["runtest.py", "-Q", filename]
+            argv = ["-Q", filename]
         try:
-            failed = zope.tal.runtest.main()
+            failed = zope.tal.runtest.main(argv, buf)
         finally:
-            captured_stdout = sys.stdout.getvalue()
+            captured_stdout = buf.getvalue()
         if failed:
             raise AssertionError("output for %s didn't match:\n%s"
                                     % (filename, captured_stdout))

@@ -37,10 +37,10 @@ except ImportError:
 import zope.tal.driver
 import zope.tal.tests.utils
 
-def showdiff(a, b):
-    print(''.join(difflib.ndiff(a, b)))
+def showdiff(a, b, out):
+    print(''.join(difflib.ndiff(a, b)), file=out)
 
-def main():
+def main(argv=None, out=sys.stdout):
     parser = optparse.OptionParser('usage: %prog [options] [testfile ...]',
                                    description=__doc__)
     parser.add_option('-q', '--quiet', action='store_true',
@@ -58,7 +58,7 @@ def main():
     for option in zope.tal.driver.OPTIONS:
         driver_options.add_option(option)
     parser.add_option_group(driver_options)
-    opts, args = parser.parse_args()
+    opts, args = parser.parse_args(argv)
 
     if not args:
         here = os.path.dirname(__file__)
@@ -82,10 +82,10 @@ def main():
         if "_sa" in arg and not opts.annotate:
             locopts.append("-a")
         if not opts.unittesting:
-            print(arg, end=' ')
+            print(arg, end=' ', file=out)
             sys.stdout.flush()
         if zope.tal.tests.utils.skipxml and arg.endswith(".xml"):
-            print("SKIPPED (XML parser not available)")
+            print("SKIPPED (XML parser not available)", file=out)
             continue
         save = sys.stdout, sys.argv
         try:
@@ -100,13 +100,13 @@ def main():
         except:
             errors = 1
             if opts.quiet:
-                print(sys.exc_info()[0].__name__)
+                print(sys.exc_info()[0].__name__, file=out)
                 sys.stdout.flush()
             else:
                 if opts.unittesting:
-                    print()
+                    print('', file=out)
                 else:
-                    print("Failed:")
+                    print("Failed:", file=out)
                     sys.stdout.flush()
                 traceback.print_exc()
             continue
@@ -118,7 +118,7 @@ def main():
             f = open(outfile)
         except IOError:
             expected = None
-            print("(missing file %s)" % outfile, end=' ')
+            print("(missing file %s)" % outfile, end=' ', file=out)
         else:
             expected = f.readlines()
             f.close()
@@ -146,15 +146,15 @@ def main():
                 expected = [l.replace('\r\n', '\n') for l in expected]
         if actual == expected:
             if not opts.unittesting:
-                print("OK")
+                print("OK", file=out)
         else:
             if opts.unittesting:
-                print()
+                print('', file=out)
             else:
-                print("not OK")
+                print("not OK", file=out)
             errors = 1
             if not opts.quiet and expected is not None:
-                showdiff(expected, actual)
+                showdiff(expected, actual, out)
     if errors:
         if opts.unittesting:
             return 1
@@ -171,4 +171,4 @@ def readlines(f):
     return L
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
