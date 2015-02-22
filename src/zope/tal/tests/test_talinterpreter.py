@@ -71,7 +71,7 @@ class MacroErrorsTestCase(TestCaseBase):
         self.macro[0] = ("version", "duh")
 
 
-class MacroFunkyErrorTest(TestCaseBase):
+class _MacroFunkyErrorTest(TestCaseBase):
 
     def test_div_in_p_using_macro(self):
         dummy, macros = self._compile('<p metal:define-macro="M">Booh</p>')
@@ -130,7 +130,7 @@ class MacroExtendTestCase(TestCaseBase):
         self.assertEqual(actual, expected)
 
 
-class I18NCornerTestCaseBase(TestCaseBase):
+class _I18NCornerTestCaseBase(TestCaseBase):
 
     def factory(self, msgid, default, mapping={}):
         raise NotImplementedError("abstract method")
@@ -495,7 +495,7 @@ class I18NCornerTestCaseBase(TestCaseBase):
             r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
         self._check(program, u"<div>FOO \u00C0</div>")
 
-class I18NCornerTestCaseMessage(I18NCornerTestCaseBase):
+class I18NCornerTestCaseMessage(_I18NCornerTestCaseBase):
 
     def factory(self, msgid, default=None, mapping={}, domain=None):
         return Message(msgid, domain=domain, default=default, mapping=mapping)
@@ -862,5 +862,5 @@ def test_suite():
         # TODO: Deactivated test, since we have not found a solution for this
         # and it is a deep and undocumented HTML parser issue.
         # Fred is looking into this.
-        #unittest.makeSuite(MacroFunkyErrorTest),
+        #unittest.makeSuite(_MacroFunkyErrorTest),
     ))

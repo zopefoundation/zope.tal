@@ -31,7 +31,7 @@ import zope.tal.runtest
 from zope.tal.tests import utils
 
 
-class FileTestCase(unittest.TestCase):
+class _FileTestCase(unittest.TestCase):
 
     def __init__(self, file, dir):
         self.__file = file
@@ -92,6 +92,6 @@ def test_suite():
     if not args:
         sys.stderr.write("Warning: no test input files found!!!\n")
     for arg in args:
-        case = FileTestCase(arg, parentdir)
+        case = _FileTestCase(arg, parentdir)
         suite.addTest(case)
     return suite
