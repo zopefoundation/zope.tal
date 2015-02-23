@@ -20,7 +20,7 @@ import time
 
 from cStringIO import StringIO
 
-from zope.tal.driver import FILE, compilefile, interpretit
+from zope.tal.driver import compilefile, interpretit
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
         if o == "-n":
             count = int(a)
     if not args:
-        args = [FILE]
+        raise ValueError("No args")
     for file in args:
         print(file)
         dummyfile = StringIO()
