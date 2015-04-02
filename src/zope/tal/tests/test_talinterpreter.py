@@ -15,6 +15,7 @@
 """Tests for TALInterpreter.
 """
 import os
+import platform
 import sys
 import unittest
 
@@ -24,6 +25,8 @@ try:
 except ImportError:
     # Python 3.x
     from io import StringIO
+
+IS_PYPY = platform.python_implementation() == 'PyPy'
 
 from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
 from zope.tal.taldefs import TALExpressionError
@@ -708,7 +711,7 @@ class OutputPresentationTestCase(TestCaseBase):
         self.compare(INPUT, EXPECTED)
 
     def test_entities(self):
-        if sys.version_info < (3, 0):
+        if IS_PYPY or sys.version_info < (3, 0):
             # HTMLParser.HTMLParser in Python 2.x parses "&#45" as "&#45"
             INPUT = ('<img tal:define="foo nothing" '
                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
