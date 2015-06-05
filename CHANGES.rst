@@ -72,14 +72,14 @@ Changes
 3.5.1 (2009-03-08)
 ------------------
 
-- Updated tests of "bad" entities for compatibility with the stricter
+- Update tests of "bad" entities for compatibility with the stricter
   HTMLParser module shipped with Python 2.6.x.
 
 
 3.5.0 (2008-06-06)
 ------------------
 
-- Removed artificial addition of a trailing newline if the output doesn't end
+- Remove artificial addition of a trailing newline if the output doesn't end
   in one; this allows the template source to be the full specification of what
   should be included.
   (See https://bugs.launchpad.net/launchpad/+bug/218706.)
