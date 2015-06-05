@@ -31,7 +31,7 @@ except ImportError:
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talgettext import POTALInterpreter
 from zope.tal.talgettext import POEngine
-from zope.tal.tests import utils
+from . import _u
 
 class test_POEngine(unittest.TestCase):
     """Test the PO engine functionality, which simply adds items to a catalog
@@ -75,10 +75,10 @@ class test_POEngine(unittest.TestCase):
         engine.file = 'psc_release_listing.pt'
         # position is position in file.
         engine.translate('foo', 'domain',
-                         default=u'Read more\u2026', position=7)
+                         default=_u('Read more\u2026'), position=7)
         # Adding the same key with the same default is fine.
         engine.translate('foo', 'domain',
-                         default=u'Read more\u2026', position=13)
+                         default=_u('Read more\u2026'), position=13)
         # Adding the same key with a different default is bad and
         # triggers a warning.
         with warnings.catch_warnings(record=True) as log:

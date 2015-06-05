@@ -8,6 +8,7 @@ Changes
   argument (passed to ``HTMLParser``).  Also ensures that upcoming change
   to the default in Python 3.5 will not affect us.
 
+- Add support for Python 3.2 and PyPy3.
 
 4.1.0 (2014-12-19)
 ------------------
@@ -114,6 +115,6 @@ Changes
   ``zope.security``.
 
 .. note::
-   
+
    Changes before 3.4.0b1 where not tracked as an individual
    package and have been documented in the Zope 3 changelog.

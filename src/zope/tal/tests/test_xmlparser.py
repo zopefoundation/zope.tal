@@ -18,6 +18,7 @@ import unittest
 
 from zope.tal import xmlparser
 from zope.tal.tests import utils
+from . import _u
 
 
 class EventCollector(xmlparser.XMLParser):
@@ -252,10 +253,10 @@ text
         self._parse_error("<!DOCTYPE foo $ >")
 
     def test_unicode_string(self):
-        output = [('starttag', u'p', []),
-                  ('data', u'\xe4\xf6\xfc\xdf'),
-                  ('endtag', u'p')]
-        self._run_check(u'<p>\xe4\xf6\xfc\xdf</p>', output)
+        output = [('starttag', _u('p'), []),
+                  ('data', _u('\xe4\xf6\xfc\xdf')),
+                  ('endtag', _u('p'))]
+        self._run_check(_u('<p>\xe4\xf6\xfc\xdf</p>'), output)
 
 
 # Support for the Zope regression test framework:

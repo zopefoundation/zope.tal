@@ -26,8 +26,10 @@ from zope.tal.translationcontext import TranslationContext
 
 try:
     unicode
+    _BLANK = unicode('')
 except NameError:
     unicode = str # Python 3.x
+    _BLANK = ''
 
 
 # Avoid constructing this tuple over and over
@@ -1025,7 +1027,7 @@ class FasterStringIO(list):
             self.append(value)
 
     def getvalue(self):
-        return u''.join(self)
+        return _BLANK.join(self)
 
 
 def _write_ValueError(s):
