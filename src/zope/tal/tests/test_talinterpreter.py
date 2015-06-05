@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-1 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2001, 2002 Zope Foundation and Contributors.
@@ -37,6 +37,7 @@ from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
 from zope.tal.tests import utils
+from . import _u
 from zope.i18nmessageid import Message
 
 
@@ -361,7 +362,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
     def test_for_correct_msgids(self):
         self.engine.translationDomain.clearMsgids()
         result = StringIO()
-        #GChapelle: 
+        #GChapelle:
         #I have the feeling the i18n:translate with the i18n:name is wrong
         #
         #program, macros = self._compile(
@@ -487,16 +488,17 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text for ${bar}.', msgids[1][0])
         self.assertEqual({'bar': '<pre> \tBAR\n </pre>'}, msgids[1][1])
         self.assertEqual(
-            u'<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>',
+            _u('<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>'),
             result.getvalue())
 
-    def test_for_handling_unicode_vars(self):
-        # Make sure that non-ASCII Unicode is substituted correctly.
-        # http://collector.zope.org/Zope3-dev/264
-        program, macros = self._compile(
-            r'''<div i18n:translate='' tal:define='bar python:u"\u00C0"'>'''
-            r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
-        self._check(program, u"<div>FOO \u00C0</div>")
+    if sys.version_info[:2] != (3,2) or IS_PYPY:
+        def test_for_handling_unicode_vars(self):
+            # Make sure that non-ASCII Unicode is substituted correctly.
+            # http://collector.zope.org/Zope3-dev/264
+            program, macros = self._compile(
+                r'''<div i18n:translate='' tal:define='bar python:u"\u00C0"'>'''
+                r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
+            self._check(program, _u("<div>FOO \u00C0</div>"))
 
 class I18NCornerTestCaseMessage(_I18NCornerTestCaseBase):
 
@@ -551,7 +553,7 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
         self._check(program, '<div>tolower</div>')
 
     def test_unused_explicit_domain(self):
-        #a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine 
+        #a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine
         #is a domain that transforms to lowercase
         self.engine.setLocal('othertolower',
             self.factory('OtherToLower', 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine', {}, domain='lower'))
@@ -691,28 +693,29 @@ class OutputPresentationTestCase(TestCaseBase):
         </html>'''
         self.compare(INPUT, EXPECTED)
 
-    def test_unicode_content(self):
-        INPUT = """<p tal:content="python:u'dÈj‡-vu'">para</p>"""
-        EXPECTED = u"""<p>dÈj‡-vu</p>"""
-        self.compare(INPUT, EXPECTED)
+    if sys.version_info[:2] != (3,2) or IS_PYPY:
+        def test_unicode_content(self):
+            INPUT = """<p tal:content="python:u'd√©j√†-vu'">para</p>"""
+            EXPECTED = _u("""<p>d√©j√†-vu</p>""")
+            self.compare(INPUT, EXPECTED)
 
-    def test_unicode_structure(self):
-        INPUT = """<p tal:replace="structure python:u'dÈj‡-vu'">para</p>"""
-        EXPECTED = u"""dÈj‡-vu"""
-        self.compare(INPUT, EXPECTED)
+        def test_unicode_structure(self):
+            INPUT = """<p tal:replace="structure python:u'd√©j√†-vu'">para</p>"""
+            EXPECTED = _u("""d√©j√†-vu""")
+            self.compare(INPUT, EXPECTED)
 
     def test_i18n_replace_number(self):
         INPUT = """
         <p i18n:translate="foo ${bar}">
         <span tal:replace="python:123" i18n:name="bar">para</span>
         </p>"""
-        EXPECTED = u"""
-        <p>FOO 123</p>"""
+        EXPECTED = _u("""
+        <p>FOO 123</p>""")
         self.compare(INPUT, EXPECTED)
 
     def test_entities(self):
-        if IS_PYPY or sys.version_info < (3, 0):
-            # HTMLParser.HTMLParser in Python 2.x parses "&#45" as "&#45"
+        if IS_PYPY or sys.version_info[:2] <= (3, 2):
+            # HTMLParser.HTMLParser in Python 2.x--3.2 parses "&#45" as "&#45"
             INPUT = ('<img tal:define="foo nothing" '
                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
