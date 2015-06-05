@@ -1,7 +1,7 @@
 Changes
 =======
 
-4.1.1 (unreleased)
+4.1.1 (2015-06-05)
 ------------------
 
 - Suppress deprecation under Python 3.4 for default ``convert_charrefs``
