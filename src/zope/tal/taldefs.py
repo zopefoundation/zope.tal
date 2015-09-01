@@ -61,6 +61,8 @@ KNOWN_I18N_ATTRIBUTES = frozenset([
     "attributes",
     "data",
     "name",
+    "ignore",
+    "ignore-attributes",
     ])
 
 class TALError(Exception):
