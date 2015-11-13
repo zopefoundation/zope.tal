@@ -7,6 +7,8 @@ Changes
 - Accept and ignore ``i18n:ignore`` and ``i18n:ignore-attributes`` attributes.
   For compatibility with other tools (such as ``i18ndude``).
 
+- Claim support for Python 3.5.
+
 4.1.1 (2015-06-05)
 ------------------
 
