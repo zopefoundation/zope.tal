@@ -1,6 +1,10 @@
 ``zope.tal``
 ============
 
+.. image:: https://img.shields.io/pypi/v/zope.tal.svg
+    :target: https://pypi.python.org/pypi/zope.tal/
+    :alt: Latest Version
+
 .. image:: https://travis-ci.org/zopefoundation/zope.tal.png?branch=master
         :target: https://travis-ci.org/zopefoundation/zope.tal
 

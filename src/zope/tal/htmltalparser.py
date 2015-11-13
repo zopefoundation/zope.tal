@@ -20,7 +20,26 @@ try:
     from HTMLParser import HTMLParser, HTMLParseError
 except ImportError:
     # Python 3.x
-    from html.parser import HTMLParser, HTMLParseError
+    from html.parser import HTMLParser
+    try:
+        from html.parser import HTMLParseError
+    except ImportError:
+        # Python 3.5 removed it, but we need it as a base class
+        # so here's a copy taken from Python 3.4:
+        class HTMLParseError(Exception):
+            def __init__(self, msg, position=(None, None)):
+                assert msg
+                self.msg = msg
+                self.lineno = position[0]
+                self.offset = position[1]
+
+            def __str__(self):
+                result = self.msg
+                if self.lineno is not None:
+                    result = result + ", at line %d" % self.lineno
+                if self.offset is not None:
+                    result = result + ", column %d" % (self.offset + 1)
+                return result
 
 from zope.tal.taldefs import (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS,
                               METALError, TALError, I18NError)
