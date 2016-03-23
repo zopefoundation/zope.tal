@@ -1,13 +1,15 @@
 Changes
 =======
 
-4.1.2 (unreleased)
+4.2.0 (unreleased)
 ------------------
+
+- Drop support for Python 2.6 and 3.2.
 
 - Accept and ignore ``i18n:ignore`` and ``i18n:ignore-attributes`` attributes.
   For compatibility with other tools (such as ``i18ndude``).
 
-- Claim support for Python 3.5.
+- Add support for Python 3.5.
 
 4.1.1 (2015-06-05)
 ------------------
