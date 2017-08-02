@@ -13,12 +13,10 @@
 ##############################################################################
 """Tests for XMLParser.py.
 """
-import sys
 import unittest
 
 from zope.tal import xmlparser
 from zope.tal.tests import utils
-from . import _u
 
 
 class EventCollector(xmlparser.XMLParser):
@@ -98,7 +96,7 @@ class SegmentedFile(object):
             s = b''
         return s
 
-
+@unittest.skipIf(utils.skipxml, "Skip XML defined")
 class XMLParserTestCase(unittest.TestCase):
 
     def _run_check(self, source, events, collector=EventCollector):
@@ -141,7 +139,7 @@ text
     ("decl", "1.0", "iso-8859-1", -1),
     ("doctype", "html", "foo", "bar", 0),
     ("starttag", "html", []),
-#    ("entityref", "entity"),
+    # ("entityref", "entity"),
     ("data", " \n"),
     ("comment", "comment1a\n-></foo><bar>&lt;<?pi?></foo<bar\ncomment1b"),
     ("data", "\n"),
@@ -154,37 +152,37 @@ text
     ])
 
     def test_bad_nesting(self):
-        try:
+        with self.assertRaises(Exception) as e:
             self._run_check("<a><b></a></b>", [
                 ("starttag", "a", []),
                 ("starttag", "b", []),
                 ("endtag", "a"),
                 ("endtag", "b"),
                 ])
-        except:
-            e = sys.exc_info()[1]
-            self.assertEqual(e.lineno, 1,
-                             "did not receive correct position information")
-        else:
-            self.fail("expected parse error: bad nesting")
+
+        e = e.exception
+        self.assertEqual(e.lineno, 1,
+                         "did not receive correct position information")
 
     def test_attr_syntax(self):
         output = [
-          ("starttag", "a", ["b", "v", "c", "v"]),
-          ("endtag", "a"),
-          ]
+            ("starttag", "a", ["b", "v", "c", "v"]),
+            ("endtag", "a"),
+        ]
         self._run_check("""<a b='v' c="v"/>""", output)
         self._run_check("""<a  b = 'v' c = "v"/>""", output)
         self._run_check("""<a\nb\n=\n'v'\nc\n=\n"v"\n/>""", output)
         self._run_check("""<a\tb\t=\t'v'\tc\t=\t"v"\t/>""", output)
 
     def test_attr_values(self):
-        self._run_check("""<a b='xxx\n\txxx' c="yyy\t\nyyy" d='\txyz\n'/>""",
-                        [("starttag", "a", ["b", "xxx  xxx",
-                                            "c", "yyy  yyy",
-                                            "d", " xyz "]),
-                         ("endtag", "a"),
-                         ])
+        self._run_check(
+            """<a b='xxx\n\txxx' c="yyy\t\nyyy" d='\txyz\n'/>""",
+            [("starttag", "a", ["b", "xxx  xxx",
+                                "c", "yyy  yyy",
+                                "d", " xyz "]),
+             ("endtag", "a"),
+            ]
+        )
         self._run_check("""<a b='' c="" d=''/>""", [
             ("starttag", "a", ["b", "", "c", "", "d", ""]),
             ("endtag", "a"),
@@ -253,15 +251,12 @@ text
         self._parse_error("<!DOCTYPE foo $ >")
 
     def test_unicode_string(self):
-        output = [('starttag', _u('p'), []),
-                  ('data', _u('\xe4\xf6\xfc\xdf')),
-                  ('endtag', _u('p'))]
-        self._run_check(_u('<p>\xe4\xf6\xfc\xdf</p>'), output)
+        output = [('starttag', u'p', []),
+                  ('data', u'\xe4\xf6\xfc\xdf'),
+                  ('endtag', u'p')]
+        self._run_check(u'<p>\xe4\xf6\xfc\xdf</p>', output)
 
 
 # Support for the Zope regression test framework:
-def test_suite(skipxml=utils.skipxml):
-    if skipxml:
-        return unittest.TestSuite()
-    else:
-        return unittest.makeSuite(XMLParserTestCase)
+def test_suite():
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)

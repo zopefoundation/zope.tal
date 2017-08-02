@@ -16,7 +16,6 @@
 
 from __future__ import print_function
 
-import sys
 import tempfile
 import unittest
 import warnings
@@ -31,7 +30,6 @@ except ImportError:
 from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talgettext import POTALInterpreter
 from zope.tal.talgettext import POEngine
-from . import _u
 
 class test_POEngine(unittest.TestCase):
     """Test the PO engine functionality, which simply adds items to a catalog
@@ -47,9 +45,10 @@ class test_POEngine(unittest.TestCase):
             engine.translate(key, 'domain')
 
         for key in test_keys:
-            self.assertTrue(key in engine.catalog['domain'],
-                        "POEngine catalog does not properly store message ids"
-                        )
+            self.assertIn(
+                key, engine.catalog['domain'],
+                "POEngine catalog does not properly store message ids"
+            )
 
     def test_translate_existing(self):
         engine = POEngine()
@@ -75,10 +74,10 @@ class test_POEngine(unittest.TestCase):
         engine.file = 'psc_release_listing.pt'
         # position is position in file.
         engine.translate('foo', 'domain',
-                         default=_u('Read more\u2026'), position=7)
+                         default=u'Read more\u2026', position=7)
         # Adding the same key with the same default is fine.
         engine.translate('foo', 'domain',
-                         default=_u('Read more\u2026'), position=13)
+                         default=u'Read more\u2026', position=13)
         # Adding the same key with a different default is bad and
         # triggers a warning.
         with warnings.catch_warnings(record=True) as log:
@@ -116,9 +115,9 @@ class test_POEngine(unittest.TestCase):
             msgids += list(domain)
         msgids.sort()
         self.assertEqual(msgids,
-            ['A <a href="${DYNAMIC_CONTENT}">link</a>.',
-            'Some ${DYNAMIC_CONTENT} text.'])
+                         ['A <a href="${DYNAMIC_CONTENT}">link</a>.',
+                          'Some ${DYNAMIC_CONTENT} text.'])
 
 
 def test_suite():
-    return unittest.makeSuite(test_POEngine)
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)

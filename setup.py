@@ -42,8 +42,13 @@ def alltests():
     suites = list(find_suites(options))
     return TestSuite(suites)
 
+TESTS_REQUIRE = [
+    'zope.testing',
+    'zope.testrunner',
+]
+
 setup(name='zope.tal',
-      version='4.2.1.dev0',
+      version='4.3.0.dev0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
@@ -51,9 +56,9 @@ setup(name='zope.tal',
           read('README.rst')
           + '\n\n' +
           read('CHANGES.rst')
-          ),
-      keywords = "zope template xml tal",
-      classifiers = [
+      ),
+      keywords="zope template xml tal",
+      classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Web Environment',
           'Intended Audience :: Developers',
@@ -62,29 +67,31 @@ setup(name='zope.tal',
           'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: Implementation :: CPython',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Natural Language :: English',
           'Operating System :: OS Independent',
           'Topic :: Internet :: WWW/HTTP',
-          'Framework :: Zope3'],
-      url='http://pypi.python.org/pypi/zope.tal',
+          'Framework :: Zope3',
+      ],
+      url='http://github.com/zopefoundation/zope.tal',
       license='ZPL 2.1',
       packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       namespace_packages=['zope'],
-      extras_require = dict(
-          test=['zope.testing',
-                ]),
+      extras_require={
+          'test': TESTS_REQUIRE,
+      },
       test_suite="__main__.alltests", # to support "setup.py test"
-      tests_require=['zope.testrunner'],
-      install_requires=['setuptools',
-                        'zope.i18nmessageid',
-                        'zope.interface',
-                       ],
-      include_package_data = True,
-      zip_safe = False,
-      )
+      tests_require=TESTS_REQUIRE,
+      install_requires=[
+          'setuptools',
+          'zope.i18nmessageid',
+          'zope.interface',
+      ],
+      include_package_data=True,
+      zip_safe=False,
+)

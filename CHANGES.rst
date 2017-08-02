@@ -1,13 +1,16 @@
-Changes
-=======
+=========
+ Changes
+=========
 
-4.2.1 (unreleased)
-------------------
+4.3.0 (unreleased)
+==================
 
-- TBD
+- Drop support for Python 3.3.
+
+- Add support for Python 3.6.
 
 4.2.0 (2016-04-12)
-------------------
+==================
 
 - Drop support for Python 2.6 and 3.2.
 
@@ -17,7 +20,7 @@ Changes
 - Add support for Python 3.5.
 
 4.1.1 (2015-06-05)
-------------------
+==================
 
 - Suppress deprecation under Python 3.4 for default ``convert_charrefs``
   argument (passed to ``HTMLParser``).  Also ensures that upcoming change
@@ -26,7 +29,7 @@ Changes
 - Add support for Python 3.2 and PyPy3.
 
 4.1.0 (2014-12-19)
-------------------
+==================
 
 .. note::
 
@@ -39,13 +42,13 @@ Changes
 
 
 4.0.0 (2014-01-13)
-------------------
+==================
 
 - Fix possible UnicodeDecodeError in warning when msgid already exists.
 
 
 4.0.0a1 (2013-02-15)
---------------------
+====================
 
 - Replace deprecated ``zope.interface.implements`` usage with equivalent
   ``zope.interface.implementer`` decorator.
@@ -59,7 +62,7 @@ Changes
 
 
 3.6.1 (2012-03-09)
-------------------
+==================
 
 - Avoid handling end tags within <script> tags in the HTML parser. This works
   around http://bugs.python.org/issue670664
@@ -67,7 +70,7 @@ Changes
 - Fix documentation link in README.txt.
 
 3.6.0 (2011-08-20)
-------------------
+==================
 
 - Update `talinterpreter.FasterStringIO` to faster list-based implementation.
 
@@ -78,21 +81,21 @@ Changes
 
 
 3.5.2 (2009-10-31)
-------------------
+==================
 
 - In ``talgettext.POEngine.translate``, print a warning if a msgid already
   exists in the domain with a different default.
 
 
 3.5.1 (2009-03-08)
-------------------
+==================
 
 - Update tests of "bad" entities for compatibility with the stricter
   HTMLParser module shipped with Python 2.6.x.
 
 
 3.5.0 (2008-06-06)
-------------------
+==================
 
 - Remove artificial addition of a trailing newline if the output doesn't end
   in one; this allows the template source to be the full specification of what
@@ -101,7 +104,7 @@ Changes
 
 
 3.4.1 (2007-11-16)
-------------------
+==================
 
 - Remove unnecessary ``dummyengine`` dependency on zope.i18n to
   simplify distribution.  The ``dummyengine.DummyTranslationDomain``
@@ -117,13 +120,13 @@ Changes
 
 
 3.4.0 (2007-10-03)
-------------------
+==================
 
 - Update package meta-data.
 
 
 3.4.0b1
--------
+=======
 
 - Update dependency on ``zope.i18n`` to a verions requiring the correct
   version of ``zope.security``, avoiding a hidden dependency issue in
