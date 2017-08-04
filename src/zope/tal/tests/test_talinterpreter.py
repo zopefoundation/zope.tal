@@ -15,7 +15,7 @@
 """Tests for TALInterpreter.
 """
 import os
-import platform
+
 import sys
 import unittest
 
@@ -26,7 +26,6 @@ except ImportError:
     # Python 3.x
     from io import StringIO
 
-IS_PYPY = platform.python_implementation() == 'PyPy'
 
 from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
 from zope.tal.taldefs import TALExpressionError
@@ -36,8 +35,6 @@ from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
-from zope.tal.tests import utils
-from . import _u
 from zope.i18nmessageid import Message
 
 
@@ -61,12 +58,8 @@ class MacroErrorsTestCase(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine)
 
     def tearDown(self):
-        try:
+        with self.assertRaises(METALError):
             self.interpreter()
-        except METALError:
-            pass
-        else:
-            self.fail("Expected METALError")
 
     def test_mode_error(self):
         self.macro[1] = ("mode", "duh")
@@ -75,9 +68,13 @@ class MacroErrorsTestCase(TestCaseBase):
         self.macro[0] = ("version", "duh")
 
 
-class _MacroFunkyErrorTest(TestCaseBase):
+class TestMacroFunkyError(TestCaseBase):
 
+    @unittest.expectedFailure
     def test_div_in_p_using_macro(self):
+        # We have not found a solution for this
+        # and it is a deep and undocumented HTML parser issue.
+        # Fred is looking into this.
         dummy, macros = self._compile('<p metal:define-macro="M">Booh</p>')
         engine = DummyEngine(macros)
         program, dummy = self._compile(
@@ -96,19 +93,18 @@ class MacroExtendTestCase(TestCaseBase):
         s = self._read(('input', 'acme_template.pt'))
         self.acme_program, acme_macros = self._compile(s)
         s = self._read(('input', 'document_list.pt'))
-        self.doclist_program, doclist_macros = self._compile(s)
+        self.doclist_program, _doclist_macros = self._compile(s)
         macros = {
             'pnome_macros_page': pnome_macros['page'],
             'acme_macros_page': acme_macros['page'],
-            }
+        }
         self.engine = DummyEngine(macros)
 
     def _read(self, path):
         dir = os.path.dirname(__file__)
         fn = os.path.join(dir, *path)
-        f = open(fn)
-        data = f.read()
-        f.close()
+        with open(fn) as f:
+            data = f.read()
         return data
 
     def test_preview_acme_template(self):
@@ -134,16 +130,18 @@ class MacroExtendTestCase(TestCaseBase):
         self.assertEqual(actual, expected)
 
 
-class _I18NCornerTestCaseBase(TestCaseBase):
+class I18NCornerTestCaseMessage(TestCaseBase):
 
-    def factory(self, msgid, default, mapping={}):
-        raise NotImplementedError("abstract method")
+    interpreter = None
+
+    def factory(self, msgid, default=None, mapping=None, domain=None):
+        return Message(msgid, domain=domain, default=default, mapping=mapping or {})
 
     def setUp(self):
         self.engine = DummyEngine()
         # Make sure we'll translate the msgid not its unicode representation
         self.engine.setLocal('foo',
-            self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
+                             self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
         self.engine.setLocal('bar', 'BaRvAlUe')
 
     def _check(self, program, expected):
@@ -156,114 +154,114 @@ class _I18NCornerTestCaseBase(TestCaseBase):
     def test_simple_messageid_translate(self):
         # This test is mainly here to make sure our DummyEngine works
         # correctly.
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:content="foo"/>')
         self._check(program, '<span>FOOVALUE</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:replace="foo"/>')
         self._check(program, 'FOOVALUE')
 
         # i18n messages defined in Python are translated automatically
         # (no i18n:translate necessary)
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:content="foo" />')
         self._check(program, '<span>FOOVALUE</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:replace="foo" />')
         self._check(program, 'FOOVALUE')
 
     def test_attributes_translation(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:attributes="test bar"/>')
         self._check(program, '<span test="BaRvAlUe" />')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span test="bar" i18n:attributes="test"/>')
         self._check(program, '<span test="BAR" />')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:attributes="test bar" i18n:attributes="test"/>')
         self._check(program, '<span test="BARVALUE" />')
 
         # i18n messages defined in Python are translated automatically
         # (no i18n:attributes necessary)
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:attributes="test foo"/>')
         self._check(program, '<span test="FOOVALUE" />')
 
     def test_text_variable_translate(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:content="bar"/>')
         self._check(program, '<span>BaRvAlUe</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:content="bar"/>')
         self._check(program, '<span>BARVALUE</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:replace="bar"/>')
         self._check(program, 'BARVALUE')
 
     def test_text_translate(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:content="string:BaR"/>')
         self._check(program, '<span>BaR</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:content="string:BaR"/>')
         self._check(program, '<span>BAR</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:replace="string:BaR"/>')
         self._check(program, 'BAR')
 
     def test_structure_text_variable_translate(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:content="structure bar"/>')
         self._check(program, '<span>BaRvAlUe</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:content="structure bar"/>')
         self._check(program, '<span>BARVALUE</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:replace="structure bar"/>')
         self._check(program, 'BARVALUE')
 
         # i18n messages defined in Python are translated automatically
         # (no i18n:translate necessary)
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:content="structure foo"/>')
         self._check(program, '<span>FOOVALUE</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:replace="structure foo"/>')
         self._check(program, 'FOOVALUE')
 
     def test_structure_text_translate(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span tal:content="structure string:BaR"/>')
         self._check(program, '<span>BaR</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:content="structure string:BaR"/>')
         self._check(program, '<span>BAR</span>')
 
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<span i18n:translate="" tal:replace="structure string:BaR"/>')
         self._check(program, 'BAR')
 
     def test_replace_with_messageid_and_i18nname(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="" >'
             '<span i18n:translate="" tal:replace="foo" i18n:name="foo_name"/>'
             '</div>')
         self._check(program, '<div>FOOVALUE</div>')
 
     def test_pythonexpr_replace_with_messageid_and_i18nname(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="" >'
             '<span i18n:translate="" tal:replace="python: foo"'
             '    i18n:name="foo_name"/>'
@@ -271,7 +269,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         self._check(program, '<div>FOOVALUE</div>')
 
     def test_structure_replace_with_messageid_and_i18nname(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="" >'
             '<span i18n:translate="" tal:replace="structure foo"'
             '    i18n:name="foo_name"/>'
@@ -279,7 +277,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         self._check(program, '<div>FOOVALUE</div>')
 
     def test_complex_replace_with_messageid_and_i18nname(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="" >'
             '<em tal:omit-tag="" i18n:name="foo_name">'
             '<span i18n:translate="" tal:replace="foo"/>'
@@ -288,7 +286,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         self._check(program, '<div>FOOVALUE</div>')
 
     def test_content_with_messageid_and_i18nname(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="" >'
             '<span i18n:translate="" tal:content="foo" i18n:name="foo_name"/>'
             '</div>')
@@ -313,13 +311,13 @@ class _I18NCornerTestCaseBase(TestCaseBase):
             '<span i18n:translate="" i18n:name="color_name">green</span>')
 
     def test_translate_static_text_as_dynamic(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="">This is text for '
             '<span tal:content="bar" i18n:name="bar_name"/>.'
             '</div>')
         self._check(program,
                     '<div>THIS IS TEXT FOR <span>BaRvAlUe</span>.</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="">This is text for '
             '<span i18n:translate="" tal:content="bar" i18n:name="bar_name"/>.'
             '</div>')
@@ -327,35 +325,36 @@ class _I18NCornerTestCaseBase(TestCaseBase):
                     '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>')
 
     def test_translate_static_text_as_dynamic_from_bytecode(self):
-        program =  [('version', TAL_VERSION),
- ('mode', 'html'),
-('setPosition', (1, 0)),
-('beginScope', {'i18n:translate': ''}),
-('startTag', ('div', [('i18n:translate', '', 'i18n')])),
-('insertTranslation',
- ('',
-  [('rawtextOffset', ('This is text for ', 17)),
-   ('setPosition', (1, 40)),
-   ('beginScope',
-    {'tal:content': 'bar', 'i18n:name': 'bar_name', 'i18n:translate': ''}),
-   ('i18nVariable',
-       ('bar_name',
-        [('startTag',
-           ('span',
-            [('i18n:translate', '', 'i18n'),
-             ('tal:content', 'bar', 'tal'),
-             ('i18n:name', 'bar_name', 'i18n')])),
-         ('insertTranslation',
-           ('',
-             [('insertText', ('$bar$', []))])),
-         ('rawtextOffset', ('</span>', 7))],
-        None,
-        0)),
-   ('endScope', ()),
-   ('rawtextOffset', ('.', 1))])),
-('endScope', ()),
-('rawtextOffset', ('</div>', 6))
-]
+        program = [
+            ('version', TAL_VERSION),
+            ('mode', 'html'),
+            ('setPosition', (1, 0)),
+            ('beginScope', {'i18n:translate': ''}),
+            ('startTag', ('div', [('i18n:translate', '', 'i18n')])),
+            ('insertTranslation',
+             ('',
+              [('rawtextOffset', ('This is text for ', 17)),
+               ('setPosition', (1, 40)),
+               ('beginScope',
+                {'tal:content': 'bar', 'i18n:name': 'bar_name', 'i18n:translate': ''}),
+               ('i18nVariable',
+                ('bar_name',
+                 [('startTag',
+                   ('span',
+                    [('i18n:translate', '', 'i18n'),
+                     ('tal:content', 'bar', 'tal'),
+                     ('i18n:name', 'bar_name', 'i18n')])),
+                  ('insertTranslation',
+                   ('',
+                    [('insertText', ('$bar$', []))])),
+                  ('rawtextOffset', ('</span>', 7))],
+                 None,
+                 0)),
+               ('endScope', ()),
+               ('rawtextOffset', ('.', 1))])),
+            ('endScope', ()),
+            ('rawtextOffset', ('</div>', 6))
+        ]
         self._check(program,
                     '<div>THIS IS TEXT FOR <span>BARVALUE</span>.</div>')
 
@@ -369,7 +368,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         #    '<div i18n:translate="">This is text for '
         #    '<span i18n:translate="" tal:content="bar" '
         #    'i18n:name="bar_name"/>.</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="">This is text for '
             '<span tal:content="bar" '
             'i18n:name="bar_name"/>.</div>')
@@ -388,7 +387,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
     def test_for_correct_msgids_translate_name(self):
         self.engine.translationDomain.clearMsgids()
         result = StringIO()
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate="">This is text for '
             '<span i18n:translate="" tal:content="bar" '
             'i18n:name="bar_name"/>.</div>')
@@ -409,7 +408,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         # on the same element
         self.engine.translationDomain.clearMsgids()
         result = StringIO()
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<p i18n:translate="">'
             'Some static text and a <a tal:attributes="href string:url"'
             ' i18n:name="link" i18n:translate="">link text</a>.</p>')
@@ -432,7 +431,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         # HTML mode
         self.engine.translationDomain.clearMsgids()
         result = StringIO()
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""> This is text\n'
             ' \tfor\n div. </div>'
             '<pre i18n:translate=""> This is text\n'
@@ -459,7 +458,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
             '<pre xmlns:i18n="http://xml.zope.org/namespaces/i18n"'
             ' i18n:translate=""> This is text\n'
             ' <b>\tfor</b>\n barvalue. </pre>')
-        program, macros = parser.getCode()
+        program, _macros = parser.getCode()
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
@@ -475,7 +474,7 @@ class _I18NCornerTestCaseBase(TestCaseBase):
     def test_raw_msgids_and_i18ntranslate_i18nname(self):
         self.engine.translationDomain.clearMsgids()
         result = StringIO()
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""> This is text\n \tfor\n'
             '<pre i18n:name="bar" i18n:translate=""> \tbar\n </pre>.</div>')
         self.interpreter = TALInterpreter(program, {}, self.engine,
@@ -488,22 +487,17 @@ class _I18NCornerTestCaseBase(TestCaseBase):
         self.assertEqual('This is text for ${bar}.', msgids[1][0])
         self.assertEqual({'bar': '<pre> \tBAR\n </pre>'}, msgids[1][1])
         self.assertEqual(
-            _u('<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>'),
+            (u'<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>'),
             result.getvalue())
 
-    if sys.version_info[:2] != (3,2) or IS_PYPY:
-        def test_for_handling_unicode_vars(self):
-            # Make sure that non-ASCII Unicode is substituted correctly.
-            # http://collector.zope.org/Zope3-dev/264
-            program, macros = self._compile(
-                r'''<div i18n:translate='' tal:define='bar python:u"\u00C0"'>'''
-                r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
-            self._check(program, _u("<div>FOO \u00C0</div>"))
+    def test_for_handling_unicode_vars(self):
+        # Make sure that non-ASCII Unicode is substituted correctly.
+        # http://collector.zope.org/Zope3-dev/264
+        program, _macros = self._compile(
+            r'''<div i18n:translate='' tal:define='bar python:u"\u00C0"'>'''
+            r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
+        self._check(program, (u"<div>FOO \u00C0</div>"))
 
-class I18NCornerTestCaseMessage(_I18NCornerTestCaseBase):
-
-    def factory(self, msgid, default=None, mapping={}, domain=None):
-        return Message(msgid, domain=domain, default=default, mapping=mapping)
 
 class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
 
@@ -512,40 +506,40 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
         # where default domain transforms to uppercase
         self.engine = MultipleDomainsDummyEngine()
         self.engine.setLocal('foo',
-            self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
+                             self.factory('FoOvAlUe${empty}', 'default', {'empty': ''}))
         self.engine.setLocal('bar', 'BaRvAlUe')
         self.engine.setLocal('baz',
-            self.factory('BaZvAlUe', 'default', {}))
+                             self.factory('BaZvAlUe', 'default', {}))
         # Message ids with different domains
         self.engine.setLocal('toupper',
-            self.factory('ToUpper', 'default', {}))
+                             self.factory('ToUpper', 'default', {}))
         self.engine.setLocal('tolower',
-            self.factory('ToLower', 'default', {}, domain='lower'))
+                             self.factory('ToLower', 'default', {}, domain='lower'))
 
     def test_multiple_domains(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="toupper" />')
         self._check(program, '<div>TOUPPER</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="tolower" />')
         self._check(program, '<div>tolower</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="string:ToUpper" />')
         self._check(program, '<div>TOUPPER</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="lower"'
             '     tal:content="string:ToLower" />')
         self._check(program, '<div>tolower</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     tal:define="msgid string:ToUpper"'
             '     tal:content="msgid" />')
         self._check(program, '<div>TOUPPER</div>')
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="lower"'
             '     tal:define="msgid string:ToLower"'
@@ -555,26 +549,32 @@ class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
     def test_unused_explicit_domain(self):
         #a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine
         #is a domain that transforms to lowercase
-        self.engine.setLocal('othertolower',
-            self.factory('OtherToLower', 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine', {}, domain='lower'))
-        program, macros = self._compile(
+        self.engine.setLocal(
+            'othertolower',
+            self.factory('OtherToLower',
+                         'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine',
+                         {},
+                         domain='lower'))
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     tal:content="othertolower" />')
         self._check(program, '<div>othertolower</div>')
         #takes domain into account for strings
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
             '     tal:content="string:ToLower" />')
         self._check(program, '<div>tolower</div>')
         #but not for messageids
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<div i18n:translate=""'
             '     i18n:domain="a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine"'
             '     tal:content="baz" />')
         self._check(program, '<div>BAZVALUE</div>')
 
 class ScriptTestCase(TestCaseBase):
+
+    interpreter = None
 
     def setUp(self):
         self.engine = DummyEngine()
@@ -587,12 +587,12 @@ class ScriptTestCase(TestCaseBase):
         self.assertEqual(expected, result.getvalue())
 
     def test_simple(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<p tal:script="text/server-python">print("hello")</p>')
         self._check(program, '<p>hello\n</p>')
 
     def test_script_and_tal_block(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<tal:block script="text/server-python">\n'
             '  global x\n'
             '  x = 1\n'
@@ -602,42 +602,42 @@ class ScriptTestCase(TestCaseBase):
         self.assertEqual(self.engine.codeGlobals['x'], 1)
 
     def test_script_and_tal_block_having_inside_print(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<tal:block script="text/server-python">\n'
             '  print("hello")'
             '</tal:block>')
         self._check(program, 'hello\n')
 
     def test_script_and_omittag(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python">\n'
             '  print("hello")'
             '</p>')
         self._check(program, 'hello\n')
 
     def test_script_and_inside_tags(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python">\n'
             '  print("<b>hello</b>")'
             '</p>')
         self._check(program, '<b>hello</b>\n')
 
     def test_script_and_inside_tags_with_tal(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<p tal:omit-tag="" tal:script="text/server-python"> <!--\n'
             '  print("""<b tal:replace="string:foo">hello</b>""")\n'
             '--></p>')
         self._check(program, '<b tal:replace="string:foo">hello</b>\n')
 
     def test_html_script(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<script type="text/server-python">\n'
             '  print("Hello world!")\n'
             '</script>')
         self._check(program, 'Hello world!\n')
 
     def test_html_script_and_javascript(self):
-        program, macros = self._compile(
+        program, _macros = self._compile(
             '<script type="text/javascript" src="somefile.js" />\n'
             '<script type="text/server-python">\n'
             '  print("Hello world!")\n'
@@ -670,9 +670,10 @@ class I18NErrorsTestCase(TestCaseBase):
                     "missing i18n:id value not caught")
 
     def test_id_with_attributes(self):
-        self._check('''<input name="Delete"
-                       tal:attributes="name string:delete_button"
-                       i18n:attributes="name message-id">''',
+        self._check(
+            '''<input name="Delete"
+            tal:attributes="name string:delete_button"
+            i18n:attributes="name message-id">''',
             "expected attribute being both part of tal:attributes" +
             " and having a msgid in i18n:attributes to be denied")
 
@@ -693,50 +694,49 @@ class OutputPresentationTestCase(TestCaseBase):
         </html>'''
         self.compare(INPUT, EXPECTED)
 
-    if sys.version_info[:2] != (3,2) or IS_PYPY:
-        def test_unicode_content(self):
-            INPUT = """<p tal:content="python:u'déjà-vu'">para</p>"""
-            EXPECTED = _u("""<p>déjà-vu</p>""")
-            self.compare(INPUT, EXPECTED)
+    def test_unicode_content(self):
+        INPUT = u"""<p tal:content="python:u'déjà-vu'">para</p>"""
+        EXPECTED = u'<p>d\xe9j\xe0-vu</p>'
+        self.compare(INPUT, EXPECTED)
 
-        def test_unicode_structure(self):
-            INPUT = """<p tal:replace="structure python:u'déjà-vu'">para</p>"""
-            EXPECTED = _u("""déjà-vu""")
-            self.compare(INPUT, EXPECTED)
+    def test_unicode_structure(self):
+        INPUT = u"""<p tal:replace="structure python:u'déjà-vu'">para</p>"""
+        EXPECTED = u'd\xe9j\xe0-vu'
+        self.compare(INPUT, EXPECTED)
 
     def test_i18n_replace_number(self):
         INPUT = """
         <p i18n:translate="foo ${bar}">
         <span tal:replace="python:123" i18n:name="bar">para</span>
         </p>"""
-        EXPECTED = _u("""
+        EXPECTED = (u"""
         <p>FOO 123</p>""")
         self.compare(INPUT, EXPECTED)
 
     def test_entities(self):
-        if IS_PYPY or sys.version_info[:2] <= (3, 2):
+        if sys.version_info[:2] <= (3, 2):
             # HTMLParser.HTMLParser in Python 2.x--3.2 parses "&#45" as "&#45"
             INPUT = ('<img tal:define="foo nothing" '
-                    'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
+                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
                         '&amp;a &amp;#45 &amp;; &lt;&gt;" />')
         elif sys.version_info < (3, 4):
             # html.parser.HTMLParser in Python 3.3 parses "&#45" as "-"
             INPUT = ('<img tal:define="foo nothing" '
-                    'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
+                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a; \x01 \n '
                         '&amp;a - &amp;; &lt;&gt;" />')
         else:
             # html.parser.HTMLParser in Python 3.4 parses "&#1" as ""
             # because '1' is an "invalid codepoint".
             INPUT = ('<img tal:define="foo nothing" '
-                    'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
+                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
             EXPECTED = ('<img alt="&a;  \n '
                         '&amp;a - &amp;; &lt;&gt;" />')
         self.compare(INPUT, EXPECTED)
 
     def compare(self, INPUT, EXPECTED):
-        program, macros = self._compile(INPUT)
+        program, _macros = self._compile(INPUT)
         sio = StringIO()
         interp = TALInterpreter(program, {}, DummyEngine(), sio, wrap=60)
         interp()
@@ -760,7 +760,8 @@ class TestSourceAnnotations(unittest.TestCase):
         interpreter = self.interpreter
         interpreter.sourceFile = '/path/to/source.pt'
         interpreter.position = (123, 42)
-        self.assertEqual(interpreter.formatSourceAnnotation(),
+        self.assertEqual(
+            interpreter.formatSourceAnnotation(),
             "<!--\n" +
             "=" * 78 + "\n" +
             "/path/to/source.pt (line 123)\n" +
@@ -771,7 +772,8 @@ class TestSourceAnnotations(unittest.TestCase):
         interpreter = self.interpreter
         interpreter.sourceFile = '/path/to/source.pt'
         interpreter.position = (None, None)
-        self.assertEqual(interpreter.formatSourceAnnotation(),
+        self.assertEqual(
+            interpreter.formatSourceAnnotation(),
             "<!--\n" +
             "=" * 78 + "\n" +
             "/path/to/source.pt\n" +
@@ -808,13 +810,13 @@ class TestErrorTracebacks(TestCaseBase):
     # Regression test for http://www.zope.org/Collectors/Zope3-dev/697
 
     def test_define_slot_does_not_clobber_source_file_on_exception(self):
-        m_program, m_macros = self._compile("""
+        _m_program, m_macros = self._compile("""
             <div metal:define-macro="amacro">
               <div metal:define-slot="aslot">
               </div>
             </div>
             """, source_file='macros.pt')
-        p_program, p_macros = self._compile("""
+        p_program, _p_macros = self._compile("""
             <div metal:use-macro="amacro">
               <div metal:fill-slot="aslot">
                 <tal:x replace="no_such_thing" />
@@ -830,14 +832,14 @@ class TestErrorTracebacks(TestCaseBase):
         self.assertEqual(engine.position, (4, 16))
 
     def test_define_slot_restores_source_file_if_no_exception(self):
-        m_program, m_macros = self._compile("""
+        _m_program, m_macros = self._compile("""
             <div metal:define-macro="amacro">
               <div metal:define-slot="aslot">
               </div>
               <tal:x replace="no_such_thing" />
             </div>
             """, source_file='macros.pt')
-        p_program, p_macros = self._compile("""
+        p_program, _p_macros = self._compile("""
             <div metal:use-macro="amacro">
               <div metal:fill-slot="aslot">
               </div>
@@ -854,19 +856,4 @@ class TestErrorTracebacks(TestCaseBase):
 
 
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(I18NErrorsTestCase),
-        unittest.makeSuite(MacroErrorsTestCase),
-        unittest.makeSuite(MacroExtendTestCase),
-        unittest.makeSuite(OutputPresentationTestCase),
-        unittest.makeSuite(ScriptTestCase),
-        unittest.makeSuite(I18NCornerTestCaseMessage),
-        unittest.makeSuite(UnusedExplicitDomainTestCase),
-        unittest.makeSuite(TestSourceAnnotations),
-        unittest.makeSuite(TestErrorTracebacks),
-
-        # TODO: Deactivated test, since we have not found a solution for this
-        # and it is a deep and undocumented HTML parser issue.
-        # Fred is looking into this.
-        #unittest.makeSuite(_MacroFunkyErrorTest),
-    ))
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)

@@ -8,3 +8,4 @@ develop-eggs/
 .coverage
 coverage.xml
 nosetests.xml
+htmlcov/

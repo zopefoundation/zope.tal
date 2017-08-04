@@ -1,18 +1,20 @@
 language: python
 sudo: false
-matrix:
-  include:
-    - python: 3.5
-      env: TOXENV=py35
-env:
-    - TOXENV=py27
-    - TOXENV=py33
-    - TOXENV=py34
-    - TOXENV=pypy
-    - TOXENV=pypy3
+python:
+    - 2.7
+    - 3.4
+    - 3.5
+    - 3.6
+    - pypy
+    - pypy3.5-5.8.0
 install:
-    - pip install tox
+    - pip install -U pip setuptools
+    - pip install -U coverage coveralls
+    - pip install -U -e .[test]
 script:
-    - tox --develop
+    - coverage run -m zope.testrunner --test-path=src
+after_success:
+    - coveralls
 notifications:
     email: false
+cache: pip

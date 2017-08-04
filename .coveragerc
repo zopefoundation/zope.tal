@@ -1,0 +1,16 @@
+[run]
+source = zope.tal
+omit =
+   src/zope/tal/tests/run.py
+   src/zope/tal/tests/markbench.py
+   src/zope/tal/timer.py
+   src/zope/tal/runtest.py
+
+[report]
+precision = 2
+exclude_lines =
+    pragma: no cover
+    if __name__ == '__main__':
+    raise NotImplementedError
+    self.fail
+    raise AssertionError
