@@ -2,6 +2,9 @@ include *.py
 include *.rst
 include buildout.cfg
 include tox.ini
+include .coveragerc
+include .travis.yml
+
 recursive-include src *.pt
 recursive-include src *.xml
 recursive-include src *.html
