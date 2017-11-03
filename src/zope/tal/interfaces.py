@@ -11,8 +11,16 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Interface that a TAL expression implementation provides to the METAL/TAL
-implementation.
+"""
+Interface that a TAL expression implementation provides to the
+METAL/TAL implementation.
+
+This package does not provide an implementation of
+:class:`ITALExpressionCompiler`, :class:`ITALExpressionEngine` or
+:class:`ITALIterator`.  An external package must provide those.  The
+most commonly used are :class:`zope.tales.tales.ExpressionEngine`,
+:class:`zope.tales.tales.Context`, and
+:class:`zope.tales.tales.Iterator`, respectively.
 """
 from zope.interface import Attribute, Interface
 
@@ -195,6 +203,7 @@ class ITALIterator(Interface):
 
 
 class ITALExpressionErrorInfo(Interface):
+    """Information about an error."""
 
     type = Attribute("type",
                      "The exception class.")

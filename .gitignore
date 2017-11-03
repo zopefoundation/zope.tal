@@ -9,3 +9,4 @@ develop-eggs/
 coverage.xml
 nosetests.xml
 htmlcov/
+docs/_build/

@@ -77,13 +77,17 @@ setup(name='zope.tal',
           'Topic :: Internet :: WWW/HTTP',
           'Framework :: Zope3',
       ],
-      url='http://github.com/zopefoundation/zope.tal',
+      url='https://github.com/zopefoundation/zope.tal',
       license='ZPL 2.1',
       packages=find_packages('src'),
       package_dir={'': 'src'},
       namespace_packages=['zope'],
       extras_require={
           'test': TESTS_REQUIRE,
+          'docs': [
+              'Sphinx',
+              'repoze.sphinx.autointerface',
+          ],
       },
       test_suite="__main__.alltests", # to support "setup.py test"
       tests_require=TESTS_REQUIRE,
