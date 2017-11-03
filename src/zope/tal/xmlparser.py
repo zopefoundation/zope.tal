@@ -32,6 +32,9 @@ except NameError:
 
 
 class XMLParser(object):
+    """
+    Parse XML using :mod:`xml.parsers.expat`.
+    """
 
     ordered_attributes = 0
 
@@ -82,10 +85,12 @@ class XMLParser(object):
         return expat.ParserCreate(encoding, ' ')
 
     def parseFile(self, filename):
+        """Parse from the given filename."""
         with open(filename, 'rb') as f:
             self.parseStream(f)
 
     def parseString(self, s):
+        """Parse the given string."""
         if isinstance(s, unicode):
             # Expat cannot deal with unicode strings, only with
             # encoded ones.  Also, its range of encodings is rather
@@ -94,9 +99,11 @@ class XMLParser(object):
         self.parser.Parse(s, 1)
 
     def parseURL(self, url):
+        """Parse the given URL."""
         self.parseStream(urlopen(url))
 
     def parseStream(self, stream):
+        """Parse the given stream (open file)."""
         self.parser.ParseFile(stream)
 
     def parseFragment(self, s, end=0):
@@ -113,4 +120,3 @@ class XMLParser(object):
         # [1] http://python.org/doc/current/lib/xmlparser-objects.html
         # [2] http://cvs.sourceforge.net/viewcvs.py/expat/expat/lib/expat.h
         return (self.parser.ErrorLineNumber, self.parser.ErrorColumnNumber)
-

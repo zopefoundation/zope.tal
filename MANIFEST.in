@@ -1,5 +1,6 @@
 include *.py
 include *.rst
+include *.txt
 include buildout.cfg
 include tox.ini
 include .coveragerc
@@ -8,3 +9,8 @@ include .travis.yml
 recursive-include src *.pt
 recursive-include src *.xml
 recursive-include src *.html
+
+recursive-include docs *.rst
+recursive-include docs *.py
+recursive-include docs Makefile
+recursive-include docs make.bat
