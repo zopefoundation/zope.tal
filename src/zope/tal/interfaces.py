@@ -38,20 +38,20 @@ class ITALExpressionCompiler(Interface):
         """
 
     def compile(expression):
-        """Return a compiled form of 'expression' for later evaluation.
+        """Return a compiled form of *expression* for later evaluation.
 
-        'expression' is the source text of the expression.
+        *expression* is the source text of the expression.
 
-        The return value may be passed to the various evaluate*()
-        methods of the ITALExpressionEngine interface.  No compatibility is
+        The return value may be passed to the various ``evaluate*()``
+        methods of the :class:`ITALExpressionEngine` interface.  No compatibility is
         required for the values of the compiled expression between
-        different ITALExpressionEngine implementations.
+        different :class:`ITALExpressionEngine` implementations.
         """
 
     def getContext(namespace):
         """Create an expression execution context
 
-        The given namespace provides the initial top-level names.
+        The given *namespace* provides the initial top-level names.
         """
 
 class ITALExpressionEngine(Interface):
@@ -59,20 +59,20 @@ class ITALExpressionEngine(Interface):
 
     The TAL interpreter uses this interface to TAL expression to support
     evaluation of the compiled expressions returned by
-    ITALExpressionCompiler.compile().
+    :meth:`ITALExpressionCompiler.compile`.
     """
 
     def getDefault():
-        """Return the value of the 'default' TAL expression.
+        """Return the value of the ``default`` TAL expression.
 
-        Checking a value for a match with 'default' should be done
-        using the 'is' operator in Python.
+        Checking a value for a match with ``default`` should be done
+        using the ``is`` operator in Python.
         """
 
     def setPosition(position):
         """Inform the engine of the current position in the source file.
 
-        ``position`` is a tuple (lineno, offset).
+        *position* is a tuple (lineno, offset).
 
         This is used to allow the evaluation engine to report
         execution errors so that site developers can more easily
@@ -113,7 +113,7 @@ class ITALExpressionEngine(Interface):
         """Evaluate an expression that must return a structured
         document fragment.
 
-        The result of evaluating 'compiled_expression' must be a
+        The result of evaluating *compiled_expression* must be a
         string containing a parsable HTML or XML fragment.  Any TAL
         markup contained in the result string will be interpreted.
         """
@@ -126,10 +126,10 @@ class ITALExpressionEngine(Interface):
         responsibility of the expression itself.
 
         If the expression evaluates to None, then that is returned. It
-        represents 'nothing' in TALES.
-        If the expression evaluates to what getDefault() of this interface
-        returns, by comparison using 'is', then that is returned. It
-        represents 'default' in TALES.
+        represents ``nothing`` in TALES.
+        If the expression evaluates to what :meth:`getDefault()`
+        returns, by comparison using ``is``, then that is returned. It
+        represents ``default`` in TALES.
         """
 
     def evaluateValue(compiled_expression):
@@ -139,9 +139,9 @@ class ITALExpressionEngine(Interface):
         """
 
     def createErrorInfo(exception, position):
-        """Returns an ITALExpressionErrorInfo object.
+        """Returns an :class:`ITALExpressionErrorInfo` object.
 
-        ``position`` is a tuple (lineno, offset).
+        *position* is a tuple (lineno, offset).
 
         The returned object is used to provide information about the
         error condition for the on-error handler.
@@ -150,13 +150,13 @@ class ITALExpressionEngine(Interface):
     def setGlobal(name, value):
         """Set a global variable.
 
-        The variable will be named 'name' and have the value 'value'.
+        The variable will be named *name* and have the value *value*.
         """
 
     def setLocal(name, value):
         """Set a local variable in the current scope.
 
-        The variable will be named 'name' and have the value 'value'.
+        The variable will be named *name* and have the value *value*.
         """
 
     def getValue(name, default=None):
@@ -166,7 +166,7 @@ class ITALExpressionEngine(Interface):
         """
 
     def setRepeat(name, compiled_expression):
-        """Start a repetition, returning an ITALIterator.
+        """Start a repetition, returning an :class:`ITALIterator`.
 
         The engine is expected to add the a value (typically the
         returned iterator) for the name to the variable namespace.
