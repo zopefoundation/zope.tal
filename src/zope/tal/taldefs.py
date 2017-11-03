@@ -17,20 +17,26 @@ import re
 from zope.tal.interfaces import ITALExpressionErrorInfo
 from zope.interface import implementer
 
-
+#: Version of the specification we implement.
 TAL_VERSION = "1.6"
 
-XML_NS = "http://www.w3.org/XML/1998/namespace" # URI for XML namespace
-XMLNS_NS = "http://www.w3.org/2000/xmlns/" # URI for XML NS declarations
+#: URI for XML namespace
+XML_NS = "http://www.w3.org/XML/1998/namespace"
+#: URI for XML NS declarations
+XMLNS_NS = "http://www.w3.org/2000/xmlns/"
 
+#: TAL namespace URI
 ZOPE_TAL_NS = "http://xml.zope.org/namespaces/tal"
+#: METAL namespace URI
 ZOPE_METAL_NS = "http://xml.zope.org/namespaces/metal"
+#: I18N namespace URI
 ZOPE_I18N_NS = "http://xml.zope.org/namespaces/i18n"
 
 # This RE must exactly match the expression of the same name in the
 # zope.i18n.simpletranslationservice module:
 NAME_RE = "[a-zA-Z_][-a-zA-Z0-9_]*"
 
+#: Known METAL attributes
 KNOWN_METAL_ATTRIBUTES = frozenset([
     "define-macro",
     "extend-macro",
@@ -39,6 +45,7 @@ KNOWN_METAL_ATTRIBUTES = frozenset([
     "fill-slot",
     ])
 
+#: Known TAL attributes
 KNOWN_TAL_ATTRIBUTES = frozenset([
     "define",
     "condition",
@@ -53,6 +60,7 @@ KNOWN_TAL_ATTRIBUTES = frozenset([
                     # like <tal:x>, <metal:y>, <i18n:z>
     ])
 
+#: Known I18N attributes
 KNOWN_I18N_ATTRIBUTES = frozenset([
     "translate",
     "domain",
@@ -66,8 +74,12 @@ KNOWN_I18N_ATTRIBUTES = frozenset([
     ])
 
 class TALError(Exception):
+    """
+    A base exception for errors raised by this implementation.
+    """
 
     def __init__(self, msg, position=(None, None)):
+        Exception.__init__(self)
         assert msg != ""
         self.msg = msg
         self.lineno = position[0]
@@ -88,17 +100,20 @@ class TALError(Exception):
         return result
 
 class METALError(TALError):
-    pass
+    """An error parsing on running METAL macros."""
 
 class TALExpressionError(TALError):
-    pass
+    """An error parsing or running a TAL expression."""
 
 class I18NError(TALError):
-    pass
+    """An error parsing a I18N expression."""
 
 
 @implementer(ITALExpressionErrorInfo)
 class ErrorInfo(object):
+    """
+    Default implementation of :class:`zope.tal.interfaces.ITALExpressionErrorInfo`.
+    """
 
     def __init__(self, err, position=(None, None)):
         if isinstance(err, Exception):
@@ -115,7 +130,7 @@ _attr_re = re.compile(r"\s*([^\s]+)\s+([^\s].*)\Z", re.S)
 _subst_re = re.compile(r"\s*(?:(text|structure)\s+)?(.*)\Z", re.S)
 
 def parseAttributeReplacements(arg, xml):
-    dict = {}
+    attr_dict = {}
     for part in splitParts(arg):
         m = _attr_re.match(part)
         if not m:
@@ -123,10 +138,10 @@ def parseAttributeReplacements(arg, xml):
         name, expr = m.groups()
         if not xml:
             name = name.lower()
-        if name in dict:
+        if name in attr_dict:
             raise TALError("Duplicate attribute name in attributes: %r" % part)
-        dict[name] = expr
-    return dict
+        attr_dict[name] = expr
+    return attr_dict
 
 def parseSubstitution(arg, position=(None, None)):
     m = _subst_re.match(arg)
@@ -151,26 +166,26 @@ def isCurrentVersion(program):
     version = getProgramVersion(program)
     return version == TAL_VERSION
 
-def isinstance_(ob, type):
+def isinstance_(ob, kind):
     # Proxy-friendly and faster isinstance_ check for new-style objects
     try:
-        return type in ob.__class__.__mro__
+        return kind in ob.__class__.__mro__
     except AttributeError:
         return False
 
 
 def getProgramMode(program):
     version = getProgramVersion(program)
-    if (version == TAL_VERSION and isinstance_(program[1], tuple) and
-        len(program[1]) == 2):
+    if (version == TAL_VERSION and isinstance_(program[1], tuple)
+            and len(program[1]) == 2):
         opcode, mode = program[1]
         if opcode == "mode":
             return mode
     return None
 
 def getProgramVersion(program):
-    if (len(program) >= 2 and
-        isinstance_(program[0], tuple) and len(program[0]) == 2):
+    if (len(program) >= 2
+            and isinstance_(program[0], tuple) and len(program[0]) == 2):
         opcode, version = program[0]
         if opcode == "version":
             return version

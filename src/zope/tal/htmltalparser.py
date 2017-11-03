@@ -11,7 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Parse HTML and compile to TALInterpreter intermediate code.
+"""
+Parse HTML and compile to :class:`~.TALInterpreter` intermediate code, using
+a :class:`~.TALGenerator`.
 """
 
 # When Python 3 becomes mainstream please swap the try and except parts.
@@ -28,6 +30,7 @@ except ImportError:
         # so here's a copy taken from Python 3.4:
         class HTMLParseError(Exception):
             def __init__(self, msg, position=(None, None)):
+                Exception.__init__(self)
                 assert msg
                 self.msg = msg
                 self.lineno = position[0]
@@ -50,30 +53,30 @@ _html_parser_extras = {}
 if 'convert_charrefs' in HTMLParser.__init__.__code__.co_names:
     _html_parser_extras['convert_charrefs'] = False  # pragma: NO COVER py34
 
-
+#: List of Boolean attributes in HTML that may be given in
+#: minimized form (e.g. ``<img ismap>`` rather than ``<img ismap="">``)
+#: From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
 BOOLEAN_HTML_ATTRS = frozenset([
-    # List of Boolean attributes in HTML that may be given in
-    # minimized form (e.g. <img ismap> rather than <img ismap="">)
-    # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
     "compact", "nowrap", "ismap", "declare", "noshade", "checked",
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
     ])
 
+#: List of HTML tags with an empty content model; these are
+#: rendered in minimized form, e.g. ``<img />``.
+#: From http://www.w3.org/TR/xhtml1/#dtds
 EMPTY_HTML_TAGS = frozenset([
-    # List of HTML tags with an empty content model; these are
-    # rendered in minimized form, e.g. <img />.
-    # From http://www.w3.org/TR/xhtml1/#dtds
     "base", "meta", "link", "hr", "br", "param", "img", "area",
     "input", "col", "basefont", "isindex", "frame",
     ])
 
+#: List of HTML elements that close open paragraph-level elements
+#: and are themselves paragraph-level.
 PARA_LEVEL_HTML_TAGS = frozenset([
-    # List of HTML elements that close open paragraph-level elements
-    # and are themselves paragraph-level.
     "h1", "h2", "h3", "h4", "h5", "h6", "p",
     ])
 
+#: Tags that automatically close other tags.
 BLOCK_CLOSING_TAG_MAP = {
     "tr": frozenset(["tr", "td", "th"]),
     "td": frozenset(["td", "th"]),
@@ -83,12 +86,13 @@ BLOCK_CLOSING_TAG_MAP = {
     "dt": frozenset(["dd", "dt"]),
     }
 
+#: List of HTML tags that denote larger sections than paragraphs.
 BLOCK_LEVEL_HTML_TAGS = frozenset([
-    # List of HTML tags that denote larger sections than paragraphs.
     "blockquote", "table", "tr", "th", "td", "thead", "tfoot", "tbody",
     "noframe", "ul", "ol", "li", "dl", "dt", "dd", "div",
     ])
 
+#: Section level HTML tags
 SECTION_LEVEL_HTML_TAGS = PARA_LEVEL_HTML_TAGS.union(BLOCK_LEVEL_HTML_TAGS)
 
 TIGHTEN_IMPLICIT_CLOSE_TAGS = PARA_LEVEL_HTML_TAGS.union(BLOCK_CLOSING_TAG_MAP)
@@ -127,25 +131,37 @@ class OpenTagError(NestingError):
         HTMLParseError.__init__(self, msg, position)
 
 class HTMLTALParser(HTMLParser):
+    """
+    Parser for HTML.
+
+    After you call either :meth:`parseFile` and :meth:`parseString`
+    you can retrieve the compiled program using :meth:`getCode`.
+    """
 
     # External API
 
     def __init__(self, gen=None):
+        """
+        :keyword TALGenerator gen: The configured (with an expression compiler)
+            code generator to use. If one is not given, a default will be used.
+        """
         HTMLParser.__init__(self, **_html_parser_extras)
         if gen is None:
             gen = TALGenerator(xml=0)
         self.gen = gen
         self.tagstack = []
         self.nsstack = []
-        self.nsdict = {'tal': ZOPE_TAL_NS,
-                       'metal': ZOPE_METAL_NS,
-                       'i18n': ZOPE_I18N_NS,
-                       }
+        self.nsdict = {
+            'tal': ZOPE_TAL_NS,
+            'metal': ZOPE_METAL_NS,
+            'i18n': ZOPE_I18N_NS,
+        }
 
     def parseFile(self, file):
-        f = open(file)
-        data = f.read()
-        f.close()
+        """Parse data in the given file."""
+        with open(file) as f:
+            data = f.read()
+
         try:
             self.parseString(data)
         except TALError as e:
@@ -153,6 +169,7 @@ class HTMLTALParser(HTMLParser):
             raise
 
     def parseString(self, data):
+        """Parse data in the given string."""
         self.feed(data)
         self.close()
         while self.tagstack:
@@ -160,6 +177,9 @@ class HTMLTALParser(HTMLParser):
         assert self.nsstack == [], self.nsstack
 
     def getCode(self):
+        """
+        After parsing, this returns ``(program, macros)``.
+        """
         return self.gen.getCode()
 
     # Overriding HTMLParser methods

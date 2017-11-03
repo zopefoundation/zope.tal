@@ -26,10 +26,9 @@ from zope.tal.translationcontext import TranslationContext
 
 try:
     unicode
-    _BLANK = unicode('')
 except NameError:
     unicode = str # Python 3.x
-    _BLANK = ''
+_BLANK = u''
 
 
 # Avoid constructing this tuple over and over
@@ -43,6 +42,7 @@ BOOLEAN_HTML_ATTRS = frozenset([
     # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
     # TODO: The problem with this is that this is not valid XML and
     # can't be parsed back!
+    # XXX: This is an exact duplicate of htmltalparser.BOOLEAN_HTML_ATTRS. Why?
     "compact", "nowrap", "ismap", "declare", "noshade", "checked",
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
@@ -116,25 +116,25 @@ class TALInterpreter(object):
     """TAL interpreter.
 
     Some notes on source annotations.  They are HTML/XML comments added to the
-    output whenever sourceFile is changed by a setSourceFile bytecode.  Source
+    output whenever ``sourceFile`` is changed by a ``setSourceFile`` bytecode.  Source
     annotations are disabled by default, but you can turn them on by passing a
-    sourceAnnotations argument to the constructor.  You can change the format
+    ``sourceAnnotations`` argument to the constructor.  You can change the format
     of the annotations by overriding formatSourceAnnotation in a subclass.
 
     The output of the annotation is delayed until some actual text is output
     for two reasons:
 
-        1. setPosition bytecode follows setSourceFile, and we need position
+        1. ``setPosition`` bytecode follows ``setSourceFile``, and we need position
            information to output the line number.
-        2. Comments are not allowed in XML documents before the <?xml?>
+        2. Comments are not allowed in XML documents before the ``<?xml?>``
            declaration.
 
     For performance reasons (TODO: premature optimization?) instead of checking
-    the value of _pending_source_annotation on every write to the output
-    stream, the _stream_write attribute is changed to point to
-    _annotated_stream_write method whenever _pending_source_annotation is
+    the value of ``_pending_source_annotation`` on every write to the output
+    stream, the ``_stream_write`` attribute is changed to point to
+    ``_annotated_stream_write`` method whenever ``_pending_source_annotation`` is
     set to True, and to _stream.write when it is False.  The following
-    invariant always holds:
+    invariant always holds::
 
         if self._pending_source_annotation:
             assert self._stream_write is self._annotated_stream_write
@@ -149,36 +149,31 @@ class TALInterpreter(object):
                  sourceAnnotations=0):
         """Create a TAL interpreter.
 
+        :param program: A compiled program, as generated
+            by :class:`zope.tal.talgenerator.TALGenerator`
+        :param macros: Namespace of macros, usually also from
+            :class:`~.TALGenerator`
+
         Optional arguments:
 
-            stream -- output stream (defaults to sys.stdout).
-
-            debug -- enable debugging output to sys.stderr (off by default).
-
-            wrap -- try to wrap attributes on opening tags to this number of
+        :keyword stream: output stream (defaults to sys.stdout).
+        :keyword bool debug: enable debugging output to sys.stderr (off by default).
+        :keyword int wrap: try to wrap attributes on opening tags to this number of
             column (default: 1023).
-
-            metal -- enable METAL macro processing (on by default).
-
-            tal -- enable TAL processing (on by default).
-
-            showtal -- do not strip away TAL directives.  A special value of
+        :keyword bool metal: enable METAL macro processing (on by default).
+        :keyword bool tal: enable TAL processing (on by default).
+        :keyword int showtal: do not strip away TAL directives.  A special value of
             -1 (which is the default setting) enables showtal when TAL
             processing is disabled, and disables showtal when TAL processing is
             enabled.  Note that you must use 0, 1, or -1; true boolean values
-            are not supported (TODO: why?).
-
-            strictinsert -- enable TAL processing and stricter HTML/XML
+            are not supported (for historical reasons).
+        :keyword bool strictinsert: enable TAL processing and stricter HTML/XML
             checking on text produced by structure inserts (on by default).
             Note that Zope turns this value off by default.
-
-            stackLimit -- set macro nesting limit (default: 100).
-
-            i18nInterpolate -- enable i18n translations (default: on).
-
-            sourceAnnotations -- enable source annotations with HTML comments
+        :keyword int stackLimit: set macro nesting limit (default: 100).
+        :keyword bool i18nInterpolate: enable i18n translations (default: on).
+        :keyword bool sourceAnnotations: enable source annotations with HTML comments
             (default: off).
-
         """
         self.program = program
         self.macros = macros
@@ -266,6 +261,11 @@ class TALInterpreter(object):
         return self.macroStack.pop()
 
     def __call__(self):
+        """
+        Interpret the current program.
+
+        :return: Nothing.
+        """
         assert self.level == 0
         assert self.scopeLevel == 0
         assert self.i18nContext.parent is None
@@ -1017,8 +1017,7 @@ class TALInterpreter(object):
 
 
 class FasterStringIO(list):
-    """Unicode-aware append-only version of StringIO.
-    """
+    # Unicode-aware append-only version of StringIO.
     write = list.append
 
     def __init__(self, value=None):

@@ -11,7 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Parse XML and compile to TALInterpreter intermediate code.
+"""
+Parse XML and compile to :class:`~.TALInterpreter` intermediate code,
+using a :class:`~.TALGenerator`.
 """
 from zope.tal.taldefs import XML_NS, ZOPE_I18N_NS, ZOPE_METAL_NS, ZOPE_TAL_NS
 from zope.tal.talgenerator import TALGenerator
@@ -19,10 +21,22 @@ from zope.tal.xmlparser import XMLParser
 
 
 class TALParser(XMLParser):
+    """
+    Parser for XML.
+
+    After parsing with :meth:`~.XMLParser.parseFile`,
+    :meth:`~.XMLParser.parseString`, :meth:`~.XMLParser.parseURL` or
+    :meth:`~.XMLParser.parseStream`, you can call :meth:`getCode` to
+    retrieve the parsed program and macros.
+    """
 
     ordered_attributes = 1
 
     def __init__(self, gen=None, encoding=None): # Override
+        """
+        :keyword TALGenerator gen: The configured (with an expression compiler)
+            code generator to use. If one is not given, a default will be used.
+        """
         XMLParser.__init__(self, encoding)
         if gen is None:
             gen = TALGenerator()
@@ -32,6 +46,7 @@ class TALParser(XMLParser):
         self.nsNew = []
 
     def getCode(self):
+        """Return the compiled program and macros after parsing."""
         return self.gen.getCode()
 
     def StartNamespaceDeclHandler(self, prefix, uri):
@@ -117,7 +132,7 @@ class TALParser(XMLParser):
 
     def EndElementHandler(self, name):
         name = self.fixname(name)[0]
-        self.gen.emitEndElement(name,  position=self.getpos())
+        self.gen.emitEndElement(name, position=self.getpos())
 
     def DefaultHandler(self, text):
         self.gen.emitRawText(text)

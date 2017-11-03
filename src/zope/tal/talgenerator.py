@@ -11,7 +11,8 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Code generator for TALInterpreter intermediate code.
+"""
+Code generator for :class:`~.TALInterpreter` intermediate code.
 """
 import re
 
@@ -37,12 +38,20 @@ except NameError:
 _name_rx = re.compile(NAME_RE)
 
 class TALGenerator(object):
+    """
+    Generate intermediate code.
+    """
 
     inMacroUse = 0
     inMacroDef = 0
     source_file = None
 
     def __init__(self, expressionCompiler=None, xml=1, source_file=None):
+        """
+        :keyword expressionCompiler: The implementation of
+            :class:`zope.tal.interfaces.ITALExpressionCompiler` to use.
+            If not given, we'll use a simple, undocumented, compiler.
+        """
         if not expressionCompiler:
             from zope.tal.dummyengine import DummyEngine
             expressionCompiler = DummyEngine()
@@ -96,7 +105,7 @@ class TALGenerator(object):
                 if self.optimizeStartTag(collect, item[1], item[2], ">"):
                     continue
             if opcode == "startEndTag":
-                endsep = self.xml and "/>" or " />"
+                endsep = "/>" if self.xml else " />"
                 if self.optimizeStartTag(collect, item[1], item[2], endsep):
                     continue
             if opcode in ("beginScope", "endScope"):
@@ -182,9 +191,9 @@ class TALGenerator(object):
         output = program[:2]
         prev2, prev1 = output
         for item in program[2:]:
-            if ( item[0] == "beginScope"
-                 and prev1[0] == "setPosition"
-                 and prev2[0] == "rawtextColumn"):
+            if (item[0] == "beginScope"
+                    and prev1[0] == "setPosition"
+                    and prev2[0] == "rawtextColumn"):
                 position = output.pop()[1]
                 text, column = output.pop()[1]
                 prev1 = None, None
@@ -302,7 +311,7 @@ class TALGenerator(object):
         self.emit("condition", cexpr, program)
 
     def emitRepeat(self, arg):
-        m = re.match("(?s)\s*(%s)\s+(.*)\Z" % NAME_RE, arg)
+        m = re.match(r"(?s)\s*(%s)\s+(.*)\Z" % NAME_RE, arg)
         if not m:
             raise TALError("invalid repeat syntax: " + repr(arg),
                            self.position)
