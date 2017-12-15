@@ -28,7 +28,7 @@ dynamic markup into a page.  It also includes the Macro Expansion for TAL
 The dynamic values themselves are specified using a companion language,
 TALES (see the `zope.tales`_ package for more).
 
-The reference documentation for the TAL language is available at https://docs.zope.org/zope2/zope2book/AppendixC.html
+The reference documentation for the TAL language is available at https://pagetemplates.readthedocs.io/en/latest/tal.html
 
 Detailed documentation for this implementation and its API is available at https://zopetal.readthedocs.io/
 
