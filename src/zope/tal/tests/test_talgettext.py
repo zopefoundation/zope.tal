@@ -118,6 +118,24 @@ class test_POEngine(unittest.TestCase):
                          ['A <a href="${DYNAMIC_CONTENT}">link</a>.',
                           'Some ${DYNAMIC_CONTENT} text.'])
 
+    def test_potalinterpreter_translate_default(self):
+        sample_source = '<p i18n:translate="">text</p>'
+        p = HTMLTALParser()
+        p.parseString(sample_source)
+        program, macros = p.getCode()
+        engine = POEngine()
+        engine.file = 'sample_source'
+        interpreter = POTALInterpreter(
+            program, macros, engine, stream=StringIO(), metal=False)
+        # We simply call this, to make sure we don't get a NameError
+        # for 'unicode' in python 3.
+        # The return value (strangely: 'x') is not interesting here.
+        interpreter.translate('text')
+        msgids = []
+        for domain in engine.catalog.values():
+            msgids += list(domain)
+        self.assertIn('text', msgids)
+
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
