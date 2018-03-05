@@ -7,6 +7,8 @@
 
 - Host documentation at https://zopetal.readthedocs.io
 
+- Fix a ``NameError`` on Python 3 in talgettext.py affecting i18ndude.
+  See https://github.com/zopefoundation/zope.tal/pull/11
 
 4.3.0 (2017-08-08)
 ==================

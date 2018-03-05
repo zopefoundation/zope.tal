@@ -44,6 +44,10 @@ from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.taldefs import TALExpressionError
 from zope.i18nmessageid import Message
 
+PY3 = sys.version_info > (3,)
+if PY3:
+    unicode = str
+
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR ORGANIZATION
@@ -63,6 +67,7 @@ msgstr ""
 '''
 
 NLSTR = '"\n"'
+
 
 def usage(code, msg=''):
     # Python 2.1 required
