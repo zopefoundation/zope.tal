@@ -5,8 +5,7 @@
 4.3.2 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Add support for Python 3.7.
 
 4.3.1 (2018-03-21)
 ==================
