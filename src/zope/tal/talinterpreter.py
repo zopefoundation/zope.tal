@@ -987,10 +987,15 @@ class TALInterpreter(object):
         # handled.
         except:
             exc = sys.exc_info()[1]
-            self.restoreState(state)
-            engine = self.engine
-            engine.beginScope()
-            error = engine.createErrorInfo(exc, self.position)
+            try:
+                self.restoreState(state)
+                engine = self.engine
+                engine.beginScope()
+                error = engine.createErrorInfo(exc, self.position)
+            finally:
+                # Avoid traceback reference cycle due to the __traceback__
+                # attribute on Python 3.
+                del exc
             engine.setLocal('error', error)
             try:
                 self.interpret(handler)

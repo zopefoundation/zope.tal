@@ -5,7 +5,7 @@
 4.5 (unreleased)
 ================
 
-- Nothing changed yet.
+- Avoid traceback reference cycle in ``TALInterpreter.do_onError_tal``.
 
 
 4.4 (2018-10-05)
