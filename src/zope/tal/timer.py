@@ -41,6 +41,7 @@ def main():
         it = timefunc(count, compilefile, file)
         timefunc(count, interpretit, it, None, dummyfile)
 
+
 def timefunc(count, func, *args):
     sys.stderr.write("%-14s: " % func.__name__)
     sys.stderr.flush()
@@ -49,8 +50,9 @@ def timefunc(count, func, *args):
         result = func(*args)
     t1 = time.clock()
     sys.stderr.write("%6.3f secs for %d calls, i.e. %4.0f msecs per call\n"
-                     % ((t1-t0), count, 1000*(t1-t0)/count))
+                     % ((t1 - t0), count, 1000 * (t1 - t0) / count))
     return result
+
 
 if __name__ == "__main__":
     main()

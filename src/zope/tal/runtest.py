@@ -37,24 +37,31 @@ except ImportError:
 import zope.tal.driver
 import zope.tal.tests.utils
 
+
 def showdiff(a, b, out):
     print(''.join(difflib.ndiff(a, b)), file=out)
+
 
 def main(argv=None, out=sys.stdout):
     parser = optparse.OptionParser('usage: %prog [options] [testfile ...]',
                                    description=__doc__)
     parser.add_option('-q', '--quiet', action='store_true',
-            help="less verbose output")
+                      help="less verbose output")
     internal_options = optparse.OptionGroup(parser, 'Internal options')
-    internal_options.add_option('-Q', '--very-quiet',
-            action='store_true', dest='unittesting',
-            help="no output on success, only diff/traceback on failure")
+    internal_options.add_option(
+        '-Q',
+        '--very-quiet',
+        action='store_true',
+        dest='unittesting',
+        help="no output on success, only diff/traceback on failure")
     internal_options.add_option('-N', '--normalize-newlines',
-            action='store_true', dest='normalize_newlines',
-            help="ignore differences between CRLF and LF")
+                                action='store_true', dest='normalize_newlines',
+                                help="ignore differences between CRLF and LF")
     parser.add_option_group(internal_options)
-    driver_options = optparse.OptionGroup(parser, 'Driver options',
-            "(for debugging only; supplying these *will* cause test failures)")
+    driver_options = optparse.OptionGroup(
+        parser,
+        'Driver options',
+        "(for debugging only; supplying these *will* cause test failures)")
     for option in zope.tal.driver.OPTIONS:
         driver_options.add_option(option)
     parser.add_option_group(driver_options)
@@ -66,10 +73,8 @@ def main(argv=None, out=sys.stdout):
         if zope.tal.tests.utils.skipxml:
             xmlargs = []
         else:
-            xmlargs = glob.glob(prefix + "xml")
-            xmlargs.sort()
-        htmlargs = glob.glob(prefix + "html")
-        htmlargs.sort()
+            xmlargs = sorted(glob.glob(prefix + "xml"))
+        htmlargs = sorted(glob.glob(prefix + "html"))
         args = xmlargs + htmlargs
         if not args:
             sys.stderr.write("No tests found -- please supply filenames\n")
@@ -97,7 +102,7 @@ def main(argv=None, out=sys.stdout):
                 sys.stdout, sys.argv = save
         except SystemExit:
             raise
-        except:
+        except BaseException:
             errors = 1
             if opts.quiet:
                 print(sys.exc_info()[0].__name__, file=out)
@@ -141,9 +146,9 @@ def main(argv=None, out=sys.stdout):
             #   also have \r\n's going through the TAL engine and showing
             #   up both in actual and expected lists.  Except for source
             #   annotation lines added by TAL, which always use just \n.
-            actual = [l.replace('\r\n', '\n') for l in actual]
+            actual = [line.replace('\r\n', '\n') for line in actual]
             if expected is not None:
-                expected = [l.replace('\r\n', '\n') for l in expected]
+                expected = [line.replace('\r\n', '\n') for line in expected]
         if actual == expected:
             if not opts.unittesting:
                 print("OK", file=out)
@@ -161,14 +166,16 @@ def main(argv=None, out=sys.stdout):
         else:
             sys.exit(1)
 
+
 def readlines(f):
     L = []
-    while 1:
+    while True:
         line = f.readline()
         if not line:
             break
         L.append(line)
     return L
+
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

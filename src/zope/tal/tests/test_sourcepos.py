@@ -59,7 +59,6 @@ main_template=main_template (6,14)
 </body></html>'''
 
 
-
 class SourcePosTestCase(unittest.TestCase):
 
     def parse(self, eng, s, fn):

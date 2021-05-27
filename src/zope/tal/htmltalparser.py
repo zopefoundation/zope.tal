@@ -60,7 +60,7 @@ BOOLEAN_HTML_ATTRS = frozenset([
     "compact", "nowrap", "ismap", "declare", "noshade", "checked",
     "disabled", "readonly", "multiple", "selected", "noresize",
     "defer"
-    ])
+])
 
 #: List of HTML tags with an empty content model; these are
 #: rendered in minimized form, e.g. ``<img />``.
@@ -68,13 +68,13 @@ BOOLEAN_HTML_ATTRS = frozenset([
 EMPTY_HTML_TAGS = frozenset([
     "base", "meta", "link", "hr", "br", "param", "img", "area",
     "input", "col", "basefont", "isindex", "frame",
-    ])
+])
 
 #: List of HTML elements that close open paragraph-level elements
 #: and are themselves paragraph-level.
 PARA_LEVEL_HTML_TAGS = frozenset([
     "h1", "h2", "h3", "h4", "h5", "h6", "p",
-    ])
+])
 
 #: Tags that automatically close other tags.
 BLOCK_CLOSING_TAG_MAP = {
@@ -84,13 +84,13 @@ BLOCK_CLOSING_TAG_MAP = {
     "li": frozenset(["li"]),
     "dd": frozenset(["dd", "dt"]),
     "dt": frozenset(["dd", "dt"]),
-    }
+}
 
 #: List of HTML tags that denote larger sections than paragraphs.
 BLOCK_LEVEL_HTML_TAGS = frozenset([
     "blockquote", "table", "tr", "th", "td", "thead", "tfoot", "tbody",
     "noframe", "ul", "ol", "li", "dl", "dt", "dd", "div",
-    ])
+])
 
 #: Section level HTML tags
 SECTION_LEVEL_HTML_TAGS = PARA_LEVEL_HTML_TAGS.union(BLOCK_LEVEL_HTML_TAGS)
@@ -114,6 +114,7 @@ class NestingError(HTMLParseError):
             msg = 'No tags are open to match </%s>' % endtag
         HTMLParseError.__init__(self, msg, position)
 
+
 class EmptyTagError(NestingError):
     """Exception raised when empty elements have an end tag."""
 
@@ -122,6 +123,7 @@ class EmptyTagError(NestingError):
         msg = 'Close tag </%s> should be removed' % tag
         HTMLParseError.__init__(self, msg, position)
 
+
 class OpenTagError(NestingError):
     """Exception raised when a tag is not allowed in another tag."""
 
@@ -129,6 +131,7 @@ class OpenTagError(NestingError):
         self.tag = tag
         msg = 'Tag <%s> is not allowed in <%s>' % (tag, tagstack[-1])
         HTMLParseError.__init__(self, msg, position)
+
 
 class HTMLTALParser(HTMLParser):
     """
@@ -188,7 +191,7 @@ class HTMLTALParser(HTMLParser):
         self.close_para_tags(tag)
         self.scan_xmlns(attrs)
         tag, attrlist, taldict, metaldict, i18ndict \
-             = self.process_ns(tag, attrs)
+            = self.process_ns(tag, attrs)
         if tag in EMPTY_HTML_TAGS and "content" in taldict:
             raise TALError(
                 "empty HTML tags cannot use tal:content: %s" % repr(tag),
@@ -209,7 +212,7 @@ class HTMLTALParser(HTMLParser):
         self.close_para_tags(tag)
         self.scan_xmlns(attrs)
         tag, attrlist, taldict, metaldict, i18ndict \
-             = self.process_ns(tag, attrs)
+            = self.process_ns(tag, attrs)
         if "content" in taldict:
             if tag in EMPTY_HTML_TAGS:
                 raise TALError(
@@ -345,7 +348,7 @@ class HTMLTALParser(HTMLParser):
         for item in attrs:
             key, value = item
             key, keybase, keyns = self.fixname(key)
-            ns = keyns or namens # default to tag namespace
+            ns = keyns or namens  # default to tag namespace
             if ns and ns != 'unknown':
                 item = (key, value, ns)
             if ns == 'tal':

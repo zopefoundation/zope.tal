@@ -32,10 +32,11 @@ from zope.tal.translationcontext import TranslationContext, DEFAULT_DOMAIN
 try:
     xrange
 except NameError:
-    xrange = range # Python 3.x
+    xrange = range  # Python 3.x
 
 
 _name_rx = re.compile(NAME_RE)
+
 
 class TALGenerator(object):
     """
@@ -89,7 +90,7 @@ class TALGenerator(object):
         output = []
         collect = []
         cursor = 0
-        for cursor in xrange(len(program)+1):
+        for cursor in xrange(len(program) + 1):
             try:
                 item = program[cursor]
             except IndexError:
@@ -128,7 +129,7 @@ class TALGenerator(object):
                     output.append(("rawtextColumn", (text, i)))
                 else:
                     output.append(("rawtextOffset", (text, len(text))))
-            if opcode != None:
+            if opcode is not None:
                 output.append(self.optimizeArgsList(item))
             collect = []
         return self.optimizeCommonTriple(output)
@@ -257,8 +258,8 @@ class TALGenerator(object):
             self.emit("endTag", name)
 
     def emitOptTag(self, name, optTag, isend):
-        program = self.popProgram() #block
-        start = self.popProgram() #start tag
+        program = self.popProgram()  # block
+        start = self.popProgram()  # start tag
         if (isend or not program) and self.xml:
             # Minimize empty element
             start[-1] = ("startEndTag",) + start[-1][1:]
@@ -367,8 +368,9 @@ class TALGenerator(object):
         program = self.popProgram()
         macroName = macroName.strip()
         if macroName in self.macros:
-            raise METALError("duplicate macro definition: %s" % repr(macroName),
-                             self.position)
+            raise METALError(
+                "duplicate macro definition: %s" %
+                repr(macroName), self.position)
         if not re.match('%s$' % NAME_RE, macroName):
             raise METALError("invalid macro name: %s" % repr(macroName),
                              self.position)
@@ -422,8 +424,8 @@ class TALGenerator(object):
             if not re.match(r"\A\s*\Z", text):
                 break
             collect.append(text)
-            i = i-1
-        del self.program[i+1:]
+            i = i - 1
+        del self.program[i + 1:]
         if i >= 0 and self.program[i][0] == "rawtext":
             text = self.program[i][1]
             m = re.search(r"\s+\Z", text)
@@ -437,7 +439,7 @@ class TALGenerator(object):
         collect = []
         i = len(self.program)
         while i > 0:
-            i = i-1
+            i = i - 1
             item = self.program[i]
             if item[0] != "rawtext":
                 break
@@ -629,9 +631,9 @@ class TALGenerator(object):
             domain = i18ndict.get("domain") or self.i18nContext.domain
             source = i18ndict.get("source") or self.i18nContext.source
             target = i18ndict.get("target") or self.i18nContext.target
-            if (  domain != DEFAULT_DOMAIN
-                  or source is not None
-                  or target is not None):
+            if (domain != DEFAULT_DOMAIN
+                or source is not None
+                    or target is not None):
                 self.i18nContext = TranslationContext(self.i18nContext,
                                                       domain=domain,
                                                       source=source,
@@ -648,13 +650,13 @@ class TALGenerator(object):
             self.emit("beginScope", dict)
             todo["scope"] = 1
         if onError:
-            self.pushProgram() # handler
+            self.pushProgram()  # handler
             if TALtag:
-                self.pushProgram() # start
-            self.emitStartTag(name, list(attrlist)) # Must copy attrlist!
+                self.pushProgram()  # start
+            self.emitStartTag(name, list(attrlist))  # Must copy attrlist!
             if TALtag:
-                self.pushProgram() # start
-            self.pushProgram() # block
+                self.pushProgram()  # start
+            self.pushProgram()  # block
             todo["onError"] = onError
         if define:
             self.emitDefines(define)
@@ -863,12 +865,14 @@ def _parseI18nAttributes(i18nattrs, position, xml):
         d[attr] = msgid
     return d
 
+
 def test():
     t = TALGenerator()
     t.pushProgram()
     t.emit("bar")
     p = t.popProgram()
     t.emit("foo", p)
+
 
 if __name__ == "__main__":
     test()

@@ -43,9 +43,9 @@ class ITALExpressionCompiler(Interface):
         *expression* is the source text of the expression.
 
         The return value may be passed to the various ``evaluate*()``
-        methods of the :class:`ITALExpressionEngine` interface.  No compatibility is
-        required for the values of the compiled expression between
-        different :class:`ITALExpressionEngine` implementations.
+        methods of the :class:`ITALExpressionEngine` interface.  No
+        compatibility is required for the values of the compiled expression
+        between different :class:`ITALExpressionEngine` implementations.
         """
 
     def getContext(namespace):
@@ -53,6 +53,7 @@ class ITALExpressionCompiler(Interface):
 
         The given *namespace* provides the initial top-level names.
         """
+
 
 class ITALExpressionEngine(Interface):
     """Render-time interface provided by a TAL expression implementation.

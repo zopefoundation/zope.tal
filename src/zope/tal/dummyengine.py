@@ -31,12 +31,13 @@ from zope.i18nmessageid import Message
 try:
     unicode
 except NameError:
-    unicode = str # Python 3.x
+    unicode = str  # Python 3.x
 
 
 Default = object()
 
 name_match = re.compile(r"(?s)(%s):(.*)\Z" % NAME_RE).match
+
 
 class CompilerError(Exception):
     pass
@@ -47,7 +48,6 @@ class DummyEngine(object):
 
     position = None
     source_file = None
-
 
     def __init__(self, macros=None):
         if macros is None:
@@ -119,7 +119,7 @@ class DummyEngine(object):
         if type == "python":
             try:
                 return eval(expr, self.globals, self.locals)
-            except:
+            except BaseException:
                 raise TALExpressionError("evaluation error in %s" % repr(expr))
         if type == "position":
             # Insert the current source file name, line number,
@@ -129,7 +129,9 @@ class DummyEngine(object):
             else:
                 lineno, offset = None, None
             return '%s (%s,%s)' % (self.source_file, lineno, offset)
-        raise TALExpressionError("unrecognized expression: " + repr(expression))
+        raise TALExpressionError(
+            "unrecognized expression: " +
+            repr(expression))
 
     # implementation; can be overridden
     def evaluatePathOrVar(self, expr):
@@ -193,7 +195,7 @@ class DummyEngine(object):
         else:
             # Up to last slash is the filename
             fileName = macroName[:i]
-            localName = macroName[i+1:]
+            localName = macroName[i + 1:]
             return fileName, localName
 
     def setRepeat(self, name, expr):
@@ -231,7 +233,7 @@ class DummyEngine(object):
 
         # Prepare code.
         lines = code.split('\n')
-        lines = [l for l in lines if l.strip() != '']
+        lines = [line for line in lines if line.strip() != '']
         code = '\n'.join(lines)
         # This saves us from all indentation issues :)
         if code.startswith(' ') or code.startswith('\t'):
@@ -253,6 +255,7 @@ class DummyEngine(object):
 
         return result.getvalue()
 
+
 class Iterator(object):
 
     def __init__(self, name, seq, engine):
@@ -267,23 +270,23 @@ class Iterator(object):
             item = self.seq[i]
         except IndexError:
             return 0
-        self.nextIndex = i+1
+        self.nextIndex = i + 1
         self.engine.setLocal(self.name, item)
         return 1
-    next = __next__ # Python 2 compatibility
+    next = __next__  # Python 2 compatibility
 
 
 class DummyTranslationDomain(object):
 
     domain = ''
 
-    msgids = {} 
+    msgids = {}
 
     def appendMsgid(self, domain, data):
         if domain not in self.msgids:
             self.msgids[domain] = []
-        self.msgids[domain].append(data)    
-    
+        self.msgids[domain].append(data)
+
     def getMsgids(self, domain):
         return self.msgids[domain]
 
@@ -309,8 +312,8 @@ class DummyTranslationDomain(object):
             domain = msgid.domain
             mapping = msgid.mapping
             default = msgid.default
-            if default is None: # Message doesn't substitute itself for
-                default = msgid # missing default
+            if default is None:  # Message doesn't substitute itself for
+                default = msgid  # missing default
 
         # simulate an unknown msgid by returning None
         if msgid == "don't translate me":
@@ -322,23 +325,23 @@ class DummyTranslationDomain(object):
             text = msgid.upper()
 
         self.appendMsgid(domain, (msgid, mapping))
-        
+
         def repl(m):
             return unicode(mapping[m.group(m.lastindex).lower()])
         cre = re.compile(r'\$(?:([_A-Za-z][-\w]*)|\{([_A-Za-z][-\w]*)\})')
         return cre.sub(repl, text)
 
+
 class MultipleDomainsDummyEngine(DummyEngine):
-    
+
     def translate(self, msgid, domain=None, mapping=None, default=None):
-        
+
         if isinstance(msgid, Message):
             domain = msgid.domain
-        
-        if domain == 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine':
+
+        if domain == 'a_very_explicit_domain_setup_by_template_developer_that_wont_be_taken_into_account_by_the_ZPT_engine':  # noqa: E501 line too long
             domain = 'lower'
-        
+
         self.translationDomain.domain = domain
         return self.translationDomain.translate(
             msgid, mapping, default=default)
-

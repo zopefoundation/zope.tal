@@ -28,7 +28,7 @@ except ImportError:
 try:
     unicode
 except NameError:
-    unicode = str # Python 3.x
+    unicode = str  # Python 3.x
 
 
 class XMLParser(object):
@@ -59,7 +59,7 @@ class XMLParser(object):
         "EndDoctypeDeclHandler",
         "ElementDeclHandler",
         "AttlistDeclHandler"
-        ]
+    ]
 
     def __init__(self, encoding=None):
         self.parser = p = self.createParser(encoding)

@@ -13,6 +13,7 @@
 ##############################################################################
 """Helper functions for the test suite.
 """
+import unittest
 import os
 import sys
 
@@ -22,13 +23,11 @@ codedir = os.path.dirname(os.path.dirname(os.path.dirname(mydir)))
 if codedir not in sys.path:
     sys.path.append(codedir)
 
-import unittest
-
 
 # Set skipxml to true if an XML parser could not be found.
 skipxml = 0
 try:
-    import xml.parsers.expat
+    import xml.parsers.expat  # noqa: F401 imported but unused
 except ImportError:
     skipxml = 1
 
@@ -39,15 +38,6 @@ def run_suite(suite, outf=None, errf=None):
     runner = unittest.TextTestRunner(outf)
     result = runner.run(suite)
 
-##     print "\n\n"
-##     if result.errors:
-##         print "Errors (unexpected exceptions):"
-##         map(print_error, result.errors)
-##         print
-##     if result.failures:
-##         print "Failures (assertion failures):"
-##         map(print_error, result.failures)
-##         print
     newerrs = len(result.errors) + len(result.failures)
     if newerrs:
         print("'Errors' indicate exceptions other than AssertionError.")
