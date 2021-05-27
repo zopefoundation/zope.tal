@@ -28,6 +28,9 @@ Options:
         found.
 """
 
+# XXX this module seems to be unused, it has NameErrors and is not Python 3
+#     compatible.
+
 from __future__ import print_function
 
 import sys
@@ -112,10 +115,10 @@ class POEngine(DummyEngine):
         return 'XXX'
 
     def evaluateSequence(self, expr):
-        return (0,) # dummy
+        return (0,)  # dummy
 
     def evaluateBoolean(self, expr):
-        return True # dummy
+        return True  # dummy
 
     def translate(self, msgid, domain=None, mapping=None, default=None,
                   # Position is not part of the ITALExpressionEngine
@@ -139,7 +142,7 @@ class POEngine(DummyEngine):
             idx = msgids.index(msgid)
             existing_msgid = msgids[idx]
             if msgid.default != existing_msgid.default:
-                references = '\n'.join([location[0]+':'+str(location[1])
+                references = '\n'.join([location[0] + ':' + str(location[1])
                                         for location in domain[msgid]])
                 # Note: a lot of encode calls here are needed so
                 # Python 3 does not break.
@@ -161,7 +164,7 @@ class UpdatePOEngine(POEngine):
     """A slightly-less braindead POEngine which supports loading an existing
     .po file first."""
 
-    def __init__ (self, macros=None, filename=None):
+    def __init__(self, macros=None, filename=None):
         POEngine.__init__(self, macros)
 
         self._filename = filename
@@ -301,7 +304,7 @@ def main():
             program, macros = p.getCode()
             POTALInterpreter(program, macros, engine, stream=Devnull(),
                              metal=False)()
-        except: # Hee hee, I love bare excepts!
+        except BaseException:  # Hee hee, I love bare excepts!
             print('There was an error processing', filename)
             traceback.print_exc()
 

@@ -31,6 +31,7 @@ from zope.tal.htmltalparser import HTMLTALParser
 from zope.tal.talgettext import POTALInterpreter
 from zope.tal.talgettext import POEngine
 
+
 class test_POEngine(unittest.TestCase):
     """Test the PO engine functionality, which simply adds items to a catalog
     as .translate is called

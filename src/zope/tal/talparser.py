@@ -32,7 +32,7 @@ class TALParser(XMLParser):
 
     ordered_attributes = 1
 
-    def __init__(self, gen=None, encoding=None): # Override
+    def __init__(self, gen=None, encoding=None):  # Override
         """
         :keyword TALGenerator gen: The configured (with an expression compiler)
             code generator to use. If one is not given, a default will be used.
@@ -67,9 +67,9 @@ class TALParser(XMLParser):
                 attrlist.append((key, value))
         else:
             # attrs is a dict of {name: value}
-            attrlist = sorted(attrs.items()) # sort for definiteness
+            attrlist = sorted(attrs.items())  # sort for definiteness
         name, attrlist, taldict, metaldict, i18ndict \
-              = self.process_ns(name, attrlist)
+            = self.process_ns(name, attrlist)
         attrlist = self.xmlnsattrs() + attrlist
         self.gen.emitStartElement(name, attrlist, taldict, metaldict, i18ndict,
                                   self.getpos())
@@ -82,7 +82,7 @@ class TALParser(XMLParser):
         name, namebase, namens = self.fixname(name)
         for key, value in attrlist:
             key, keybase, keyns = self.fixname(key)
-            ns = keyns or namens # default to tag namespace
+            ns = keyns or namens  # default to tag namespace
             item = key, value
             if ns == 'metal':
                 metaldict[keybase] = value
@@ -137,6 +137,7 @@ class TALParser(XMLParser):
     def DefaultHandler(self, text):
         self.gen.emitRawText(text)
 
+
 def test():
     import sys
     p = TALParser()
@@ -149,6 +150,7 @@ def test():
     from zope.tal.dummyengine import DummyEngine
     engine = DummyEngine(macros)
     TALInterpreter(program, macros, engine, sys.stdout, wrap=0)()
+
 
 if __name__ == "__main__":
     test()

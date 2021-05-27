@@ -96,6 +96,7 @@ class SegmentedFile(object):
             s = b''
         return s
 
+
 @unittest.skipIf(utils.skipxml, "Skip XML defined")
 class XMLParserTestCase(unittest.TestCase):
 
@@ -121,7 +122,7 @@ class XMLParserTestCase(unittest.TestCase):
             ("pi", "processing", "instruction"),
             ("starttag", "a", []),
             ("endtag", "a"),
-            ])
+        ])
 
     def _check_simple_html(self):
         self._run_check("""\
@@ -136,20 +137,21 @@ text
 <!--comment2a- -comment2b-->
 </html>
 """, [
-    ("decl", "1.0", "iso-8859-1", -1),
-    ("doctype", "html", "foo", "bar", 0),
-    ("starttag", "html", []),
-    # ("entityref", "entity"),
-    ("data", " \n"),
-    ("comment", "comment1a\n-></foo><bar>&lt;<?pi?></foo<bar\ncomment1b"),
-    ("data", "\n"),
-    ("starttag", "img", ["src", "Bar", "ismap", ""]),
-    ("endtag", "img"),
-    ("data", "sample\ntext\n"),
-    ("comment", "comment2a- -comment2b"),
-    ("data", "\n"),
-    ("endtag", "html"),
-    ])
+            ("decl", "1.0", "iso-8859-1", -1),
+            ("doctype", "html", "foo", "bar", 0),
+            ("starttag", "html", []),
+            # ("entityref", "entity"),
+            ("data", " \n"),
+            ("comment",
+             "comment1a\n-></foo><bar>&lt;<?pi?></foo<bar\ncomment1b"),
+            ("data", "\n"),
+            ("starttag", "img", ["src", "Bar", "ismap", ""]),
+            ("endtag", "img"),
+            ("data", "sample\ntext\n"),
+            ("comment", "comment2a- -comment2b"),
+            ("data", "\n"),
+            ("endtag", "html"),
+        ])
 
     def test_bad_nesting(self):
         with self.assertRaises(Exception) as e:
@@ -158,7 +160,7 @@ text
                 ("starttag", "b", []),
                 ("endtag", "a"),
                 ("endtag", "b"),
-                ])
+            ])
 
         e = e.exception
         self.assertEqual(e.lineno, 1,
@@ -181,34 +183,34 @@ text
                                 "c", "yyy  yyy",
                                 "d", " xyz "]),
              ("endtag", "a"),
-            ]
+             ]
         )
         self._run_check("""<a b='' c="" d=''/>""", [
             ("starttag", "a", ["b", "", "c", "", "d", ""]),
             ("endtag", "a"),
-            ])
+        ])
 
     def test_attr_entity_replacement(self):
         self._run_check("""<a b='&amp;&gt;&lt;&quot;&apos;'/>""", [
             ("starttag", "a", ["b", "&><\"'"]),
             ("endtag", "a"),
-            ])
+        ])
 
     def test_attr_funky_names(self):
         self._run_check("""<a a.b='v' e-f='v'/>""", [
             ("starttag", "a", ["a.b", "v", "e-f", "v"]),
             ("endtag", "a"),
-            ])
+        ])
 
     def test_starttag_end_boundary(self):
         self._run_check("""<a b='&lt;'/>""", [
             ("starttag", "a", ["b", "<"]),
             ("endtag", "a"),
-            ])
+        ])
         self._run_check("""<a b='&gt;'/>""", [
             ("starttag", "a", ["b", ">"]),
             ("endtag", "a"),
-            ])
+        ])
 
     def test_buffer_artefacts(self):
         output = [("starttag", "a", ["b", "<"]), ("endtag", "a")]

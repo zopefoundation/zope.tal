@@ -54,9 +54,9 @@ class TestEngine(DummyEngine):
 
     def evaluatePathOrVar(self, expr):
         if expr == 'here/currentTime':
-            return {'hours'  : 6,
+            return {'hours': 6,
                     'minutes': 59,
-                    'ampm'   : 'PM',
+                    'ampm': 'PM',
                     }
         elif expr == 'context/@@object_name':
             return '7'
@@ -80,27 +80,35 @@ ENGINES = {'test23.html': TestEngine,
 
 
 OPTIONS = [
-    optparse.make_option('-H', '--html',
-            action='store_const', const='html', dest='mode',
-            help='explicitly choose HTML input (default: use file extension)'),
-    optparse.make_option('-x', '--xml',
-            action='store_const', const='xml', dest='mode',
-            help='explicitly choose XML input (default: use file extension)'),
+    optparse.make_option(
+        '-H', '--html',
+        action='store_const', const='html', dest='mode',
+        help='explicitly choose HTML input (default: use file extension)'),
+    optparse.make_option(
+        '-x', '--xml',
+        action='store_const', const='xml', dest='mode',
+        help='explicitly choose XML input (default: use file extension)'),
     optparse.make_option('-l', '--lenient', action='store_true',
-            help='lenient structure insertion'),
-            # aka don't validate HTML/XML inserted by
-            # tal:content="structure expr"
-    optparse.make_option('-m', '--macro-only', action='store_true',
-            help='macro expansion only'),
-    optparse.make_option('-s', '--show-code', action='store_true',
-            help='print intermediate opcodes only'),
-    optparse.make_option('-t', '--show-tal', action='store_true',
-            help='leave TAL/METAL attributes in output'),
-    optparse.make_option('-i', '--show-i18n', action='store_true',
-            help='leave I18N substitution string un-interpolated'),
-    optparse.make_option('-a', '--annotate', action='store_true',
-            help='enable source annotations'),
+                         help='lenient structure insertion'),
+    # aka don't validate HTML/XML inserted by
+    # tal:content="structure expr"
+    optparse.make_option(
+        '-m', '--macro-only', action='store_true',
+        help='macro expansion only'),
+    optparse.make_option(
+        '-s', '--show-code', action='store_true',
+        help='print intermediate opcodes only'),
+    optparse.make_option(
+        '-t', '--show-tal', action='store_true',
+        help='leave TAL/METAL attributes in output'),
+    optparse.make_option(
+        '-i', '--show-i18n', action='store_true',
+        help='leave I18N substitution string un-interpolated'),
+    optparse.make_option(
+        '-a', '--annotate', action='store_true',
+        help='enable source annotations'),
 ]
+
 
 def main(values=None):
     parser = optparse.OptionParser('usage: %prog [options] testfile',
@@ -130,6 +138,7 @@ def main(values=None):
                     i18nInterpolate=not opts.show_i18n,
                     sourceAnnotations=opts.annotate)
 
+
 def interpretit(it, engine=None, stream=None, tal=1, showtal=-1,
                 strictinsert=1, i18nInterpolate=1, sourceAnnotations=0):
     from zope.tal.talinterpreter import TALInterpreter
@@ -142,6 +151,7 @@ def interpretit(it, engine=None, stream=None, tal=1, showtal=-1,
                    i18nInterpolate=i18nInterpolate,
                    sourceAnnotations=sourceAnnotations)()
 
+
 def compilefile(file, mode=None):
     assert mode in ("html", "xml", None)
     if mode is None:
@@ -153,13 +163,13 @@ def compilefile(file, mode=None):
     # make sure we can find the file
     prefix = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
     if (not os.path.exists(file)
-        and os.path.exists(os.path.join(prefix, file))):
+            and os.path.exists(os.path.join(prefix, file))):
         file = os.path.join(prefix, file)
     # normalize filenames for test output
     filename = os.path.abspath(file)
     if filename.startswith(prefix):
         filename = filename[len(prefix):]
-    filename = filename.replace(os.sep, '/') # test files expect slashes
+    filename = filename.replace(os.sep, '/')  # test files expect slashes
     # parse
     from zope.tal.talgenerator import TALGenerator
     if mode == "html":
@@ -171,9 +181,11 @@ def compilefile(file, mode=None):
     p.parseFile(file)
     return p.getCode()
 
+
 def showit(it):
     from pprint import pprint
     pprint(it)
+
 
 if __name__ == "__main__":
     main()

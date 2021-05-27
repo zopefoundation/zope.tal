@@ -27,7 +27,7 @@ from zope.tal.translationcontext import TranslationContext
 try:
     unicode
 except NameError:
-    unicode = str # Python 3.x
+    unicode = str  # Python 3.x
 _BLANK = u''
 
 
@@ -50,6 +50,7 @@ BOOLEAN_HTML_ATTRS = frozenset([
 
 _nulljoin = ''.join
 _spacejoin = ' '.join
+
 
 def normalize(text):
     # Now we need to normalize the whitespace in implicit message ids and
@@ -90,7 +91,6 @@ class AltTALGenerator(TALGenerator):
         return TALGenerator.replaceAttrs(self, attrlist, repldict)
 
 
-
 class MacroStackItem(list):
     # This is a `list` subclass for backward compability.
     """Stack entry for the TALInterpreter.macroStack.
@@ -116,24 +116,25 @@ class TALInterpreter(object):
     """TAL interpreter.
 
     Some notes on source annotations.  They are HTML/XML comments added to the
-    output whenever ``sourceFile`` is changed by a ``setSourceFile`` bytecode.  Source
-    annotations are disabled by default, but you can turn them on by passing a
-    ``sourceAnnotations`` argument to the constructor.  You can change the format
-    of the annotations by overriding formatSourceAnnotation in a subclass.
+    output whenever ``sourceFile`` is changed by a ``setSourceFile`` bytecode.
+    Source annotations are disabled by default, but you can turn them on by
+    passing a ``sourceAnnotations`` argument to the constructor.  You can
+    change the format of the annotations by overriding formatSourceAnnotation
+    in a subclass.
 
     The output of the annotation is delayed until some actual text is output
     for two reasons:
 
-        1. ``setPosition`` bytecode follows ``setSourceFile``, and we need position
-           information to output the line number.
+        1. ``setPosition`` bytecode follows ``setSourceFile``, and we need
+           position information to output the line number.
         2. Comments are not allowed in XML documents before the ``<?xml?>``
            declaration.
 
     For performance reasons (TODO: premature optimization?) instead of checking
     the value of ``_pending_source_annotation`` on every write to the output
     stream, the ``_stream_write`` attribute is changed to point to
-    ``_annotated_stream_write`` method whenever ``_pending_source_annotation`` is
-    set to True, and to _stream.write when it is False.  The following
+    ``_annotated_stream_write`` method whenever ``_pending_source_annotation``
+    is set to True, and to _stream.write when it is False.  The following
     invariant always holds::
 
         if self._pending_source_annotation:
@@ -157,13 +158,14 @@ class TALInterpreter(object):
         Optional arguments:
 
         :keyword stream: output stream (defaults to sys.stdout).
-        :keyword bool debug: enable debugging output to sys.stderr (off by default).
-        :keyword int wrap: try to wrap attributes on opening tags to this number of
-            column (default: 1023).
+        :keyword bool debug: enable debugging output to sys.stderr (off by
+            default).
+        :keyword int wrap: try to wrap attributes on opening tags to this
+            number of column (default: 1023).
         :keyword bool metal: enable METAL macro processing (on by default).
         :keyword bool tal: enable TAL processing (on by default).
-        :keyword int showtal: do not strip away TAL directives.  A special value of
-            -1 (which is the default setting) enables showtal when TAL
+        :keyword int showtal: do not strip away TAL directives.  A special
+            value of -1 (which is the default setting) enables showtal when TAL
             processing is disabled, and disables showtal when TAL processing is
             enabled.  Note that you must use 0, 1, or -1; true boolean values
             are not supported (for historical reasons).
@@ -172,12 +174,12 @@ class TALInterpreter(object):
             Note that Zope turns this value off by default.
         :keyword int stackLimit: set macro nesting limit (default: 100).
         :keyword bool i18nInterpolate: enable i18n translations (default: on).
-        :keyword bool sourceAnnotations: enable source annotations with HTML comments
-            (default: off).
+        :keyword bool sourceAnnotations: enable source annotations with HTML
+            comments (default: off).
         """
         self.program = program
         self.macros = macros
-        self.engine = engine # Execution engine (aka context)
+        self.engine = engine  # Execution engine (aka context)
         self.Default = engine.getDefault()
         self._pending_source_annotation = False
         self._currentTag = ""
@@ -295,8 +297,8 @@ class TALInterpreter(object):
             # Do not preprend comments in front of the <?xml?> declaration.
             end_of_doctype = s.find('?>', idx)
             if end_of_doctype > idx:
-                self.stream.write(s[:end_of_doctype+2])
-                s = s[end_of_doctype+2:]
+                self.stream.write(s[:end_of_doctype + 2])
+                s = s[end_of_doctype + 2:]
                 # continue
             else:
                 self.stream.write(s)
@@ -333,7 +335,7 @@ class TALInterpreter(object):
         try:
             if self.debug:
                 for (opcode, args) in program:
-                    s = "%sdo_%s(%s)\n" % ("    "*self.level, opcode,
+                    s = "%sdo_%s(%s)\n" % ("    " * self.level, opcode,
                                            repr(args))
                     if len(s) > 80:
                         s = s[:76] + "...\n"
@@ -389,7 +391,7 @@ class TALInterpreter(object):
         col = self.col + _len(name) + 1
         wrap = self.wrap
         align = col + 1
-        if align >= wrap/2:
+        if align >= wrap / 2:
             align = 4  # Avoid a narrow column far to the right
         attrAction = self.dispatch["<attrAction>"]
         try:
@@ -410,9 +412,9 @@ class TALInterpreter(object):
                     slen = _len(s)
                     if (wrap and
                         col >= align and
-                        col + 1 + slen > wrap):
+                            col + 1 + slen > wrap):
                         append("\n")
-                        append(" "*align)
+                        append(" " * align)
                         col = align + slen
                     else:
                         append(" ")
@@ -473,7 +475,7 @@ class TALInterpreter(object):
         if self.html and name.lower() in BOOLEAN_HTML_ATTRS:
             evalue = self.engine.evaluateBoolean(item[3])
             if evalue is self.Default:
-                if action == 'insert': # Cancelled insert
+                if action == 'insert':  # Cancelled insert
                     ok = 0
             elif evalue:
                 value = None
@@ -482,7 +484,7 @@ class TALInterpreter(object):
         elif expr is not None:
             evalue = self.engine.evaluateText(item[3])
             if evalue is self.Default:
-                if action == 'insert': # Cancelled insert
+                if action == 'insert':  # Cancelled insert
                     ok = 0
             else:
                 if evalue is None:
@@ -786,7 +788,7 @@ class TALInterpreter(object):
     def insertHTMLStructure(self, text, repldict):
         from zope.tal.htmltalparser import HTMLTALParser
         gen = AltTALGenerator(repldict, self.engine, 0)
-        p = HTMLTALParser(gen) # Raises an exception if text is invalid
+        p = HTMLTALParser(gen)  # Raises an exception if text is invalid
         p.parseString(text)
         program, macros = p.getCode()
         self.interpret(program)
@@ -798,7 +800,7 @@ class TALInterpreter(object):
         gen.enable(0)
         p.parseFragment('<!DOCTYPE foo PUBLIC "foo" "bar"><foo>')
         gen.enable(1)
-        p.parseFragment(text) # Raises an exception if text is invalid
+        p.parseFragment(text)  # Raises an exception if text is invalid
         gen.enable(0)
         p.parseFragment('</foo>', 1)
         program, macros = gen.getCode()
@@ -883,9 +885,10 @@ class TALInterpreter(object):
             macro = block
         else:
             if not isCurrentVersion(macro):
-                raise METALError("macro %s has incompatible version %s" %
-                                 (repr(macroName), repr(getProgramVersion(macro))),
-                                 self.position)
+                raise METALError(
+                    "macro %s has incompatible version %s" %
+                    (repr(macroName), repr(
+                        getProgramVersion(macro))), self.position)
             mode = getProgramMode(macro)
             if mode != (self.html and "html" or "xml"):
                 raise METALError("macro %s has incompatible mode %s" %
@@ -985,7 +988,7 @@ class TALInterpreter(object):
         # The ITALExpressionEngine interface should provide a way of
         # getting the set of exception types that should not be
         # handled.
-        except:
+        except BaseException:
             exc = sys.exc_info()[1]
             try:
                 self.restoreState(state)

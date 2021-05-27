@@ -16,25 +16,23 @@
 """
 
 from __future__ import print_function
+from zope.tal.dummyengine import DummyEngine
+from zope.tal.talinterpreter import TALInterpreter
+from zope.tal.htmltalparser import HTMLTALParser
+from cStringIO import StringIO
+import errno
+import time
+import sys
+import getopt
+import os
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import os
 os.environ['NO_SECURITY'] = 'true'
 
-import getopt
-import sys
-import time
-import errno
 
-from cStringIO import StringIO
-
-#from zope.documenttemplate.dt_html import HTMLFile
-
-from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.dummyengine import DummyEngine
+# from zope.documenttemplate.dt_html import HTMLFile
 
 
 def time_apply(f, args, kwargs, count):
@@ -50,11 +48,13 @@ def time_apply(f, args, kwargs, count):
     t = time.clock() - t1 - (t1 - t0)
     return t / count
 
+
 def time_zpt(fn, count):
     from zope.pagetemplate.pagetemplate import PageTemplate
     pt = PageTemplate()
     pt.write(open(fn).read())
     return time_apply(pt.pt_render, (data,), {}, count)
+
 
 def time_tal(fn, count):
     p = HTMLTALParser()
@@ -66,9 +66,11 @@ def time_tal(fn, count):
                          tal=1, strictinsert=0)
     return time_apply(tal, (), {}, count)
 
+
 def time_dtml(fn, count):
-    html = HTMLFile(fn)
+    html = HTMLFile(fn)  # noqa: F821 undefined name 'HTMLFile'
     return time_apply(html, (), data, count)
+
 
 def profile_zpt(fn, count, profiler):
     from zope.pagetemplate.pagetemplate import PageTemplate
@@ -79,6 +81,7 @@ def profile_zpt(fn, count, profiler):
     r = [None] * count
     for i in r:
         profiler.runcall(pt.pt_render, 0, data)
+
 
 def profile_tal(fn, count, profiler):
     p = HTMLTALParser()
@@ -94,6 +97,7 @@ def profile_tal(fn, count, profiler):
     for i in r:
         profiler.runcall(tal)
 
+
 # Figure out where the benchmark files are:
 try:
     fname = __file__
@@ -106,14 +110,16 @@ benchdir = os.path.join(taldir, 'benchmark')
 tal_fn = os.path.join(benchdir, 'tal%.2d.html')
 dtml_fn = os.path.join(benchdir, 'dtml%.2d.html')
 
+
 def compare(n, count, profiler=None, verbose=1):
     if verbose:
         t1 = int(time_zpt(tal_fn % n, count) * 1000 + 0.5)
         t2 = int(time_tal(tal_fn % n, count) * 1000 + 0.5)
-        t3 = 'n/a' # int(time_dtml(dtml_fn % n, count) * 1000 + 0.5)
+        t3 = 'n/a'  # int(time_dtml(dtml_fn % n, count) * 1000 + 0.5)
         print('%.2d: %10s %10s %10s' % (n, t1, t2, t3))
     if profiler:
         profile_tal(tal_fn % n, count, profiler)
+
 
 def main(count, profiler=None, verbose=1):
     n = 1
@@ -123,6 +129,7 @@ def main(count, profiler=None, verbose=1):
         compare(n, count, profiler, verbose)
         n = n + 1
 
+
 def get_signal_name(sig):
     import signal
     for name in dir(signal):
@@ -130,7 +137,8 @@ def get_signal_name(sig):
             return name
     return None
 
-data = {'x':'X', 'r2': [0, 1], 'r8': list(range(8)), 'r64': list(range(64))}
+
+data = {'x': 'X', 'r2': [0, 1], 'r8': list(range(8)), 'r64': list(range(64))}
 for i in range(10):
     data['x%s' % i] = 'X%s' % i
 
@@ -163,9 +171,9 @@ if __name__ == "__main__":
             sys.exit(rc)
         elif rc < 0:
             sig = -rc
-            print((
-                "Process exited, signal %d (%s)."
-                % (sig, get_signal_name(sig) or "<unknown signal>")), file=sys.stderr)
+            print(("Process exited, signal %d (%s)." %
+                   (sig, get_signal_name(sig) or "<unknown signal>")),
+                  file=sys.stderr)
             sys.exit(1)
         os.chdir(pwd)
 

@@ -43,7 +43,7 @@ KNOWN_METAL_ATTRIBUTES = frozenset([
     "use-macro",
     "define-slot",
     "fill-slot",
-    ])
+])
 
 #: Known TAL attributes
 KNOWN_TAL_ATTRIBUTES = frozenset([
@@ -58,7 +58,7 @@ KNOWN_TAL_ATTRIBUTES = frozenset([
     "script",
     "tal tag",      # a pseudo attribute that holds the namespace of elements
                     # like <tal:x>, <metal:y>, <i18n:z>
-    ])
+])
 
 #: Known I18N attributes
 KNOWN_I18N_ATTRIBUTES = frozenset([
@@ -71,7 +71,8 @@ KNOWN_I18N_ATTRIBUTES = frozenset([
     "name",
     "ignore",
     "ignore-attributes",
-    ])
+])
+
 
 class TALError(Exception):
     """
@@ -99,11 +100,14 @@ class TALError(Exception):
             result = result + ', in file %s' % self.filename
         return result
 
+
 class METALError(TALError):
     """An error parsing on running METAL macros."""
 
+
 class TALExpressionError(TALError):
     """An error parsing or running a TAL expression."""
+
 
 class I18NError(TALError):
     """An error parsing a I18N expression."""
@@ -112,7 +116,8 @@ class I18NError(TALError):
 @implementer(ITALExpressionErrorInfo)
 class ErrorInfo(object):
     """
-    Default implementation of :class:`zope.tal.interfaces.ITALExpressionErrorInfo`.
+    Default implementation of
+    :class:`zope.tal.interfaces.ITALExpressionErrorInfo`.
     """
 
     def __init__(self, err, position=(None, None)):
@@ -129,6 +134,7 @@ class ErrorInfo(object):
 _attr_re = re.compile(r"\s*([^\s]+)\s+([^\s].*)\Z", re.S)
 _subst_re = re.compile(r"\s*(?:(text|structure)\s+)?(.*)\Z", re.S)
 
+
 def parseAttributeReplacements(arg, xml):
     attr_dict = {}
     for part in splitParts(arg):
@@ -143,6 +149,7 @@ def parseAttributeReplacements(arg, xml):
         attr_dict[name] = expr
     return attr_dict
 
+
 def parseSubstitution(arg, position=(None, None)):
     m = _subst_re.match(arg)
     if not m:
@@ -152,6 +159,7 @@ def parseSubstitution(arg, position=(None, None)):
         key = "text"
     return key, expr
 
+
 def splitParts(arg):
     # Break in pieces at undoubled semicolons and
     # change double semicolons to singles:
@@ -159,12 +167,14 @@ def splitParts(arg):
     parts = arg.split(';')
     parts = [p.replace("\0", ";") for p in parts]
     if len(parts) > 1 and not parts[-1].strip():
-        del parts[-1] # It ended in a semicolon
+        del parts[-1]  # It ended in a semicolon
     return parts
+
 
 def isCurrentVersion(program):
     version = getProgramVersion(program)
     return version == TAL_VERSION
+
 
 def isinstance_(ob, kind):
     # Proxy-friendly and faster isinstance_ check for new-style objects
@@ -183,6 +193,7 @@ def getProgramMode(program):
             return mode
     return None
 
+
 def getProgramVersion(program):
     if (len(program) >= 2
             and isinstance_(program[0], tuple) and len(program[0]) == 2):
@@ -191,11 +202,13 @@ def getProgramVersion(program):
             return version
     return None
 
+
 _ent1_re = re.compile('&(?![A-Z#])', re.I)
 _entch_re = re.compile('&([A-Z][A-Z0-9]*)(?![A-Z0-9;])', re.I)
 _entn1_re = re.compile('&#(?![0-9X])', re.I)
 _entnx_re = re.compile('&(#X[A-F0-9]*)(?![A-F0-9;])', re.I)
 _entnd_re = re.compile('&(#[0-9][0-9]*)(?![0-9;])')
+
 
 def attrEscape(s):
     """Replace special characters '&<>' by character entities,
@@ -210,8 +223,9 @@ def attrEscape(s):
     s = s.replace('"', '&quot;')
     return s
 
+
 def quote(s):
-    s = s.replace("&", "&amp;") # Must be done first!
+    s = s.replace("&", "&amp;")  # Must be done first!
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")
     s = s.replace('"', "&quot;")

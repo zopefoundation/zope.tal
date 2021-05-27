@@ -61,7 +61,7 @@ def _factory(filename, dirname):
             captured_stdout = buf.getvalue()
         if failed:
             raise AssertionError("output for %s didn't match:\n%s"
-                                    % (filename, captured_stdout))
+                                 % (filename, captured_stdout))
 
     return unittest.FunctionTestCase(runTest, setUp, tearDown, short_path)
 
@@ -81,9 +81,12 @@ def _find_files():
 # Nose doesn't handle 'test_suite' in the same was as zope.testrunner,
 # so we'll use its generator-as-test-factory feature.  See:
 # https://nose.readthedocs.org/en/latest/writing_tests.html#test-generators
+
+
 def test_for_nose_discovery():
     for arg in _find_files():
         yield _factory(arg, PARENTDIR)
+
 
 def test_suite():
     return unittest.TestSuite(

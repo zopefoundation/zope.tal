@@ -24,9 +24,11 @@ from setuptools import setup, find_packages
 
 here = os.path.dirname(__file__)
 
+
 def read(*rnames):
     with open(os.path.join(here, *rnames)) as f:
         return f.read()
+
 
 def alltests():
     # use the zope.testrunner machinery to find all the
@@ -41,6 +43,7 @@ def alltests():
     options = get_options(args, defaults)
     suites = list(find_suites(options))
     return TestSuite(suites)
+
 
 TESTS_REQUIRE = [
     'zope.testing',
@@ -67,10 +70,11 @@ setup(name='zope.tal',
           'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: Implementation :: CPython',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Natural Language :: English',
@@ -90,7 +94,7 @@ setup(name='zope.tal',
               'repoze.sphinx.autointerface',
           ],
       },
-      test_suite="__main__.alltests", # to support "setup.py test"
+      test_suite="__main__.alltests",  # to support "setup.py test"
       tests_require=TESTS_REQUIRE,
       install_requires=[
           'setuptools',
@@ -99,4 +103,4 @@ setup(name='zope.tal',
       ],
       include_package_data=True,
       zip_safe=False,
-)
+      )

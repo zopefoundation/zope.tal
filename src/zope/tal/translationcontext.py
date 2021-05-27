@@ -18,6 +18,7 @@ needed to perform translation of a marked string from a page template.
 """
 DEFAULT_DOMAIN = "default"
 
+
 class TranslationContext(object):
     """Information about the I18N settings of a TAL processor."""
 

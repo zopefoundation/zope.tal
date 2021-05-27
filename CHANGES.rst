@@ -7,6 +7,10 @@
 
 - Avoid traceback reference cycle in ``TALInterpreter.do_onError_tal``.
 
+- Add support for Python 3.8 and 3.9.
+
+- Drop support for Python 3.4.
+
 
 4.4 (2018-10-05)
 ================

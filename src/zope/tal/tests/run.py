@@ -24,6 +24,8 @@ from zope.tal.tests import test_files
 from zope.tal.tests import test_sourcepos
 
 # TODO this code isn't picked up by the Zope 3 test framework..
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(test_htmltalparser.test_suite())
@@ -35,8 +37,10 @@ def test_suite():
     suite.addTest(test_sourcepos.test_suite())
     return suite
 
+
 def main():
     return utils.run_suite(test_suite())
+
 
 if __name__ == "__main__":
     errs = main()
