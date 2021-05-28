@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.5 (unreleased)
+4.5 (2021-05-28)
 ================
 
 - Avoid traceback reference cycle in ``TALInterpreter.do_onError_tal``.
