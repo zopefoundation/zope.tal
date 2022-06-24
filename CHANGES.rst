@@ -7,6 +7,9 @@
 
 - Add support for Python 3.10.
 
+- Add ``nav`` to the list of HTML block level elements.
+  (`#18 <https://github.com/zopefoundation/zope.tal/pull/18>`_)
+
 
 4.5 (2021-05-28)
 ================

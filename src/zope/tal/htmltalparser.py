@@ -89,7 +89,7 @@ BLOCK_CLOSING_TAG_MAP = {
 #: List of HTML tags that denote larger sections than paragraphs.
 BLOCK_LEVEL_HTML_TAGS = frozenset([
     "blockquote", "table", "tr", "th", "td", "thead", "tfoot", "tbody",
-    "noframe", "ul", "ol", "li", "dl", "dt", "dd", "div",
+    "noframe", "ul", "ol", "li", "dl", "dt", "dd", "div", "nav",
 ])
 
 #: Section level HTML tags
