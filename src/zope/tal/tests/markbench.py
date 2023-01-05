@@ -15,7 +15,6 @@
 """Run benchmarks of TAL vs. DTML
 """
 
-from __future__ import print_function
 
 import errno
 import getopt
@@ -195,6 +194,6 @@ if __name__ == "__main__":
         p.sort_stats('time', 'calls')
         try:
             p.print_stats(20)
-        except IOError as e:
+        except OSError as e:
             if e.errno != errno.EPIPE:
                 raise

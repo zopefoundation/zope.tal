@@ -1058,11 +1058,3 @@ translated string</span>
             ('endScope', ()),
             ('rawtextColumn', ('</p>\n', 0))
         ])
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(HTMLTALParserTestCases),
-        unittest.makeSuite(METALGeneratorTestCases),
-        unittest.makeSuite(TALGeneratorTestCases),
-    ))

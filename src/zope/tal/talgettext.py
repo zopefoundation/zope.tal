@@ -12,25 +12,12 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Program to extract internationalization markup from Page Templates.
+"""Extract internationalization markup from Page Templates.
 
 Once you have marked up a Page Template file with i18n: namespace tags, use
-this program to extract GNU gettext .po file entries.
-
-Usage: talgettext.py [options] files
-Options:
-    -h / --help
-        Print this message and exit.
-    -o / --output <file>
-        Output the translation .po file to <file>.
-    -u / --update <file>
-        Update the existing translation <file> with any new translation strings
-        found.
+this code to extract GNU gettext .po file entries.
 """
 
-from __future__ import print_function
-
-import sys
 import warnings
 
 from zope.i18nmessageid import Message
@@ -41,10 +28,6 @@ from zope.tal.interfaces import ITALExpressionEngine
 from zope.tal.talinterpreter import TALInterpreter
 from zope.tal.talinterpreter import normalize
 
-
-PY3 = sys.version_info > (3,)
-if PY3:
-    unicode = str
 
 pot_header = '''\
 # SOME DESCRIPTIVE TITLE.
@@ -67,18 +50,10 @@ msgstr ""
 NLSTR = '"\n"'
 
 
-def usage(code, msg=''):
-    # Python 2.1 required
-    print(__doc__, file=sys.stderr)
-    if msg:
-        print(msg, file=sys.stderr)
-    sys.exit(code)
-
-
 class POTALInterpreter(TALInterpreter):
     def translate(self, msgid, default=None, i18ndict=None, obj=None):
         if default is None:
-            default = getattr(msgid, 'default', unicode(msgid))
+            default = getattr(msgid, 'default', str(msgid))
         # If no i18n dict exists yet, create one.
         if i18ndict is None:
             i18ndict = {}
@@ -140,13 +115,13 @@ class POEngine(DummyEngine):
                 references = '\n'.join([location[0] + ':' + str(location[1])
                                         for location in domain[msgid]])
                 # Note: a lot of encode calls here are needed so
-                # Python 3 does not break.
+                # it does not break.
                 warnings.warn(
                     "Warning: msgid '%s' in %s already exists "
                     "with a different default (bad: %s, should be: %s)\n"
                     "The references for the existent value are:\n%s\n" %
                     (msgid.encode('utf-8'),
-                     self.file.encode('utf-8') + ':'.encode('utf-8')
+                     self.file.encode('utf-8') + b':'
                      + str(position).encode('utf-8'),
                      msgid.default.encode('utf-8'),
                      existing_msgid.default.encode('utf-8'),

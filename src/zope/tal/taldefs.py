@@ -117,7 +117,7 @@ class I18NError(TALError):
 
 
 @implementer(ITALExpressionErrorInfo)
-class ErrorInfo(object):
+class ErrorInfo:
     """
     Default implementation of
     :class:`zope.tal.interfaces.ITALExpressionErrorInfo`.

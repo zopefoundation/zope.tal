@@ -18,14 +18,7 @@ import glob
 import os
 import sys
 import unittest
-
-
-try:
-    # Python 2.x
-    from cStringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
+from io import StringIO
 
 import zope.tal.runtest
 from zope.tal.tests import utils

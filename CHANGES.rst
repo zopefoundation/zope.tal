@@ -17,6 +17,8 @@
 - Remove ``.talgettext.UpdatePOEngine`` and the ability to call
   ``zope/tal/talgettext.py`` (main function). The code was broken and unused.
 
+- Remove support to run the tests using deprecated ``python setup.py test``.
+
 
 4.5 (2021-05-28)
 ================

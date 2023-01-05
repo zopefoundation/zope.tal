@@ -16,7 +16,6 @@
 interprets a file, prints results to stdout.
 """
 
-from __future__ import print_function
 
 import optparse
 import os
