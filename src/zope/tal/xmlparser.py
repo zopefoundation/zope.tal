@@ -17,6 +17,7 @@ This creates a parser with namespace processing enabled.
 """
 import logging
 
+
 try:
     # Python 2.x
     from urllib import urlopen

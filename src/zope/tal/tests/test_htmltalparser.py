@@ -16,7 +16,8 @@
 import pprint
 import unittest
 
-from zope.tal import htmltalparser, taldefs
+from zope.tal import htmltalparser
+from zope.tal import taldefs
 
 
 class TestCaseBase(unittest.TestCase):

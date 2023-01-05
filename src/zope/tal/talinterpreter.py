@@ -13,16 +13,21 @@
 ##############################################################################
 """Interpreter for a pre-compiled TAL program.
 """
-import cgi
+import html
 import operator
 import sys
 
 from zope.i18nmessageid import Message
-from zope.tal.taldefs import quote, TAL_VERSION, METALError
+
+from zope.tal.taldefs import TAL_VERSION
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import getProgramMode
+from zope.tal.taldefs import getProgramVersion
 from zope.tal.taldefs import isCurrentVersion
-from zope.tal.taldefs import getProgramVersion, getProgramMode
+from zope.tal.taldefs import quote
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
+
 
 try:
     unicode
@@ -682,7 +687,7 @@ class TALInterpreter(object):
                 value = self.translate(value)
 
             if not structure:
-                value = cgi.escape(unicode(value))
+                value = html.escape(unicode(value))
 
         # Either the i18n:name tag is nested inside an i18n:translate in which
         # case the last item on the stack has the i18n dictionary and string
@@ -731,7 +736,7 @@ class TALInterpreter(object):
         if len(stuff) > 2:
             obj = self.engine.evaluate(stuff[2])
         xlated_msgid = self.translate(msgid, default, i18ndict, obj)
-        # TODO: I can't decide whether we want to cgi escape the translated
+        # TODO: I can't decide whether we want to html.escape the translated
         # string or not.  OTOH not doing this could introduce a cross-site
         # scripting vector by allowing translators to sneak JavaScript into
         # translations.  OTOH, for implicit interpolation values, we don't

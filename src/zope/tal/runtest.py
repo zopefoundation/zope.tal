@@ -19,13 +19,14 @@ directory.
 
 from __future__ import print_function
 
+import copy
+import difflib
 import glob
+import optparse
 import os
 import sys
 import traceback
-import difflib
-import copy
-import optparse
+
 
 try:
     # Python 2.x

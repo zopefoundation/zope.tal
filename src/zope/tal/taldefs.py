@@ -14,8 +14,11 @@
 """Common definitions used by TAL and METAL compilation and transformation.
 """
 import re
-from zope.tal.interfaces import ITALExpressionErrorInfo
+
 from zope.interface import implementer
+
+from zope.tal.interfaces import ITALExpressionErrorInfo
+
 
 #: Version of the specification we implement.
 TAL_VERSION = "1.6"

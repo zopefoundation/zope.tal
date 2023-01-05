@@ -15,9 +15,9 @@
 """Tests for TALInterpreter.
 """
 import os
-
 import sys
 import unittest
+
 
 try:
     # Python 2.x
@@ -26,16 +26,18 @@ except ImportError:
     # Python 3.x
     from io import StringIO
 
+from zope.i18nmessageid import Message
 
-from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
-from zope.tal.taldefs import TALExpressionError
-from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talparser import TALParser
-from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
-from zope.i18nmessageid import Message
+from zope.tal.htmltalparser import HTMLTALParser
+from zope.tal.taldefs import TAL_VERSION
+from zope.tal.taldefs import I18NError
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import TALExpressionError
+from zope.tal.talgenerator import TALGenerator
+from zope.tal.talinterpreter import TALInterpreter
+from zope.tal.talparser import TALParser
 
 
 class TestCaseBase(unittest.TestCase):

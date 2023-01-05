@@ -22,7 +22,8 @@ most commonly used are :class:`zope.tales.tales.ExpressionEngine`,
 :class:`zope.tales.tales.Context`, and
 :class:`zope.tales.tales.Iterator`, respectively.
 """
-from zope.interface import Attribute, Interface
+from zope.interface import Attribute
+from zope.interface import Interface
 
 
 class ITALExpressionCompiler(Interface):

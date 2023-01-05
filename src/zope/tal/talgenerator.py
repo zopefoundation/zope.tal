@@ -16,6 +16,7 @@ Code generator for :class:`~.TALInterpreter` intermediate code.
 """
 import re
 
+
 try:
     # Python 3.x
     from html import escape
@@ -24,10 +25,15 @@ except ImportError:
     from cgi import escape
 
 from zope.tal import taldefs
-from zope.tal.taldefs import NAME_RE, TAL_VERSION
-from zope.tal.taldefs import I18NError, METALError, TALError
+from zope.tal.taldefs import NAME_RE
+from zope.tal.taldefs import TAL_VERSION
+from zope.tal.taldefs import I18NError
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import TALError
 from zope.tal.taldefs import parseSubstitution
-from zope.tal.translationcontext import TranslationContext, DEFAULT_DOMAIN
+from zope.tal.translationcontext import DEFAULT_DOMAIN
+from zope.tal.translationcontext import TranslationContext
+
 
 try:
     xrange

@@ -15,6 +15,7 @@
 """
 import unittest
 
+
 try:
     # Python 2.x
     from StringIO import StringIO
@@ -22,10 +23,10 @@ except ImportError:
     # Python 3.x
     from io import StringIO
 
-from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
+from zope.tal.htmltalparser import HTMLTALParser
+from zope.tal.talgenerator import TALGenerator
+from zope.tal.talinterpreter import TALInterpreter
 
 
 page1 = '''<html metal:use-macro="main"><body>

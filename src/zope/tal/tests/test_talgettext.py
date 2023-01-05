@@ -20,6 +20,7 @@ import tempfile
 import unittest
 import warnings
 
+
 try:
     # Python 2.x
     from StringIO import StringIO
@@ -28,8 +29,8 @@ except ImportError:
     from io import StringIO
 
 from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talgettext import POTALInterpreter
 from zope.tal.talgettext import POEngine
+from zope.tal.talgettext import POTALInterpreter
 
 
 class test_POEngine(unittest.TestCase):

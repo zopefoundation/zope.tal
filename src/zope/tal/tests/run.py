@@ -17,11 +17,12 @@
 import sys
 import unittest
 
-from zope.tal.tests import utils
-from zope.tal.tests import test_htmltalparser
-from zope.tal.tests import test_talinterpreter
 from zope.tal.tests import test_files
+from zope.tal.tests import test_htmltalparser
 from zope.tal.tests import test_sourcepos
+from zope.tal.tests import test_talinterpreter
+from zope.tal.tests import utils
+
 
 # TODO this code isn't picked up by the Zope 3 test framework..
 

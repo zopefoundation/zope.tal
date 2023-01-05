@@ -15,6 +15,7 @@
 """
 import re
 
+
 try:
     # Python 2.x
     from StringIO import StringIO
@@ -22,10 +23,14 @@ except ImportError:
     # Python 3.x
     from io import StringIO
 
-from zope.interface import implementer
-from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
-from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18nmessageid import Message
+from zope.interface import implementer
+
+from zope.tal.interfaces import ITALExpressionCompiler
+from zope.tal.interfaces import ITALExpressionEngine
+from zope.tal.taldefs import NAME_RE
+from zope.tal.taldefs import ErrorInfo
+from zope.tal.taldefs import TALExpressionError
 
 
 try:

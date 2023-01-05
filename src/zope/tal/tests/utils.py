@@ -13,9 +13,10 @@
 ##############################################################################
 """Helper functions for the test suite.
 """
-import unittest
 import os
 import sys
+import unittest
+
 
 mydir = os.path.abspath(os.path.dirname(__file__))
 codedir = os.path.dirname(os.path.dirname(os.path.dirname(mydir)))

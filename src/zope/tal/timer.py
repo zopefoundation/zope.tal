@@ -20,7 +20,8 @@ import time
 
 from cStringIO import StringIO
 
-from zope.tal.driver import compilefile, interpretit
+from zope.tal.driver import compilefile
+from zope.tal.driver import interpretit
 
 
 def main():

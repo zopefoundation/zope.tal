@@ -18,8 +18,8 @@ interprets a file, prints results to stdout.
 
 from __future__ import print_function
 
-import os
 import optparse
+import os
 import sys
 
 # Import local classes

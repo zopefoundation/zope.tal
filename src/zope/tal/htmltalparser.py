@@ -19,7 +19,8 @@ a :class:`~.TALGenerator`.
 # When Python 3 becomes mainstream please swap the try and except parts.
 try:
     # Python 2.x
-    from HTMLParser import HTMLParser, HTMLParseError
+    from HTMLParser import HTMLParseError
+    from HTMLParser import HTMLParser
 except ImportError:
     # Python 3.x
     from html.parser import HTMLParser
@@ -44,8 +45,12 @@ except ImportError:
                     result = result + ", column %d" % (self.offset + 1)
                 return result
 
-from zope.tal.taldefs import (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS,
-                              METALError, TALError, I18NError)
+from zope.tal.taldefs import ZOPE_I18N_NS
+from zope.tal.taldefs import ZOPE_METAL_NS
+from zope.tal.taldefs import ZOPE_TAL_NS
+from zope.tal.taldefs import I18NError
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import TALError
 from zope.tal.talgenerator import TALGenerator
 
 
