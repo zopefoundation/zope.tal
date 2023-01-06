@@ -15,30 +15,23 @@
 Code generator for :class:`~.TALInterpreter` intermediate code.
 """
 import re
-
-try:
-    # Python 3.x
-    from html import escape
-except ImportError:
-    # Python 2.x
-    from cgi import escape
+from html import escape
 
 from zope.tal import taldefs
-from zope.tal.taldefs import NAME_RE, TAL_VERSION
-from zope.tal.taldefs import I18NError, METALError, TALError
+from zope.tal.taldefs import NAME_RE
+from zope.tal.taldefs import TAL_VERSION
+from zope.tal.taldefs import I18NError
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import TALError
 from zope.tal.taldefs import parseSubstitution
-from zope.tal.translationcontext import TranslationContext, DEFAULT_DOMAIN
-
-try:
-    xrange
-except NameError:
-    xrange = range  # Python 3.x
+from zope.tal.translationcontext import DEFAULT_DOMAIN
+from zope.tal.translationcontext import TranslationContext
 
 
 _name_rx = re.compile(NAME_RE)
 
 
-class TALGenerator(object):
+class TALGenerator:
     """
     Generate intermediate code.
     """
@@ -90,7 +83,7 @@ class TALGenerator(object):
         output = []
         collect = []
         cursor = 0
-        for cursor in xrange(len(program) + 1):
+        for cursor in range(len(program) + 1):
             try:
                 item = program[cursor]
             except IndexError:
@@ -163,7 +156,7 @@ class TALGenerator(object):
     def optimizeStartTag(self, collect, name, attrlist, end):
         # return true if the tag can be converted to plain text
         if not attrlist:
-            collect.append("<%s%s" % (name, end))
+            collect.append("<{}{}".format(name, end))
             return 1
         opt = 1
         new = ["<" + name]
@@ -177,7 +170,7 @@ class TALGenerator(object):
                 if item[1] is None:
                     s = item[0]
                 else:
-                    s = '%s="%s"' % (item[0], taldefs.attrEscape(item[1]))
+                    s = '{}="{}"'.format(item[0], taldefs.attrEscape(item[1]))
                 attrlist[i] = item[0], s
                 new.append(" " + s)
         # if no non-optimizable attributes were found, convert to plain text
@@ -219,8 +212,11 @@ class TALGenerator(object):
         try:
             return self.expressionCompiler.compile(expr)
         except self.CompilerError as err:
-            raise TALError('%s in expression %s' % (err.args[0], repr(expr)),
-                           self.position)
+            raise TALError(
+                '{} in expression {}'.format(
+                    err.args[0],
+                    repr(expr)),
+                self.position)
 
     def pushProgram(self):
         self.stack.append(self.program)

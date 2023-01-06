@@ -13,28 +13,24 @@
 ##############################################################################
 """Interpreter for a pre-compiled TAL program.
 """
-import cgi
-import operator
+import html
 import sys
 
 from zope.i18nmessageid import Message
-from zope.tal.taldefs import quote, TAL_VERSION, METALError
+
+from zope.tal.taldefs import TAL_VERSION
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import getProgramMode
+from zope.tal.taldefs import getProgramVersion
 from zope.tal.taldefs import isCurrentVersion
-from zope.tal.taldefs import getProgramVersion, getProgramMode
+from zope.tal.taldefs import quote
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.translationcontext import TranslationContext
-
-try:
-    unicode
-except NameError:
-    unicode = str  # Python 3.x
-_BLANK = u''
 
 
 # Avoid constructing this tuple over and over
 I18nMessageTypes = (Message,)
-
-TypesToTranslate = I18nMessageTypes + (str, unicode)
+TypesToTranslate = I18nMessageTypes + (str, )
 
 BOOLEAN_HTML_ATTRS = frozenset([
     # List of Boolean attributes in HTML that should be rendered in
@@ -92,7 +88,7 @@ class AltTALGenerator(TALGenerator):
 
 
 class MacroStackItem(list):
-    # This is a `list` subclass for backward compability.
+    # This is a `list` subclass for backward compatibility.
     """Stack entry for the TALInterpreter.macroStack.
 
     This offers convenience attributes for more readable access.
@@ -100,19 +96,36 @@ class MacroStackItem(list):
     """
     __slots__ = ()
 
-    # These would be nicer using @syntax, but that would require
-    # Python 2.4.x; this will do for now.
+    @property
+    def macroName(self):
+        return self[0]
 
-    macroName = property(lambda self: self[0])
-    slots = property(lambda self: self[1])
-    definingName = property(lambda self: self[2])
-    extending = property(lambda self: self[3])
-    entering = property(lambda self: self[4],
-                        lambda self, value: operator.setitem(self, 4, value))
-    i18nContext = property(lambda self: self[5])
+    @property
+    def slots(self):
+        return self[1]
+
+    @property
+    def definingName(self):
+        return self[2]
+
+    @property
+    def extending(self):
+        return self[3]
+
+    @property
+    def entering(self):
+        return self[4]
+
+    @entering.setter
+    def entering(self, value):
+        self[4] = value
+
+    @property
+    def i18nContext(self):
+        return self[5]
 
 
-class TALInterpreter(object):
+class TALInterpreter:
     """TAL interpreter.
 
     Some notes on source annotations.  They are HTML/XML comments added to the
@@ -219,7 +232,7 @@ class TALInterpreter(object):
         self.sourceAnnotations = sourceAnnotations
 
     def StringIO(self):
-        # Third-party products wishing to provide a full Unicode-aware
+        # Third-party products wishing to provide a full text-aware
         # StringIO can do so by monkey-patching this method.
         return FasterStringIO()
 
@@ -313,9 +326,9 @@ class TALInterpreter(object):
         if lineno is None:
             location = self.sourceFile
         else:
-            location = '%s (line %s)' % (self.sourceFile, lineno)
+            location = '{} (line {})'.format(self.sourceFile, lineno)
         sep = '=' * 78
-        return '<!--\n%s\n%s\n%s\n-->' % (sep, location, sep)
+        return '<!--\n{}\n{}\n{}\n-->'.format(sep, location, sep)
 
     def stream_write(self, s,
                      len=len):
@@ -335,8 +348,8 @@ class TALInterpreter(object):
         try:
             if self.debug:
                 for (opcode, args) in program:
-                    s = "%sdo_%s(%s)\n" % ("    " * self.level, opcode,
-                                           repr(args))
+                    s = "{}do_{}({})\n".format("    " * self.level, opcode,
+                                               repr(args))
                     if len(s) > 80:
                         s = s[:76] + "...\n"
                     sys.stderr.write(s)
@@ -451,9 +464,10 @@ class TALInterpreter(object):
                 defName = macs[0].definingName
                 res = []
                 if defName:
-                    res.append('%sdefine-macro=%s' % (prefix, quote(defName)))
+                    res.append(
+                        '{}define-macro={}'.format(prefix, quote(defName)))
                 if useName:
-                    res.append('%suse-macro=%s' % (prefix, quote(useName)))
+                    res.append('{}use-macro={}'.format(prefix, quote(useName)))
                 return res
             elif suffix == "define-slot":
                 name = prefix + "fill-slot"
@@ -465,7 +479,7 @@ class TALInterpreter(object):
         if value is None:
             value = name
         else:
-            value = "%s=%s" % (name, quote(value))
+            value = "{}={}".format(name, quote(value))
         return [value]
 
     def attrAction_tal(self, item):
@@ -502,7 +516,7 @@ class TALInterpreter(object):
                     value = translated
             if value is None:
                 value = name
-            return ["%s=%s" % (name, quote(value))]
+            return ["{}={}".format(name, quote(value))]
         else:
             return ()
     bytecode_handlers["<attrAction>"] = attrAction
@@ -682,7 +696,7 @@ class TALInterpreter(object):
                 value = self.translate(value)
 
             if not structure:
-                value = cgi.escape(unicode(value))
+                value = html.escape(str(value))
 
         # Either the i18n:name tag is nested inside an i18n:translate in which
         # case the last item on the stack has the i18n dictionary and string
@@ -731,7 +745,7 @@ class TALInterpreter(object):
         if len(stuff) > 2:
             obj = self.engine.evaluate(stuff[2])
         xlated_msgid = self.translate(msgid, default, i18ndict, obj)
-        # TODO: I can't decide whether we want to cgi escape the translated
+        # TODO: I can't decide whether we want to html.escape the translated
         # string or not.  OTOH not doing this could introduce a cross-site
         # scripting vector by allowing translators to sneak JavaScript into
         # translations.  OTOH, for implicit interpolation values, we don't
@@ -756,7 +770,7 @@ class TALInterpreter(object):
         if isinstance(structure, I18nMessageTypes):
             text = self.translate(structure)
         else:
-            text = unicode(structure)
+            text = str(structure)
         if not (repldict or self.strictinsert):
             # Take a shortcut, no error checking
             self.stream_write(text)
@@ -775,7 +789,7 @@ class TALInterpreter(object):
                 self.interpret(block)
             else:
                 if not isinstance(structure, TypesToTranslate):
-                    structure = unicode(structure)
+                    structure = str(structure)
                 text = self.translate(structure)
                 if not (repldict or self.strictinsert):
                     # Take a shortcut, no error checking
@@ -835,7 +849,7 @@ class TALInterpreter(object):
     def translate(self, msgid, default=None, i18ndict=None,
                   obj=None, domain=None):
         if default is None:
-            default = getattr(msgid, 'default', unicode(msgid))
+            default = getattr(msgid, 'default', str(msgid))
         if i18ndict is None:
             i18ndict = {}
         if domain is None:
@@ -997,7 +1011,7 @@ class TALInterpreter(object):
                 error = engine.createErrorInfo(exc, self.position)
             finally:
                 # Avoid traceback reference cycle due to the __traceback__
-                # attribute on Python 3.
+                # attribute.
                 del exc
             engine.setLocal('error', error)
             try:
@@ -1025,7 +1039,7 @@ class TALInterpreter(object):
 
 
 class FasterStringIO(list):
-    # Unicode-aware append-only version of StringIO.
+    # text-aware append-only version of StringIO.
     write = list.append
 
     def __init__(self, value=None):
@@ -1034,7 +1048,7 @@ class FasterStringIO(list):
             self.append(value)
 
     def getvalue(self):
-        return _BLANK.join(self)
+        return ''.join(self)
 
 
 def _write_ValueError(s):

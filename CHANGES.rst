@@ -2,13 +2,22 @@
  Changes
 =========
 
-4.6 (unreleased)
+5.0 (unreleased)
 ================
+
+- Add support for Python 3.11.
+
+- Drop support for Python 2.7, 3.5, 3.6.
 
 - Add support for Python 3.10.
 
 - Add ``nav`` to the list of HTML block level elements.
   (`#18 <https://github.com/zopefoundation/zope.tal/pull/18>`_)
+
+- Remove ``.talgettext.UpdatePOEngine`` and the ability to call
+  ``zope/tal/talgettext.py`` (main function). The code was broken and unused.
+
+- Remove support to run the tests using deprecated ``python setup.py test``.
 
 
 4.5 (2021-05-28)

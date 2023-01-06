@@ -15,18 +15,21 @@
 """Run benchmarks of TAL vs. DTML
 """
 
-from __future__ import print_function
-from zope.tal.dummyengine import DummyEngine
-from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.htmltalparser import HTMLTALParser
-from cStringIO import StringIO
+
 import errno
-import time
-import sys
 import getopt
 import os
-
+import sys
+import time
 import warnings
+
+from cStringIO import StringIO
+
+from zope.tal.dummyengine import DummyEngine
+from zope.tal.htmltalparser import HTMLTALParser
+from zope.tal.talinterpreter import TALInterpreter
+
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 os.environ['NO_SECURITY'] = 'true'
@@ -191,6 +194,6 @@ if __name__ == "__main__":
         p.sort_stats('time', 'calls')
         try:
             p.print_stats(20)
-        except IOError as e:
+        except OSError as e:
             if e.errno != errno.EPIPE:
                 raise

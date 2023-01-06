@@ -15,38 +15,35 @@
 Parse HTML and compile to :class:`~.TALInterpreter` intermediate code, using
 a :class:`~.TALGenerator`.
 """
+from html.parser import HTMLParser
 
-# When Python 3 becomes mainstream please swap the try and except parts.
-try:
-    # Python 2.x
-    from HTMLParser import HTMLParser, HTMLParseError
-except ImportError:
-    # Python 3.x
-    from html.parser import HTMLParser
-    try:
-        from html.parser import HTMLParseError
-    except ImportError:
-        # Python 3.5 removed it, but we need it as a base class
-        # so here's a copy taken from Python 3.4:
-        class HTMLParseError(Exception):
-            def __init__(self, msg, position=(None, None)):
-                Exception.__init__(self)
-                assert msg
-                self.msg = msg
-                self.lineno = position[0]
-                self.offset = position[1]
-
-            def __str__(self):
-                result = self.msg
-                if self.lineno is not None:
-                    result = result + ", at line %d" % self.lineno
-                if self.offset is not None:
-                    result = result + ", column %d" % (self.offset + 1)
-                return result
-
-from zope.tal.taldefs import (ZOPE_METAL_NS, ZOPE_TAL_NS, ZOPE_I18N_NS,
-                              METALError, TALError, I18NError)
+from zope.tal.taldefs import ZOPE_I18N_NS
+from zope.tal.taldefs import ZOPE_METAL_NS
+from zope.tal.taldefs import ZOPE_TAL_NS
+from zope.tal.taldefs import I18NError
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import TALError
 from zope.tal.talgenerator import TALGenerator
+
+
+class HTMLParseError(Exception):
+    # Python 3.5 removed this class, but we need it as a base class
+    # so here's a copy taken from Python 3.4
+
+    def __init__(self, msg, position=(None, None)):
+        Exception.__init__(self)
+        assert msg
+        self.msg = msg
+        self.lineno = position[0]
+        self.offset = position[1]
+
+    def __str__(self):
+        result = self.msg
+        if self.lineno is not None:
+            result = result + ", at line %d" % self.lineno
+        if self.offset is not None:
+            result = result + ", column %d" % (self.offset + 1)
+        return result
 
 
 _html_parser_extras = {}
@@ -129,7 +126,7 @@ class OpenTagError(NestingError):
 
     def __init__(self, tagstack, tag, position=(None, None)):
         self.tag = tag
-        msg = 'Tag <%s> is not allowed in <%s>' % (tag, tagstack[-1])
+        msg = 'Tag <{}> is not allowed in <{}>'.format(tag, tagstack[-1])
         HTMLParseError.__init__(self, msg, position)
 
 

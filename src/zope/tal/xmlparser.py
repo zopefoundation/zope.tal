@@ -16,22 +16,10 @@
 This creates a parser with namespace processing enabled.
 """
 import logging
-
-try:
-    # Python 2.x
-    from urllib import urlopen
-except ImportError:
-    # Python 3.x
-    from urllib.request import urlopen
+from urllib.request import urlopen
 
 
-try:
-    unicode
-except NameError:
-    unicode = str  # Python 3.x
-
-
-class XMLParser(object):
+class XMLParser:
     """
     Parse XML using :mod:`xml.parsers.expat`.
     """
@@ -91,9 +79,9 @@ class XMLParser(object):
 
     def parseString(self, s):
         """Parse the given string."""
-        if isinstance(s, unicode):
-            # Expat cannot deal with unicode strings, only with
-            # encoded ones.  Also, its range of encodings is rather
+        if isinstance(s, str):
+            # Expat cannot deal with str, only with
+            # bytes.  Also, its range of encodings is rather
             # limited, UTF-8 is the safest bet here.
             s = s.encode('utf-8')
         self.parser.Parse(s, 1)

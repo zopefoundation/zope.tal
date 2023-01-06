@@ -15,7 +15,10 @@
 Parse XML and compile to :class:`~.TALInterpreter` intermediate code,
 using a :class:`~.TALGenerator`.
 """
-from zope.tal.taldefs import XML_NS, ZOPE_I18N_NS, ZOPE_METAL_NS, ZOPE_TAL_NS
+from zope.tal.taldefs import XML_NS
+from zope.tal.taldefs import ZOPE_I18N_NS
+from zope.tal.taldefs import ZOPE_METAL_NS
+from zope.tal.taldefs import ZOPE_TAL_NS
 from zope.tal.talgenerator import TALGenerator
 from zope.tal.xmlparser import XMLParser
 
@@ -125,7 +128,7 @@ class TALParser(XMLParser):
             prefix = self.nsDict[uri]
             prefixed = name
             if prefix:
-                prefixed = "%s:%s" % (prefix, name)
+                prefixed = "{}:{}".format(prefix, name)
             ns = self._namespaces.get(uri, "x")
             return (prefixed, name, ns)
         return (name, name, None)
@@ -146,8 +149,8 @@ def test():
         file = sys.argv[1]
     p.parseFile(file)
     program, macros = p.getCode()
-    from zope.tal.talinterpreter import TALInterpreter
     from zope.tal.dummyengine import DummyEngine
+    from zope.tal.talinterpreter import TALInterpreter
     engine = DummyEngine(macros)
     TALInterpreter(program, macros, engine, sys.stdout, wrap=0)()
 

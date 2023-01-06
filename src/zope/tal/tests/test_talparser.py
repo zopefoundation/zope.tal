@@ -34,4 +34,4 @@ class TALParserTestCase(unittest.TestCase):
 
 
 def test_suite():
-    return unittest.makeSuite(TALParserTestCase)
+    return unittest.defaultTestLoader.loadTestsFromTestCase(TALParserTestCase)

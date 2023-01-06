@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2001, 2002 Zope Foundation and Contributors.
@@ -15,27 +14,21 @@
 """Tests for TALInterpreter.
 """
 import os
-
-import sys
 import unittest
+from io import StringIO
 
-try:
-    # Python 2.x
-    from StringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
+from zope.i18nmessageid import Message
 
-
-from zope.tal.taldefs import METALError, I18NError, TAL_VERSION
-from zope.tal.taldefs import TALExpressionError
-from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talparser import TALParser
-from zope.tal.talinterpreter import TALInterpreter
-from zope.tal.talgenerator import TALGenerator
 from zope.tal.dummyengine import DummyEngine
 from zope.tal.dummyengine import MultipleDomainsDummyEngine
-from zope.i18nmessageid import Message
+from zope.tal.htmltalparser import HTMLTALParser
+from zope.tal.taldefs import TAL_VERSION
+from zope.tal.taldefs import I18NError
+from zope.tal.taldefs import METALError
+from zope.tal.taldefs import TALExpressionError
+from zope.tal.talgenerator import TALGenerator
+from zope.tal.talinterpreter import TALInterpreter
+from zope.tal.talparser import TALParser
 
 
 class TestCaseBase(unittest.TestCase):
@@ -466,8 +459,7 @@ class I18NCornerTestCaseMessage(TestCaseBase):
         self.interpreter = TALInterpreter(program, {}, self.engine,
                                           stream=result)
         self.interpreter()
-        msgids = self.engine.translationDomain.getMsgids('default')
-        msgids.sort()
+        msgids = sorted(self.engine.translationDomain.getMsgids('default'))
         self.assertEqual(1, len(msgids))
         self.assertEqual('This is text <b> for</b> barvalue.', msgids[0][0])
         self.assertEqual(
@@ -490,7 +482,7 @@ class I18NCornerTestCaseMessage(TestCaseBase):
         self.assertEqual('This is text for ${bar}.', msgids[1][0])
         self.assertEqual({'bar': '<pre> \tBAR\n </pre>'}, msgids[1][1])
         self.assertEqual(
-            (u'<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>'),
+            ('<div>THIS IS TEXT FOR <pre> \tBAR\n </pre>.</div>'),
             result.getvalue())
 
     def test_for_handling_unicode_vars(self):
@@ -499,7 +491,7 @@ class I18NCornerTestCaseMessage(TestCaseBase):
         program, _macros = self._compile(
             r'''<div i18n:translate='' tal:define='bar python:u"\u00C0"'>'''
             r'''Foo <span tal:replace='bar' i18n:name='bar' /></div>''')
-        self._check(program, (u"<div>FOO \u00C0</div>"))
+        self._check(program, ("<div>FOO \u00C0</div>"))
 
 
 class UnusedExplicitDomainTestCase(I18NCornerTestCaseMessage):
@@ -708,13 +700,13 @@ class OutputPresentationTestCase(TestCaseBase):
         self.compare(INPUT, EXPECTED)
 
     def test_unicode_content(self):
-        INPUT = u"""<p tal:content="python:u'déjà-vu'">para</p>"""
-        EXPECTED = u'<p>d\xe9j\xe0-vu</p>'
+        INPUT = """<p tal:content="python:u'déjà-vu'">para</p>"""
+        EXPECTED = '<p>d\xe9j\xe0-vu</p>'
         self.compare(INPUT, EXPECTED)
 
     def test_unicode_structure(self):
-        INPUT = u"""<p tal:replace="structure python:u'déjà-vu'">para</p>"""
-        EXPECTED = u'd\xe9j\xe0-vu'
+        INPUT = """<p tal:replace="structure python:u'déjà-vu'">para</p>"""
+        EXPECTED = 'd\xe9j\xe0-vu'
         self.compare(INPUT, EXPECTED)
 
     def test_i18n_replace_number(self):
@@ -722,30 +714,16 @@ class OutputPresentationTestCase(TestCaseBase):
         <p i18n:translate="foo ${bar}">
         <span tal:replace="python:123" i18n:name="bar">para</span>
         </p>"""
-        EXPECTED = (u"""
+        EXPECTED = ("""
         <p>FOO 123</p>""")
         self.compare(INPUT, EXPECTED)
 
     def test_entities(self):
-        if sys.version_info[:2] <= (3, 2):
-            # HTMLParser.HTMLParser in Python 2.x--3.2 parses "&#45" as "&#45"
-            INPUT = ('<img tal:define="foo nothing" '
-                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
-            EXPECTED = ('<img alt="&a; \x01 \n '
-                        '&amp;a &amp;#45 &amp;; &lt;&gt;" />')
-        elif sys.version_info < (3, 4):
-            # html.parser.HTMLParser in Python 3.3 parses "&#45" as "-"
-            INPUT = ('<img tal:define="foo nothing" '
-                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
-            EXPECTED = ('<img alt="&a; \x01 \n '
-                        '&amp;a - &amp;; &lt;&gt;" />')
-        else:
-            # html.parser.HTMLParser in Python 3.4 parses "&#1" as ""
-            # because '1' is an "invalid codepoint".
-            INPUT = ('<img tal:define="foo nothing" '
-                     'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
-            EXPECTED = ('<img alt="&a;  \n '
-                        '&amp;a - &amp;; &lt;&gt;" />')
+        # Python parses "&#1" as "" because '1' is an "invalid codepoint".
+        INPUT = ('<img tal:define="foo nothing" '
+                 'alt="&a; &#1; &#x0a; &a &#45 &; <>" />')
+        EXPECTED = ('<img alt="&a;  \n '
+                    '&amp;a - &amp;; &lt;&gt;" />')
         self.compare(INPUT, EXPECTED)
 
     def compare(self, INPUT, EXPECTED):

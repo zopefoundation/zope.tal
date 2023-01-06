@@ -19,8 +19,10 @@
 """Setup for zope.tal package
 """
 import os
-import sys
-from setuptools import setup, find_packages
+
+from setuptools import find_packages
+from setuptools import setup
+
 
 here = os.path.dirname(__file__)
 
@@ -30,28 +32,13 @@ def read(*rnames):
         return f.read()
 
 
-def alltests():
-    # use the zope.testrunner machinery to find all the
-    # test suites we've put under ourselves
-    from zope.testrunner.options import get_options
-    from zope.testrunner.find import find_suites
-    from unittest import TestSuite
-    here = os.path.abspath(os.path.dirname(sys.argv[0]))
-    args = sys.argv[:]
-    src = os.path.join(here, 'src')
-    defaults = ['--test-path', src]
-    options = get_options(args, defaults)
-    suites = list(find_suites(options))
-    return TestSuite(suites)
-
-
 TESTS_REQUIRE = [
     'zope.testing',
     'zope.testrunner',
 ]
 
 setup(name='zope.tal',
-      version='4.6.dev0',
+      version='5.0.dev0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
@@ -67,15 +54,12 @@ setup(name='zope.tal',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: Zope Public License',
           'Programming Language :: Python',
-          'Programming Language :: Python :: 2',
-          'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: 3.11',
           'Programming Language :: Python :: Implementation :: CPython',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Natural Language :: English',
@@ -95,8 +79,6 @@ setup(name='zope.tal',
               'repoze.sphinx.autointerface',
           ],
       },
-      test_suite="__main__.alltests",  # to support "setup.py test"
-      tests_require=TESTS_REQUIRE,
       install_requires=[
           'setuptools',
           'zope.i18nmessageid',

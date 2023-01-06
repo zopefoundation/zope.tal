@@ -2,29 +2,21 @@
 # https://github.com/zopefoundation/meta/tree/master/config/pure-python
 [meta]
 template = "pure-python"
-commit-id = "3b712f305ca8207e971c5bf81f2bdb5872489f2f"
+commit-id = "d03ad585"
 
 [python]
 with-pypy = true
-with-legacy-python = true
 with-docs = true
 with-sphinx-doctests = false
 with-windows = false
 with-future-python = false
+with-macos = false
 
 [tox]
 use-flake8 = true
 
 [coverage]
-fail-under = 81
-
-[flake8]
-additional-config = [
-    "# E741 ambiguous variable name",
-    "# F821 undefined name",
-    "per-file-ignores =",
-    "    src/zope/tal/talgettext.py: E741 F821",
-    ]
+fail-under = 84
 
 [manifest]
 additional-rules = [

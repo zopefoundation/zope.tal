@@ -14,22 +14,15 @@
 """Tests for the talgettext utility.
 """
 
-from __future__ import print_function
 
 import tempfile
 import unittest
 import warnings
-
-try:
-    # Python 2.x
-    from StringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
+from io import StringIO
 
 from zope.tal.htmltalparser import HTMLTALParser
-from zope.tal.talgettext import POTALInterpreter
 from zope.tal.talgettext import POEngine
+from zope.tal.talgettext import POTALInterpreter
 
 
 class test_POEngine(unittest.TestCase):
@@ -75,10 +68,10 @@ class test_POEngine(unittest.TestCase):
         engine.file = 'psc_release_listing.pt'
         # position is position in file.
         engine.translate('foo', 'domain',
-                         default=u'Read more\u2026', position=7)
+                         default='Read more\u2026', position=7)
         # Adding the same key with the same default is fine.
         engine.translate('foo', 'domain',
-                         default=u'Read more\u2026', position=13)
+                         default='Read more\u2026', position=13)
         # Adding the same key with a different default is bad and
         # triggers a warning.
         with warnings.catch_warnings(record=True) as log:

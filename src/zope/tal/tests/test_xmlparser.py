@@ -81,7 +81,7 @@ class EventCollectorExtra(EventCollector):
         self.append(("starttag_text", self.get_starttag_text()))
 
 
-class SegmentedFile(object):
+class SegmentedFile:
     def __init__(self, parts):
         self.parts = list(parts)
 
@@ -253,10 +253,10 @@ text
         self._parse_error("<!DOCTYPE foo $ >")
 
     def test_unicode_string(self):
-        output = [('starttag', u'p', []),
-                  ('data', u'\xe4\xf6\xfc\xdf'),
-                  ('endtag', u'p')]
-        self._run_check(u'<p>\xe4\xf6\xfc\xdf</p>', output)
+        output = [('starttag', 'p', []),
+                  ('data', '\xe4\xf6\xfc\xdf'),
+                  ('endtag', 'p')]
+        self._run_check('<p>\xe4\xf6\xfc\xdf</p>', output)
 
 
 # Support for the Zope regression test framework:

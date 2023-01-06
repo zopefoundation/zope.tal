@@ -17,22 +17,15 @@ compares interpeted test files with expected output files in a sibling
 directory.
 """
 
-from __future__ import print_function
 
+import copy
+import difflib
 import glob
+import optparse
 import os
 import sys
 import traceback
-import difflib
-import copy
-import optparse
-
-try:
-    # Python 2.x
-    from cStringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
+from io import StringIO
 
 import zope.tal.driver
 import zope.tal.tests.utils
@@ -121,7 +114,7 @@ def main(argv=None, out=sys.stdout):
             tail)
         try:
             f = open(outfile)
-        except IOError:
+        except OSError:
             expected = None
             print("(missing file %s)" % outfile, end=' ', file=out)
         else:
@@ -135,7 +128,7 @@ def main(argv=None, out=sys.stdout):
         if opts.normalize_newlines or "_sa" in arg or arg.endswith('.xml'):
             # EOL normalization makes the tests pass:
             # - XML files, on Windows, have \r\n line endings.  Because
-            #   expat insists on byte streams on Python 3, we end up with
+            #   expat insists on byte streams, we end up with
             #   those \r\n's going through the entire TAL engine and
             #   showing up in the actual output.  Expected output, on the
             #   other hand, has just \n's, since we read the file as text.

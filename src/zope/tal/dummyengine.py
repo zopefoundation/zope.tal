@@ -14,24 +14,16 @@
 """Dummy TAL expression engine so that I can test out the TAL implementation.
 """
 import re
+from io import StringIO
 
-try:
-    # Python 2.x
-    from StringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
-
-from zope.interface import implementer
-from zope.tal.taldefs import NAME_RE, TALExpressionError, ErrorInfo
-from zope.tal.interfaces import ITALExpressionCompiler, ITALExpressionEngine
 from zope.i18nmessageid import Message
+from zope.interface import implementer
 
-
-try:
-    unicode
-except NameError:
-    unicode = str  # Python 3.x
+from zope.tal.interfaces import ITALExpressionCompiler
+from zope.tal.interfaces import ITALExpressionEngine
+from zope.tal.taldefs import NAME_RE
+from zope.tal.taldefs import ErrorInfo
+from zope.tal.taldefs import TALExpressionError
 
 
 Default = object()
@@ -44,7 +36,7 @@ class CompilerError(Exception):
 
 
 @implementer(ITALExpressionCompiler, ITALExpressionEngine)
-class DummyEngine(object):
+class DummyEngine:
 
     position = None
     source_file = None
@@ -128,7 +120,7 @@ class DummyEngine(object):
                 lineno, offset = self.position
             else:
                 lineno, offset = None, None
-            return '%s (%s,%s)' % (self.source_file, lineno, offset)
+            return '{} ({},{})'.format(self.source_file, lineno, offset)
         raise TALExpressionError(
             "unrecognized expression: " +
             repr(expression))
@@ -151,7 +143,7 @@ class DummyEngine(object):
 
     def evaluateText(self, expr):
         text = self.evaluate(expr)
-        if isinstance(text, (str, unicode, Message)):
+        if isinstance(text, (str, Message)):
             return text
         if text is not None and text is not Default:
             text = str(text)
@@ -256,7 +248,7 @@ class DummyEngine(object):
         return result.getvalue()
 
 
-class Iterator(object):
+class Iterator:
 
     def __init__(self, name, seq, engine):
         self.name = name
@@ -273,10 +265,9 @@ class Iterator(object):
         self.nextIndex = i + 1
         self.engine.setLocal(self.name, item)
         return 1
-    next = __next__  # Python 2 compatibility
 
 
-class DummyTranslationDomain(object):
+class DummyTranslationDomain:
 
     domain = ''
 
@@ -327,7 +318,7 @@ class DummyTranslationDomain(object):
         self.appendMsgid(domain, (msgid, mapping))
 
         def repl(m):
-            return unicode(mapping[m.group(m.lastindex).lower()])
+            return str(mapping[m.group(m.lastindex).lower()])
         cre = re.compile(r'\$(?:([_A-Za-z][-\w]*)|\{([_A-Za-z][-\w]*)\})')
         return cre.sub(repl, text)
 

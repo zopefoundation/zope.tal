@@ -19,7 +19,7 @@ needed to perform translation of a marked string from a page template.
 DEFAULT_DOMAIN = "default"
 
 
-class TranslationContext(object):
+class TranslationContext:
     """Information about the I18N settings of a TAL processor."""
 
     def __init__(self, parent=None, domain=None, target=None, source=None):

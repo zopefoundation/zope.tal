@@ -16,7 +16,8 @@
 import pprint
 import unittest
 
-from zope.tal import htmltalparser, taldefs
+from zope.tal import htmltalparser
+from zope.tal import taldefs
 
 
 class TestCaseBase(unittest.TestCase):
@@ -1057,11 +1058,3 @@ translated string</span>
             ('endScope', ()),
             ('rawtextColumn', ('</p>\n', 0))
         ])
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(HTMLTALParserTestCases),
-        unittest.makeSuite(METALGeneratorTestCases),
-        unittest.makeSuite(TALGeneratorTestCases),
-    ))
