@@ -113,16 +113,16 @@ class MacroStackItem(list):
         return self[3]
 
     @property
-    def i18nContext(self):
-        return self[5]
-
-    @property
     def entering(self):
         return self[4]
 
     @entering.setter
     def entering(self, value):
         self[4] = value
+
+    @property
+    def i18nContext(self):
+        return self[5]
 
 
 class TALInterpreter:

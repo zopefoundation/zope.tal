@@ -27,6 +27,9 @@ from zope.tal.talgenerator import TALGenerator
 
 
 class HTMLParseError(Exception):
+    # Python 3.5 removed this class, but we need it as a base class
+    # so here's a copy taken from Python 3.4
+
     def __init__(self, msg, position=(None, None)):
         Exception.__init__(self)
         assert msg
