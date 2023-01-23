@@ -2,8 +2,8 @@
  Changes
 =========
 
-5.1 (unreleased)
-================
+5.0.1 (2023-01-23)
+==================
 
 - Add missing ``python_requires`` to ``setup.py``.
 

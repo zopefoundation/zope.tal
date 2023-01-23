@@ -38,7 +38,7 @@ TESTS_REQUIRE = [
 ]
 
 setup(name='zope.tal',
-      version='5.1.dev0',
+      version='5.0.1',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Template Application Language (TAL)',
