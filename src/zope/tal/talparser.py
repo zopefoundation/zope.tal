@@ -128,7 +128,7 @@ class TALParser(XMLParser):
             prefix = self.nsDict[uri]
             prefixed = name
             if prefix:
-                prefixed = "{}:{}".format(prefix, name)
+                prefixed = f"{prefix}:{name}"
             ns = self._namespaces.get(uri, "x")
             return (prefixed, name, ns)
         return (name, name, None)

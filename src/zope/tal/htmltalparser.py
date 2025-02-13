@@ -27,8 +27,6 @@ from zope.tal.talgenerator import TALGenerator
 
 
 class HTMLParseError(Exception):
-    # Python 3.5 removed this class, but we need it as a base class
-    # so here's a copy taken from Python 3.4
 
     def __init__(self, msg, position=(None, None)):
         Exception.__init__(self)
@@ -48,7 +46,7 @@ class HTMLParseError(Exception):
 
 _html_parser_extras = {}
 if 'convert_charrefs' in HTMLParser.__init__.__code__.co_names:
-    _html_parser_extras['convert_charrefs'] = False  # pragma: NO COVER py34
+    _html_parser_extras['convert_charrefs'] = False  # pragma: NO COVER
 
 #: List of Boolean attributes in HTML that may be given in
 #: minimized form (e.g. ``<img ismap>`` rather than ``<img ismap="">``)
@@ -126,7 +124,7 @@ class OpenTagError(NestingError):
 
     def __init__(self, tagstack, tag, position=(None, None)):
         self.tag = tag
-        msg = 'Tag <{}> is not allowed in <{}>'.format(tag, tagstack[-1])
+        msg = f'Tag <{tag}> is not allowed in <{tagstack[-1]}>'
         HTMLParseError.__init__(self, msg, position)
 
 

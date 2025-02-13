@@ -156,7 +156,7 @@ class TALGenerator:
     def optimizeStartTag(self, collect, name, attrlist, end):
         # return true if the tag can be converted to plain text
         if not attrlist:
-            collect.append("<{}{}".format(name, end))
+            collect.append(f"<{name}{end}")
             return 1
         opt = 1
         new = ["<" + name]
@@ -170,7 +170,7 @@ class TALGenerator:
                 if item[1] is None:
                     s = item[0]
                 else:
-                    s = '{}="{}"'.format(item[0], taldefs.attrEscape(item[1]))
+                    s = f'{item[0]}="{taldefs.attrEscape(item[1])}"'
                 attrlist[i] = item[0], s
                 new.append(" " + s)
         # if no non-optimizable attributes were found, convert to plain text
