@@ -120,7 +120,7 @@ class DummyEngine:
                 lineno, offset = self.position
             else:
                 lineno, offset = None, None
-            return '{} ({},{})'.format(self.source_file, lineno, offset)
+            return f'{self.source_file} ({lineno},{offset})'
         raise TALExpressionError(
             "unrecognized expression: " +
             repr(expression))

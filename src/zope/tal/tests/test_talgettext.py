@@ -83,8 +83,10 @@ class test_POEngine(unittest.TestCase):
             with tempfile.TemporaryFile('w+') as printfile:
                 print(message, file=printfile)
                 printfile.seek(0)
-                self.assertTrue("already exists with a different default"
-                                in printfile.read())
+                self.assertIn(
+                    "already exists with a different default",
+                    printfile.read()
+                )
 
     def test_dynamic_msgids(self):
         sample_source = """

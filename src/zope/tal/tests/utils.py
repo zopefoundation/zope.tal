@@ -29,7 +29,7 @@ if codedir not in sys.path:
 skipxml = 0
 try:
     import xml.parsers.expat  # noqa: F401 imported but unused
-except ImportError:
+except ModuleNotFoundError:
     skipxml = 1
 
 

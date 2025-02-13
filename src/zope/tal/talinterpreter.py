@@ -326,9 +326,9 @@ class TALInterpreter:
         if lineno is None:
             location = self.sourceFile
         else:
-            location = '{} (line {})'.format(self.sourceFile, lineno)
+            location = f'{self.sourceFile} (line {lineno})'
         sep = '=' * 78
-        return '<!--\n{}\n{}\n{}\n-->'.format(sep, location, sep)
+        return f'<!--\n{sep}\n{location}\n{sep}\n-->'
 
     def stream_write(self, s,
                      len=len):
@@ -465,9 +465,9 @@ class TALInterpreter:
                 res = []
                 if defName:
                     res.append(
-                        '{}define-macro={}'.format(prefix, quote(defName)))
+                        f'{prefix}define-macro={quote(defName)}')
                 if useName:
-                    res.append('{}use-macro={}'.format(prefix, quote(useName)))
+                    res.append(f'{prefix}use-macro={quote(useName)}')
                 return res
             elif suffix == "define-slot":
                 name = prefix + "fill-slot"
@@ -479,7 +479,7 @@ class TALInterpreter:
         if value is None:
             value = name
         else:
-            value = "{}={}".format(name, quote(value))
+            value = f"{name}={quote(value)}"
         return [value]
 
     def attrAction_tal(self, item):
@@ -516,7 +516,7 @@ class TALInterpreter:
                     value = translated
             if value is None:
                 value = name
-            return ["{}={}".format(name, quote(value))]
+            return [f"{name}={quote(value)}"]
         else:
             return ()
     bytecode_handlers["<attrAction>"] = attrAction
