@@ -5,7 +5,7 @@
 5.2 (unreleased)
 ================
 
-- Nothing changed yet.
+- Fix tests for Python 3.13.6+ compatibility.
 
 
 5.1 (2025-02-14)

@@ -68,10 +68,11 @@ def rawtext(s):
 class HTMLTALParserTestCases(TestCaseBase):
 
     def test_code_simple_identity(self):
-        self._run_check("""<html a='b' b="c" c=d><title>My Title</html>""", [
-            rawtext('<html a="b" b="c" c="d">'
-                    '<title>My Title</title></html>'),
-        ])
+        self._run_check(
+            """<html a='b' b="c" c=d><title>My Title</title></html>""", [
+                rawtext('<html a="b" b="c" c="d">'
+                        '<title>My Title</title></html>'),
+            ])
 
     def test_code_implied_list_closings(self):
         self._run_check("""<ul><li><p><p><li></ul>""", [
