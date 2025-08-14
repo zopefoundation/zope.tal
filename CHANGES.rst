@@ -2,8 +2,8 @@
  Changes
 =========
 
-5.2 (unreleased)
-================
+5.1.1 (2025-08-14)
+==================
 
 - Fix tests for Python 3.13.6+ compatibility.
 
