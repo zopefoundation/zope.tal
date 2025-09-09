@@ -160,12 +160,12 @@ def compilefile(file, mode=None):
         else:
             mode = "xml"
     # make sure we can find the file
-    prefix = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
+    prefix = os.path.dirname(os.path.realpath(__file__)) + os.path.sep
     if (not os.path.exists(file)
             and os.path.exists(os.path.join(prefix, file))):
         file = os.path.join(prefix, file)
     # normalize filenames for test output
-    filename = os.path.abspath(file)
+    filename = os.path.realpath(file)
     if filename.startswith(prefix):
         filename = filename[len(prefix):]
     filename = filename.replace(os.sep, '/')  # test files expect slashes
