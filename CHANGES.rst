@@ -5,7 +5,11 @@
 6.1 (unreleased)
 ================
 
-- Nothing changed yet.
+- Move package metadata from setup.py to pyproject.toml.
+
+- Add support for Python 3.14.
+
+- Drop support for Python 3.9.
 
 
 6.0 (2025-09-12)

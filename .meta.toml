@@ -1,8 +1,8 @@
-# Generated from:
-# https://github.com/zopefoundation/meta/tree/master/config/pure-python
+# Generated with zope.meta (https://zopemeta.readthedocs.io/) from:
+# https://github.com/zopefoundation/meta/tree/master/src/zope/meta/pure-python
 [meta]
 template = "pure-python"
-commit-id = "f97912cf"
+commit-id = "f6df9072"
 
 [python]
 with-pypy = true
@@ -11,9 +11,6 @@ with-sphinx-doctests = false
 with-windows = false
 with-future-python = false
 with-macos = false
-
-[tox]
-use-flake8 = true
 
 [coverage]
 fail-under = 84
@@ -25,4 +22,4 @@ additional-rules = [
     "recursive-include src *.html",
     "recursive-include src *.pt",
     "recursive-include src *.xml",
-    ]
+]
