@@ -166,8 +166,7 @@ def compilefile(file, mode=None):
         file = os.path.join(prefix, file)
     # normalize filenames for test output
     filename = os.path.realpath(file)
-    if filename.startswith(prefix):
-        filename = filename[len(prefix):]
+    filename = filename.removeprefix(prefix)
     filename = filename.replace(os.sep, '/')  # test files expect slashes
     # parse
     from zope.tal.talgenerator import TALGenerator
